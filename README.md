@@ -3,12 +3,12 @@
 
 Github suggested format
 
-Description:
+##### Description:
 
-Installation: 
+##### Installation: 
 Run makefile with "make" command.
 
-Usage:
+##### Usage:
 
 Usage: ./CCJ \<sequence> \<arguments>  
 Valid agruments include:   
@@ -26,8 +26,8 @@ Valid agruments include:
 Example: ./CCJ GCAACGAUGACAUACAUCGCUAGUCGACGC -shape=shapedata.txt b=0.64 -ns  
 
 
-Contributing: 
+##### Contributing: 
 
-Credits: 
+##### Credits: 
 
-License: 
+##### License: 
