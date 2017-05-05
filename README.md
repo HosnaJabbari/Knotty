@@ -3,6 +3,10 @@
 
 Github suggested format
 
+I realize now that this has to apply for both Original and Sparse CCJ  
+Perhaps it should be two repositories instead of one with two folders  
+\- Ian
+
 ##### Description:
 
 ##### Installation: 
