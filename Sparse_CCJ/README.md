@@ -1,7 +1,7 @@
 # Sparse CCJ
 
 ##### Description:
-Both the Modified, non-sparse CCJ and the Sparsified CCJ are contained here.   
+Both the Modified CCJ and the Sparsified CCJ are contained here.   
 Which version is used is based upon arguments supplied.   
 
 ##### Installation: 
