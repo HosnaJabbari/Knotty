@@ -2,7 +2,7 @@
 
 ##### Description:
 Both the Modified CCJ and the Sparsified CCJ are contained here.   
-Which version is used is based upon arguments supplied.   
+Which version is used is based upon arguments supplied when used.   
 
 ##### Installation: 
 Run makefile with "make" command.   

@@ -84,26 +84,6 @@ public:
     {
         // Asserts to ensure that the values fit within the data type
         /*
-        /// TODO the problem with making it unsigned is the P->PK thing
-        int i_diff = i-src_i;
-        int j_diff = src_j-j;
-        int k_diff = k-src_k;
-        int l_diff = src_l-l;
-
-        if (!(i_diff > -256 && i_diff <  256))
-            printf("src %c tgt %c src i %d tgt i %d idiff %d\n",srctype,tgttype,src_i,i,i_diff);
-        if (!(j_diff > -256 && j_diff <  256))
-            printf("src %c tgt %c src j %d tgt j %d jdiff %d\n",srctype,tgttype,src_j,j,j_diff);
-        if (!(k_diff > -256 && k_diff <  256))
-            printf("src %c tgt %c src k %d tgt k %d kdiff %d\n",srctype,tgttype,src_k,k,k_diff);
-        if (!(l_diff > -256 && l_diff <  256))
-            printf("src %c tgt %c src l %d tgt l %d ldiff %d\n",srctype,tgttype,src_l,l,l_diff);
-
-        assert(i_diff > -256 && i_diff <  256);
-        assert(j_diff > -256 && j_diff <  256);
-        assert(k_diff > -256 && k_diff <  256);
-        assert(l_diff > -256 && l_diff <  256);
-
         /// TODO i'm a bit confused by size_t
         int assert_i = i;
         int assert_j = j;
@@ -128,32 +108,6 @@ public:
     {
         // Asserts to ensure that the values fit within the data type
         /*
-        /// TODO the problem with making it unsigned is the P->PK thing
-        int i_diff = i-src_i;
-        int j_diff = src_j-j;
-        int k_diff = k-src_k;
-        int l_diff = src_l-l;
-        //int w_i_diff = W_i-src_i;
-        //int w_l_diff = src_l-W_l;
-
-
-        if (!(i_diff > -256 && i_diff <  256))
-            printf("src %c tgt %c src i %d tgt i %d idiff %d\n",srctype,tgttype,src_i,i,i_diff);
-        if (!(j_diff > -256 && j_diff <  256))
-            printf("src %c tgt %c src j %d tgt j %d jdiff %d\n",srctype,tgttype,src_j,j,j_diff);
-        if (!(k_diff > -256 && k_diff <  256))
-            printf("src %c tgt %c src k %d tgt k %d kdiff %d\n",srctype,tgttype,src_k,k,k_diff);
-        if (!(l_diff > -256 && l_diff <  256))
-            printf("src %c tgt %c src l %d tgt l %d ldiff %d\n",srctype,tgttype,src_l,l,l_diff);
-
-
-        assert(i_diff > -256 && i_diff <  256);
-        assert(j_diff > -256 && j_diff <  256);
-        assert(k_diff > -256 && k_diff <  256);
-        assert(l_diff > -256 && l_diff <  256);
-        //assert(l_diff > -256 && l_diff <  256);
-        //assert(l_diff > -256 && l_diff <  256);
-
         int assert_i = i;
         int assert_j = j;
         int assert_k = k;
@@ -184,25 +138,6 @@ public:
 
         // asserts to ensure values fit into data types
         /*
-        int i_diff = i-src_i;
-        int j_diff = src_j-j;
-        int k_diff = k-src_k;
-        int l_diff = src_l-l;
-
-        if (!(i_diff > -256 && i_diff <  256))
-            printf("src %c tgt %c src i %d tgt i %d idiff %d\n",srctype,tgttype,src_i,i,i_diff);
-        if (!(j_diff > -256 && j_diff <  256))
-            printf("src %c tgt %c src j %d tgt j %d jdiff %d\n",srctype,tgttype,src_j,j,j_diff);
-        if (!(k_diff > -256 && k_diff <  256))
-            printf("src %c tgt %c src k %d tgt k %d kdiff %d\n",srctype,tgttype,src_k,k,k_diff);
-        if (!(l_diff > -256 && l_diff <  256))
-            printf("src %c tgt %c src l %d tgt l %d ldiff %d\n",srctype,tgttype,src_l,l,l_diff);
-
-        assert(i_diff > -256 && i_diff <  256);
-        assert(j_diff > -256 && j_diff <  256);
-        assert(k_diff > -256 && k_diff <  256);
-        assert(l_diff > -256 && l_diff <  256);
-
         int assert_i = i;
         int assert_j = j;
         int assert_k = k;
@@ -229,13 +164,13 @@ public:
     unsigned char target_type() const { return tgttype_;}
     unsigned char W_type() const { return W_type_;}
 
-    index_t i(int src_i) const {return i_;}
-    index_t j(int src_j) const {return j_;}
-    index_t k(int src_k) const {return k_;}
-    index_t l(int src_l) const {return l_;}
+    index_t i() const {return i_;}
+    index_t j() const {return j_;}
+    index_t k() const {return k_;}
+    index_t l() const {return l_;}
 
-    index_t W_i(int src_i) const { return W_i_;}
-    index_t W_l(int src_l) const { return W_l_;}
+    index_t W_i() const { return W_i_;}
+    index_t W_l() const { return W_l_;}
 
     energy_t target_energy() const {return energy_;}
     index_t source_ref_count() const {return ref_count;}

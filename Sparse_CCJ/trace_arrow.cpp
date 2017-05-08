@@ -85,14 +85,13 @@ MasterTraceArrows::register_trace_arrow(size_t i, size_t j, size_t k, size_t l,
             if (ta_debug) {
                 printf("Replace trace arrow: \n old trace arrow: ");
                 source->print_type(old->source_type()); printf("(%d,%d,%d,%d) -> ", i,j,k,l);
-                source->print_type(old->target_type()); printf("(%d,%d,%d,%d) e:%d\n",old->i(i),old->j(j),old->k(k),old->l(l), old->target_energy());
+                source->print_type(old->target_type()); printf("(%d,%d,%d,%d) e:%d\n",old->i(),old->j(),old->k(),old->l(), old->target_energy());
                 printf("new trace arrow: ");
                 source->print_type(srctype); printf("(%d,%d,%d,%d) -> ", i,j,k,l);
                 source->print_type(tgttype);
                 printf("(%d,%d,%d,%d) e:%d\n",m,n,o,p,e);
             }
 
-            //dec_source_ref_count(old->i(i),old->j(j),old->k(k),old->l(l),old->target_type());
             old->replace(i,j,k,l, m,n,o,p, e,srctype,tgttype);
             inc_source_ref_count(m,n,o,p,tgttype);
             source->inc_replaced();
@@ -184,7 +183,7 @@ MasterTraceArrows::inc_source_ref_count(size_t i, size_t j, size_t k, size_t l, 
     ta->inc_src();
 
     if (ta_debug) {
-        printf("inc_source_ref_count %c(%d,%d,%d,%d)->%c(%d,%d,%d,%d) ref count:%d\n",ta->source_type(),i,j,k,l, ta->target_type(),ta->i(i),ta->j(j),ta->k(k),ta->l(l),ta->source_ref_count());
+        printf("inc_source_ref_count %c(%d,%d,%d,%d)->%c(%d,%d,%d,%d) ref count:%d\n",ta->source_type(),i,j,k,l, ta->target_type(),ta->i(),ta->j(),ta->k(),ta->l(),ta->source_ref_count());
     }
 }
 
@@ -212,7 +211,7 @@ MasterTraceArrows::dec_source_ref_count(size_t i, size_t j, size_t k, size_t l, 
     ta->dec_src();
 
     if (ta_debug) {
-        printf("dec_source_ref_count %c(%d,%d,%d,%d)->%c(%d,%d,%d,%d) ref count:%d\n",ta->source_type(),i,j,k,l, ta->target_type(),ta->i(i),ta->j(j),ta->k(k),ta->l(l),ta->source_ref_count());
+        printf("dec_source_ref_count %c(%d,%d,%d,%d)->%c(%d,%d,%d,%d) ref count:%d\n",ta->source_type(),i,j,k,l, ta->target_type(),ta->i(),ta->j(),ta->k(),ta->l(),ta->source_ref_count());
     }
 }
 
@@ -295,12 +294,12 @@ MasterTraceArrows::gc_trace_arrow(int i, int j, SimpleMap<ta_key_pair, TraceArro
         source.print_type(ta.source_type());
         printf("(%d,%d,%d,%d)->",i,j,k,l);
         source.print_type(ta.target_type());
-        printf("(%d,%d,%d,%d) ref_count:%d\n", ta.i(i),ta.j(j),ta.k(k),ta.l(l),ta.source_ref_count());
+        printf("(%d,%d,%d,%d) ref_count:%d\n", ta.i(),ta.j(),ta.k(),ta.l(),ta.source_ref_count());
     }
 
     assert(ta.source_ref_count() >= 0);
     if (ta.source_ref_count() == 0) {
-        int tgt_i = ta.i(i), tgt_j = ta.j(j), tgt_k = ta.k(k), tgt_l = ta.l(l);
+        int tgt_i = ta.i(), tgt_j = ta.j(), tgt_k = ta.k(), tgt_l = ta.l();
 
         TraceArrows *target = get_arrows_by_type(ta.target_type());
 
