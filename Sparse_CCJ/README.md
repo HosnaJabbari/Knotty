@@ -1,7 +1,11 @@
 # Sparse CCJ
 
+##### Description:
+Both the Modified, non-sparse CCJ and the Sparsified CCJ are contained here.   
+Which version is used is based upon arguments supplied.   
+
 ##### Installation: 
-Run makefile with "make" command.
+Run makefile with "make" command.   
 
 ##### Usage:
 
@@ -19,17 +23,3 @@ Valid agruments include:
 -pcl to print information on the candidate lists  
 -pcl-v to print verbose candidate list information  
 Example: ./CCJ GCAACGAUGACAUACAUCGCUAGUCGACGC -shape=shapedata.txt b=0.64 -ns  
-
-
-
-Description:
-
-Installation: 
-
-Usage: 
-
-Contributing: 
-
-Credits:
-
-License:

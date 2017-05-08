@@ -1,16 +1,11 @@
-# Original CCJ
+# Original CCJ    
 
-##### Description: 
+##### Description:    
+Original 2015 CCJ.    
 
-##### Installation: 
-Run makefile with command "make".
+##### Installation:     
+Run makefile with command "make".    
 
-##### Usage: 
-./CCJ \<sequence>
-Example: ./CCJ "GCAACGAUGACAUACAUCGCUAGUCGACGC"
-
-##### Contributing: 
-
-##### Credits:
-
-##### License: 
+##### Usage:    
+./CCJ \<sequence>    
+Example: ./CCJ "GCAACGAUGACAUACAUCGCUAGUCGACGC"    
