@@ -1,5 +1,5 @@
 dnl initial information about the project
-AC_INIT([simfold],[1.0],[jabbari@ualberta.edu])
+AC_INIT([simfold],[1.0],[jabbari@ualberta.ca])
 
 dnl check if the source folder is correct
 AC_CONFIG_SRCDIR([./simfold.cpp])
