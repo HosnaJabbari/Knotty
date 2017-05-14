@@ -37,7 +37,7 @@ AC_SUBST([AM_CXXFLAGS])
 AC_SUBST([AM_LDFLAGS])
 
 dnl files to generate via autotools (.am or .in source files)
-dnl AC_CONFIG_FILES([src/Makefile])
+AC_CONFIG_FILES([simfold.pc])
 
 dnl generate the final Makefile etc.
 AC_OUTPUT([Makefile])
