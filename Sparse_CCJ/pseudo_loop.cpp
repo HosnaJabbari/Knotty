@@ -6699,7 +6699,7 @@ void pseudo_loop::trace_continue(int i, int j, int k, int l, char srctype, energ
 
             // Ian - arrows point to target location which is used for the next trace_continue
             // assert that arrow isn't just pointing to the same spot
-            assert(i!=arrow->i(i) || j!=arrow->j(j) || k!=arrow->k(k) || l!=arrow->l(l) || srctype != arrow->target_type());
+            assert(i!=arrow->i() || j!=arrow->j() || k!=arrow->k() || l!=arrow->l() || srctype != arrow->target_type());
 
             switch (arrow->W_type()) {
                 case P_WB:
