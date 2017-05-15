@@ -18,15 +18,19 @@ AM_INIT_AUTOMAKE([1.9])
 
 dnl distribute additional compiler and linker flags
 dnl --> set these variables instead of CXXFLAGS or LDFLAGS
-AC_SUBST([LIBS])
+AC_SUBST([SIMFOLD_CFLAGS])
+AC_SUBST([SIMFOLD_LIBS])
+AC_SUBST([LIBPATH])
 AC_SUBST([AM_CXXFLAGS])
 AC_SUBST([AM_LDFLAGS])
 
 
 dnl configure simfold library via pkg-config
 PKG_CHECK_MODULES([SIMFOLD],[simfold >= 0.1],[SIMFOLD_OK=true],[SIMFOLD_OK=false])
-LIBS+="$SIMFOLD_LIBS"
-AM_CXXFLAGS="$SIMFOLD_CFLAGS $AM_CXXFLAGS"
+LIBPATH=${SIMFOLD_LIBS:2:-11}
+
+# LIBS+="$SIMFOLD_LIBS"
+# AM_CXXFLAGS="$SIMFOLD_CFLAGS $AM_CXXFLAGS"
 
 dnl use the C++ compiler for the following checks
 AC_LANG_CPLUSPLUS

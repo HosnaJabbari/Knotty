@@ -2,7 +2,9 @@ ACLOCAL_AMFLAGS  = -I m4
 
 bin_PROGRAMS=CCJ
 
-AM_LDFLAGS = $(LIBS)
+test = -Wl,-rpath,$(LIBPATH)
+CCJ_LDFLAGS = $(test)
+CCJ_LDADD =  $(SIMFOLD_LIBS) 
 
 CCJ_SOURCES = \
 	h_externs.h h_globals.h h_struct.h	\
