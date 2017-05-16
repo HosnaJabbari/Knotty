@@ -1,4 +1,4 @@
-# simfold
+# SimFold
 
 ##### Description:
 Simfold library used by CCJ. Install before using CCJ.
