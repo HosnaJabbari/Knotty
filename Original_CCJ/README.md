@@ -5,7 +5,7 @@ Original 2015 CCJ.
 
 ##### Installation:     
 To install first insure you have installed the simfold library from the simfold folder.   
-Then type into a command line:   
+Then run from a command line in the Original_CCJ directory: 
 autoreconf -i   
 ./configure SIMFOLD_HOME=<path to simfold library (default is /usr/local)>   
 make  
