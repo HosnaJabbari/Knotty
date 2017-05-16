@@ -2,8 +2,8 @@ ACLOCAL_AMFLAGS  = -I m4
 
 bin_PROGRAMS=CCJ
 
-test = -Wl,-rpath,$(LIBPATH)
-CCJ_LDFLAGS = $(test)
+#test = -Wl,-rpath,$(LIBPATH)
+#CCJ_LDFLAGS = $(test)
 CCJ_LDADD =  $(SIMFOLD_LIBS) 
 
 CCJ_SOURCES = \
