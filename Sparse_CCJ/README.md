@@ -5,7 +5,11 @@ Both the Modified CCJ and the Sparsified CCJ are contained here.
 Which version is used is based upon arguments supplied when used.   
 
 ##### Installation: 
-Run makefile with "make" command.   
+To install first insure you have installed the simfold library from the simfold folder.
+Then run from a command line in the Sparse_CCJ directory:
+autoreconf -i
+./configure SIMFOLD_HOME=<path to simfold library (default is /usr/local)>
+make
 
 ##### Usage:
 
