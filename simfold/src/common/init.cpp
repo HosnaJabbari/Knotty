@@ -930,7 +930,7 @@ void init_data(char *arg, char *config_file, int what, double temperature)
 
     // get the path of the configuration directory
     strcpy (conf, config_file);
-    sprintf (config_file, "%s%s", path, conf);    
+    //sprintf (config_file, "%s%s", path, conf);    
 
     len = strlen(config_file);
     index = -1;    

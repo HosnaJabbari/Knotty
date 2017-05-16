@@ -24,7 +24,7 @@ AC_SUBST([AM_LDFLAGS])
 ## check pkg-config
 AC_CHECK_PROG([PKG_CONFIG_AVAILABLE],pkg-config,[true],[false])
 
-dnl get path to simfold
+dnl get path to simfold supplied as argument
 AC_ARG_VAR([SIMFOLD_HOME],
     AC_HELP_STRING(
         [SIMFOLD_HOME],
@@ -32,6 +32,13 @@ AC_ARG_VAR([SIMFOLD_HOME],
       )
 )
 
+dnl ensure SIMFOLD_HOME argument is supplied
+AS_IF([test "$SIMFOLD_HOME" = "" ],[
+    AC_MSG_WARN([Please set the environment variable SIMFOLD_HOME
+to the installation directory of the simfold library.])
+])
+
+dnl if SIMFOLD_HOME is supplied, set PKG_CONFIG_PATH
 AS_IF([test "$SIMFOLD_HOME" != "" ],[
     export PKG_CONFIG_PATH="$SIMFOLD_HOME/lib/pkgconfig:$PKG_CONFIG_PATH"
 ])
@@ -39,11 +46,14 @@ AS_IF([test "$SIMFOLD_HOME" != "" ],[
 dnl configure simfold library via pkg-config
 SIMFOLD_OK=false
 PKG_CHECK_MODULES([SIMFOLD],[simfold >= 1.0],[SIMFOLD_OK=true])
-LIBPATH=${SIMFOLD_LIBS:2:-11}
 
+dnl set flags to include -lsimfold
 LIBS="$SIMFOLD_LIBS $LIBS"
 AM_CXXFLAGS="$SIMFOLD_CFLAGS $AM_CXXFLAGS"
+dnl set directory where to find data files ("multirnafold.conf", etc.)
+AM_CXXFLAGS="-DDATADIR=\\\"$SIMFOLD_HOME/share/simfold/params\\\" $AM_CXXFLAGS"
 
+dnl set path to the simfold lib via rpath
 AS_IF([test "$SIMFOLD_HOME" != "" ],[
     LDFLAGS="-Wl,-rpath,$SIMFOLD_HOME/lib"
 ])
@@ -65,11 +75,6 @@ AS_IF([test "$SIMFOLD_OK" = "true"],[],[
 Try settin the environment variable SIMFOLD_HOME
 to the installation path of the simfold library.],
     [-1])
-])
-
-AS_IF([test "$SIMFOLD_HOME" = "" ],[
-    AC_MSG_WARN([Please set the environment variable SIMFOLD_HOME
-to the installation directory of the simfold library.])
 ])
 
 dnl files to generate via autotools (.am or .in source files)
