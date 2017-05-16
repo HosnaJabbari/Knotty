@@ -4,7 +4,11 @@
 Original 2015 CCJ.    
 
 ##### Installation:     
-Run makefile with command "make".    
+To install first insure you have installed the simfold library from the simfold folder.   
+Then type into a command line:   
+autoreconf -i   
+./configure SIMFOLD_HOME=<path to where simfold library is installed (default is /usr/local)>
+make  
 
 ##### Usage:    
 ./CCJ \<sequence>    
