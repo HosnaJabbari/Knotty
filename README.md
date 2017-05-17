@@ -7,6 +7,7 @@ CCJ is a method for predicting the psuedoknotted secondary structures of RNA seq
 Simfold is required to be installed as a library before using CCJ.    
 Original CCJ is contained in the Original CCJ subdirectory.      
 Both Modifed CCJ and Sparse CCJ are in the Sparse CCJ subdirectory.      
+Sparse CCJ uses the least amount of memory and is recommended to be used.
 Instructions for installation and usage are in the READMEs of their respective subdirectories.    
 
 Simfold is a part of MultiRNAFold (http://www.rnasoft.ca/download.html).     
