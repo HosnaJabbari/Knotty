@@ -114,7 +114,7 @@ int main (int argc, char *argv[])
 
     // configuration file, the path should be relative to the location of this executable
     char config_file[200];
-    strcpy (config_file, "./simfold/params/multirnafold.conf");
+    strcpy (config_file, SIMFOLD_HOME "/share/simfold/params/multirnafold.conf");
 
     // what to fold: RNA or DNA
     int dna_or_rna;
@@ -127,17 +127,17 @@ int main (int argc, char *argv[])
 
     // initialize the thermodynamic parameters
     // call init_data only once for the same dna_or_rna and same temperature
-    // if one of them changes, call init_data again
+    // if one of them changes, call init_data again  
     init_data (argv[0], config_file, dna_or_rna, temperature);
 
 	// Hosna, July 18, 2012
 	// In simfold we have the following for RNA && temp=37
-	fill_data_structures_with_new_parameters ("./simfold/params/turner_parameters_fm363_constrdangles.txt");
+	fill_data_structures_with_new_parameters (SIMFOLD_HOME "/share/simfold/params/turner_parameters_fm363_constrdangles.txt");
 
 	// Hosna, July 25, 2012
 	// in HotKnots and ComputeEnergy package the most up-to-date parameters set is DP09.txt
 	// so we add it here
-	fill_data_structures_with_new_parameters ("./simfold/params/parameters_DP09.txt");
+	fill_data_structures_with_new_parameters (SIMFOLD_HOME "/share/simfold/params/parameters_DP09.txt");
 
 	energy = ccj(sequence, structure);
 

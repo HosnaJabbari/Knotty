@@ -5,7 +5,7 @@
 #include "h_struct.h"
 #include "h_common.h"
 
-#include <memory>
+//#include <memory>
 
 // PK candidate
 // sorted by l in PK_CL in pseudo_loop
