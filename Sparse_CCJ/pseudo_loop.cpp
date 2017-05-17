@@ -72,9 +72,8 @@ void pseudo_loop::allocate_space_sparse()
 
     // Ian Wark Jan 23, 2017
     // implemented as a 1D array of length [nb_nucleotides], ie.[l]
-    PK_CL = new candidate_PK*[nb_nucleotides];
+    PK_CL = new std::forward_list<candidate_PK> [nb_nucleotides];
     if (PK_CL == NULL) giveup ("Cannot allocate memory", "energy");
-    for (i=0; i < nb_nucleotides; ++i) PK_CL[i] = nullptr;
 
     index = new int [nb_nucleotides];
     int total_length = (nb_nucleotides *(nb_nucleotides+1))/2;
@@ -707,10 +706,6 @@ pseudo_loop::~pseudo_loop()
         delete [] POmloop01;
         delete [] POmloop00;
 
-
-        for (int i = 0; i < nb_nucleotides; ++i) {
-            delete PK_CL[i];
-        }
         delete [] PK_CL;
 
         delete ta;
@@ -1004,10 +999,9 @@ void pseudo_loop::compute_P_sp(int i, int l){
     }
     int il = index[i]+l-i;
 
-    const candidate_PK *c = PK_CL[l];
-    while (c != NULL) {
+    for (const candidate_PK c : PK_CL[l]) {
         // get_PK(i,j,d+1,k) + get_PK(j+1,d,k+1,l);
-        index_t j = c->j(), d = c->d(), k = c->k(), w = c->w();
+        index_t j = c.j(), d = c.d(), k = c.k(), w = c.w();
 
         temp = get_PK(i, j-1, d+1, k-1) + w;
 
@@ -1018,8 +1012,6 @@ void pseudo_loop::compute_P_sp(int i, int l){
             best_k = k-1;
             best_w = w;
         }
-
-        c = c->get_next();
     }
 
 
@@ -6337,30 +6329,27 @@ void pseudo_loop::back_track_sp(minimum_fold *f, seq_interval *cur_interval)
     if (ta->P.exists_trace_arrow_from(i,i+1, l-1, l))
         trace = ta->P.trace_arrow_from(i,i+1, l-1, l);
 
-    const candidate_PK *c = PK_CL[l];
-
     // if there is a trace arrow there
     if (trace != nullptr) {
         x = trace->target_energy();
 
-        while (c != NULL) {
-            if (c->j()-1 == trace->j() && c->d()+1 == trace->k() && c->k()-1 == trace->l()) {
-                temp = x + c->w();
+        for (const candidate_PK c : PK_CL[l]) {
+            if (c.j()-1 == trace->j() && c.d()+1 == trace->k() && c.k()-1 == trace->l()) {
+                temp = x + c.w();
 
-                if (temp < min_energy && c->j() > i+1 ) {
+                if (temp < min_energy && c.j() > i+1 ) {
                     min_energy = temp;
-                    best_j = c->j()-1;
-                    best_d = c->d();
-                    best_k = c->k()-1;
+                    best_j = c.j()-1;
+                    best_d = c.d();
+                    best_k = c.k()-1;
                     best_x = x;
-                    best_w = c->w();
+                    best_w = c.w();
                 }
             }
-            c = c->get_next();
         }
     } else {
-        while (c != NULL) {
-            index_t j = c->j(), d = c->d(), k = c->k(), w = c->w();
+        for (const candidate_PK c : PK_CL[l]) {
+            index_t j = c.j(), d = c.d(), k = c.k(), w = c.w();
             // couldn't find a trace arrow, look for a corresponding candidate
             const candidate_PK *c2 = find_candidate(i,j-1,d+1,k-1, PK_CL);
             if (c2 != NULL) {
@@ -6381,8 +6370,6 @@ void pseudo_loop::back_track_sp(minimum_fold *f, seq_interval *cur_interval)
                 best_x = x;
                 best_w = w;
             }
-
-            c = c->get_next();
         }
     }
 
@@ -6968,58 +6955,54 @@ void pseudo_loop::trace_candidate_continue(int i, int j, int k, int l, int m, in
  * @param e - energy value
  * @param CL - candidate list to look through
  */
-void pseudo_loop::trace_candidate(int i, int j, int k, int l, char srctype, char tgttype, energy_t e, candidate_PK **CL) {
+void pseudo_loop::trace_candidate(int i, int j, int k, int l, char srctype, char tgttype, energy_t e, std::forward_list<candidate_PK> *CL) {
     //printf("trace_candidate_PK %c (%d,%d,%d,%d) e:%d\n", tgttype,i,j,k,l,e);
 
-    const candidate_PK *c = CL[l];
-
     // Look through candidates,
-    while (c != nullptr) {
+    for (const candidate_PK c : CL[l]) {
         // if one recreates e, continue trace from there and end while loop
-        if (i == c->j()) {
-            // PK(i,c->j-1,c->d+1,c->k-1) + PK(c->j,c->d,c->k,l)
+        if (i == c.j()) {
+            // PK(i,c.j-1,c.d+1,c.k-1) + PK(c.j,c.d,c.k,l)
             // Find trace arrows that has the first part
                             // Only certain ways PK can move
                             // ensure one of the following:
                             // 1. arrow points to a new matrix type ex. PK(i,j,k,l)->PM(i,j,k,l,) (branches 3,4,5,6) - can ignore (don't point to candidates)
-                            // 2. j is lesser and k is the same ex. PK(i,j,k,l)->PK(i,d,k,l) (branch 1) - uses get_WP(c->d+1,j)
-                            // 3. j is the same and k is greater ex. PK(i,j,k,l)->PK(i,j,d,l) (branch 2) - uses get_WP(k,c->k-1)
+                            // 2. j is lesser and k is the same ex. PK(i,j,k,l)->PK(i,d,k,l) (branch 1) - uses get_WP(c.d+1,j)
+                            // 3. j is the same and k is greater ex. PK(i,j,k,l)->PK(i,j,d,l) (branch 2) - uses get_WP(k,c.k-1)
 
             //2. j is lesser and k is the same ex. PK(i,j,k,l)->PK(i,d,k,l) (branch 1) - uses get_WP(d+1,j)
-            int total = c->w() + get_WP(c->d()+1,j);
-            if (total == e && (c->d() < j && c->k() == k)) {
+            int total = c.w() + get_WP(c.d()+1,j);
+            if (total == e && (c.d() < j && c.k() == k)) {
                 if (node_debug || pl_debug) {
                     printf("candidate   ");
                     print_type(srctype);
                     printf("(%d,%d,%d,%d): going to ",i,j,k,l);
                     print_type(tgttype);
-                    printf("(%d,%d,%d,%d) and WP(%d,%d) e:%d\n",c->j(),c->d(),c->k(),l, c->d()+1,j, total);
+                    printf("(%d,%d,%d,%d) and WP(%d,%d) e:%d\n",c.j(),c.d(),c.k(),l, c.d()+1,j, total);
                 }
 
-                trace_continue(c->j(), c->d(), c->k(), l, tgttype, c->w());
-                bt_WP(c->d()+1,j);
+                trace_continue(c.j(), c.d(), c.k(), l, tgttype, c.w());
+                bt_WP(c.d()+1,j);
                 return;
             } else {
-                // 3. j is the same and k is greater ex. PK(i,j,k,l)->PK(i,j,d,l) (branch 2) - uses get_WP(k,c->k-1)
-                total = c->w() + get_WP(k,c->k()-1);
+                // 3. j is the same and k is greater ex. PK(i,j,k,l)->PK(i,j,d,l) (branch 2) - uses get_WP(k,c.k-1)
+                total = c.w() + get_WP(k,c.k()-1);
 
-                if (total == e && (c->d() == j && c->k() > k))  {
+                if (total == e && (c.d() == j && c.k() > k))  {
                     if (node_debug || pl_debug) {
                         printf("candidate   ");
                         print_type(srctype);
                         printf("(%d,%d,%d,%d): going to ",i,j,k,l);
                         print_type(tgttype);
-                        printf("(%d,%d,%d,%d) and WP(%d,%d) e:%d\n",c->j(),c->d(),c->k(),l, c->d()+1,j, total);
+                        printf("(%d,%d,%d,%d) and WP(%d,%d) e:%d\n",c.j(),c.d(),c.k(),l, c.d()+1,j, total);
                     }
 
-                    trace_continue(c->j(), c->d(), c->k(), l, tgttype, c->w());
-                    bt_WP(k,c->k()-1);
+                    trace_continue(c.j(), c.d(), c.k(), l, tgttype, c.w());
+                    bt_WP(k,c.k()-1);
                     return;
                 }
             }
         }
-
-        c = c->get_next();
     }
 }
 
@@ -7261,13 +7244,9 @@ void pseudo_loop::get_PK_CL_size(int &candidates, int &empty_lists) {
     const candidate_PK *c;
 
     for (int l = 0; l < nb_nucleotides; ++l) {
-        c = PK_CL[l];
-        if (c == nullptr) {
-            empty_lists += 1;
-        } else {
-            while (c != nullptr) {
+        for (int j = 0; j < nb_nucleotides; ++j ) {
+            for ( const candidate_PK c : PK_CL[j]) {
                 candidates += 1;
-                c = c->get_next();
             }
         }
     }
@@ -7281,14 +7260,6 @@ void pseudo_loop::print_PK_CL_size() {
 
     printf("Num empty lists: %d\n",empty_lists);
     printf("Num candidates: %d\n", candidates);
-
-    int p_size = sizeof(PK_CL[0][0]); // size of a pointer
-    int empty_space = empty_lists*p_size;
-    printf("Empty list space: %d \n", empty_space);
-
-    int c_size = sizeof(candidate_PK);
-    printf("Total candidate space: %d\n", candidates*c_size );
-
 }
 
 void pseudo_loop::print_CL_sizes()
@@ -7301,13 +7272,9 @@ void pseudo_loop::print_CL_sizes()
     PfromL_CL->get_CL_size(candidates, empty_lists, size, capacity);
     PfromO_CL->get_CL_size(candidates, empty_lists, size, capacity);
 
-    const candidate_PK *c;
-    for (int j = 0; j < nb_nucleotides; ++j ){
-        c = PK_CL[j];
-        if (c == nullptr) { empty_PK += 1;}
-        else while (c != nullptr) {
+    for (int j = 0; j < nb_nucleotides; ++j ) {
+        for ( const candidate_PK c : PK_CL[j]) {
             PK_candidates += 1;
-            c = c->get_next();
         }
     }
 

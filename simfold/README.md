@@ -11,10 +11,12 @@ pair probabilities and gradient computations.
 
 ##### Installation: 
 Run the following from a command line in the simfold directory:    
+```
 autoreconf -i     
 ./configure    
 make  
 make install
+```
 
 To install the library in to custom path, use
 ./configure --prefix=<path>
