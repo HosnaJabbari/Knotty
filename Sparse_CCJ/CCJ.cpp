@@ -16,6 +16,7 @@
 #include "params.h"
 
 #include "cmd_line_options.h"
+#include "shape_data.h"
 
 #include "CCJ.h"
 
@@ -33,7 +34,7 @@ int main (int argc, char *argv[])
     bool cmd_line_error = false;
 
     // important that this is before set_shape_file
-    cmd_line_options.set_sequence_length(strlen(sequence));
+    shape.set_sequence_length(strlen(sequence));
 
     if (argc < 2)
         cmd_line_error = true;
@@ -62,7 +63,7 @@ int main (int argc, char *argv[])
                     cmd_line_options.set_print_candidate_list_info(2);
                 else
                 if (!strncmp(arg, "-shape=", 7))
-                    cmd_line_options.set_shape_file(std::string(arg));
+                    shape.set_shape_file(std::string(arg));
                 else
                 if (!strncmp(arg, "-b=",3)) {
                     std::string str = std::string(arg);
@@ -102,7 +103,7 @@ int main (int argc, char *argv[])
         printf ("-pta-v to print verbose trace arrow information\n");
         printf ("-pcl to print information on the candidate lists\n");
         printf ("-pcl-v to print verbose candidate list information\n");
-        printf ("Example: %s GCAACGAUGACAUACAUCGCUAGUCGACGC -shape=shapedata.txt b=0.64 -ns\n", argv[0]);
+        printf ("Example: %s GCAACGAUGACAUACAUCGCUAGUCGACGC -shape=shapedata.txt -b=0.64 -ns\n", argv[0]);
         return 0;
     }
     cmd_line_options.set_done();
