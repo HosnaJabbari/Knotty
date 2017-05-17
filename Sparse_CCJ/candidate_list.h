@@ -19,23 +19,20 @@ private:
     /// TODO ordering this stuff for space
     energy_t w_;
 
-    const candidate_PK *next = nullptr;
+    //const candidate_PK *next = nullptr;
 
-    candidate_PK(candidate_PK &) {assert(false);}
-    candidate_PK& operator=(candidate_PK const&) {assert(false);}
-
-    void set_next(const candidate_PK *next_tgt) {
-        if (next_tgt != NULL) {
-            next= next_tgt;
-        }
-    }
+    //void set_next(const candidate_PK *next_tgt) {
+    //    if (next_tgt != NULL) {
+    //        next= next_tgt;
+    //    }
+    //}
 
 public:
-    candidate_PK(size_t set_d, size_t set_j, size_t set_k, energy_t set_w, const candidate_PK *next_tgt)
+    candidate_PK(size_t set_d, size_t set_j, size_t set_k, energy_t set_w)
     : d_(set_d), j_(set_j), k_(set_k), w_(set_w)
     {
-        next = nullptr;
-        set_next(next_tgt);
+        //next = nullptr;
+        //set_next(next_tgt);
 
         // make sure we can fit it in a short
         assert((set_w < 32768) && (set_w < 32767));
@@ -55,13 +52,28 @@ public:
         //printf("end ~candidate_PK\n");
     }
 
-    const candidate_PK *get_next() const {
-        /// TODO
-        if (next != NULL)
-            return next;
-        else
-            return nullptr;
+    candidate_PK(const candidate_PK &source)
+    : d_(source.d()), j_(source.j()), k_(source.k()), w_(source.w())
+    {
     }
+
+    candidate_PK& operator=(candidate_PK source)
+    {
+        std::swap(d_, source.d_);
+        std::swap(j_, source.j_);
+        std::swap(k_, source.k_);
+        std::swap(w_, source.w_);
+
+        return *this;
+    }
+
+   // const candidate_PK *get_next() const {
+        ///// TODO
+       // if (next != NULL)
+   //         return next;
+       // else
+  //          return nullptr;
+   // }
 
     short d() const { return d_; }
     short j() const { return j_; }

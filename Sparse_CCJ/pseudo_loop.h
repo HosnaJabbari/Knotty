@@ -2,6 +2,7 @@
 #define PSEUDO_LOOP_H_
 #include <stdio.h>
 #include <string.h>
+#include <forward_list>
 #include "h_struct.h"
 #include "h_common.h"
 #include "V_final.h"
@@ -71,7 +72,7 @@ public:
     int get_PR(int i,int j, int k, int l);
     int get_PM(int i,int j, int k, int l);
     int get_PO(int i,int j, int k, int l);
-    
+
     int get_PfromL(int i, int j, int k, int l);
     int get_PfromR(int i, int j, int k, int l);
     int get_PfromM(int i, int j, int k, int l);
@@ -218,18 +219,16 @@ private:
     candidate_list *POmloop00_CL;
     candidate_list *PfromL_CL;
     candidate_list *PfromO_CL;
-    candidate_PK **PK_CL;
+    // This is an array of [nb_nucleotides] forward lists
+    std::forward_list<candidate_PK> *PK_CL;
 
     void push_candidate_PK(int d, int j, int k, int l, int w)
     {
-        const candidate_PK *next = PK_CL[l];
-        candidate_PK *toAdd = new candidate_PK(d,j,k,w,next);
-
-        PK_CL[l]=toAdd;
+        PK_CL[l].push_front(candidate_PK(d,j,k,w));
     }
 
     // returns whether there is a candidate in that list at that location
-    bool is_candidate(int i, int j, int k, int l, candidate_PK **CL) const
+    bool is_candidate(int i, int j, int k, int l, std::forward_list<candidate_PK>* CL) const
     {
         return (find_candidate(i,j,k,l,CL) != nullptr);
     }
@@ -243,22 +242,18 @@ private:
      * @param l
      * @returns if failure returns nullptr, else candidate_PK
      */
-    const candidate_PK* find_candidate(int i, int j, int k, int l, candidate_PK **CL) const {
+    const candidate_PK* find_candidate(int i, int j, int k, int l, std::forward_list<candidate_PK>* CL) const {
         int prev_j = 0, prev_d = 0, prev_k = 0;
 
         // j is always ascending (or equal)
         // d is always descending (or equal)
-        // k is always ascending (or equal)
-        const candidate_PK *c = CL[l];
-        /// TODO does this checking stuff actually save time or do the checks take too long
-        /// probably more of a difference on a long one?
-        while (c != NULL && (c->j() <= i || c->d() >= j || c->k() <= k)) {
+        // k is always ascending (or equal
+        for (const candidate_PK &c : PK_CL[l]) {
+        //while (c != NULL && (c->j() <= i || c->d() >= j || c->k() <= k)) {
             //assert(c->j() > prev_j || c->d() < prev_d || c->k() > prev_k);
             //prev_j = c->j(); prev_d = c->d(); prev_k = c->k();
 
-            if (c->j() == i && c->d() == j && c->k() == k) { return c; }
-
-            c = c->get_next();
+            if (c.j() == i && c.d() == j && c.k() == k) { return &c; }
         }
         // No candidate found in CL with that i
         return nullptr;
@@ -292,7 +287,7 @@ private:
     * @param e - energy value
     * @param CL - candidate list to look through
     */
-    void trace_candidate(int i, int j, int k, int l, char srctype, char tgttype, energy_t e, candidate_PK **CL);
+    void trace_candidate(int i, int j, int k, int l, char srctype, char tgttype, energy_t e, std::forward_list<candidate_PK> *CL);
 
 
     // Ian Wark Feb 8, 2017
