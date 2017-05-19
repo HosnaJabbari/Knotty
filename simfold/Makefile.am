@@ -14,8 +14,7 @@ libsimfold_la_SOURCES = src/common/params.cpp src/common/common.cpp	\
   src/simfold/s_hairpin_loop.cpp src/simfold/s_stacked_pair.cpp		\
   src/simfold/s_energy_matrix.cpp src/simfold/s_internal_loop.cpp	\
   src/simfold/s_multi_loop.cpp src/simfold/s_multi_loop_sub.cpp		\
-  src/simfold/s_sub_folding.cpp src/simfold/s_partition_function.cpp    \
-  shape_data.cpp
+  src/simfold/s_sub_folding.cpp src/simfold/s_partition_function.cpp 
 
 libsimfold_includedir = $(includedir)
 libsimfold_include_HEADERS = src/simfold/s_min_folding.h		\
@@ -30,8 +29,7 @@ libsimfold_include_HEADERS = src/simfold/s_min_folding.h		\
   src/simfold/s_energy_matrix.h src/common/timer.h			\
   src/common/common.h src/common/params.h include/constants.h		\
   include/externs.h include/globals.h include/init.h			\
-  include/simfold.h include/structs.h                                   \
-  shape_data.h
+  include/simfold.h include/structs.h
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = simfold.pc

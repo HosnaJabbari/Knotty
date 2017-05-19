@@ -16,7 +16,6 @@
  ***************************************************************************/
 
 #include <string.h>
-#include <math.h>
 
 #include "constants.h"
 #include "structs.h"
@@ -26,7 +25,6 @@
 #include "s_stacked_pair.h"
 #include "params.h"
 
-#include "shape_data.h"
 
 s_stacked_pair::s_stacked_pair (int *seq, int length)
 // The constructor
@@ -66,34 +64,6 @@ PARAMTYPE s_stacked_pair::compute_energy (int i, int j)
 
 	
     min = V_energy + local_energy;
-
-    // Ian Wark, April 12 2017
-    // if using shape data, add to min
-    if (shape.use_shape_data()) {
-        // formula is m ln[SHAPE+1]+b
-        // if negative log returns NAN so data[i]+1 must be greater than 0
-        if (shape.data(i) >= -1) {
-            float calculated = (shape.m() * log(shape.data(i)+1)) + shape.b();
-
-            if (!isnan(calculated)) {
-                // energies are stored as ints, with the original decimal form multiplied by 100
-                PARAMTYPE to_add = (PARAMTYPE)(calculated*100);
-                min = min + to_add;
-            }
-        }
-
-        if (shape.data(j) >= -1) {
-            float calculated = (shape.m() * log(shape.data(j)+1)) + shape.b();
-
-            if (!isnan(calculated)) {
-                // energies are stored as ints, with the original decimal form multiplied by 100
-                PARAMTYPE to_add = (PARAMTYPE)(calculated*100);
-                min = min + to_add;
-
-            }
-        }
-
-    }
     
     // add the loss
     if (pred_pairings != NULL)
