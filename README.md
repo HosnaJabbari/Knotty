@@ -5,10 +5,12 @@ CCJ is a method for predicting the psuedoknotted secondary structures of RNA seq
 Sparse CCJ is a "sparsified" version of CCJ that uses less memory and is recommended to be used.
      
 ##### Organization
-SimFold is required to be installed as a library before using CCJ.    
+Instructions for installation and usage are in the READMEs of the respective subdirectories.
+
+SimFold is required to be installed as a library before using any version of CCJ.   
+
 Original CCJ is contained in the Original CCJ subdirectory.      
-Both Modifed CCJ and Sparse CCJ are in the Sparse CCJ subdirectory.      
-Instructions for installation and usage are in the READMEs of their respective subdirectories.    
+Both Modifed CCJ and Sparse CCJ are in the Sparse CCJ subdirectory.     
 
 SimFold is a part of MultiRNAFold (http://www.rnasoft.ca/download.html).     
 
