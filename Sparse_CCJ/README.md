@@ -15,13 +15,21 @@ make
 
 ##### Usage:
 
-Usage: ./CCJ \<sequence> \<arguments>  
+Usage: 
+Run from commandline, where <sequence> is the input RNA sequence and \<arguments> are detailed below:
+```
+./CCJ \<sequence> \<arguments>  
+```
 Valid agruments include:   
 -ns to use non-sparse or "Modifed CCJ" version  
--ngc to not use garbage collection   
+-ngc to not use garbage collection for Sparse CCJ
 
 -pta to print information on the number of trace arrows  
 -pta-v to print verbose trace arrow information  
 -pcl to print information on the candidate lists  
 -pcl-v to print verbose candidate list information  
-Example: ./CCJ GCAACGAUGACAUACAUCGCUAGUCGACGC -ns  
+
+Example: 
+```
+./CCJ GCAACGAUGACAUACAUCGCUAGUCGACGC -ngc -pta
+```
