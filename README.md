@@ -1,16 +1,27 @@
 # CCJ
 
 ##### Description
-CCJ is a method for predicting the psuedoknotted secondary structures of RNA sequences.
-Sparse CCJ is a "sparsified" version of CCJ that uses less memory and is recommended to be used.
+CCJ is a method for predicting the psuedoknotted secondary structures of RNA sequences.   
+For general usage, Sparse CCJ is recommended to be used.
+
+The different subdirectories correspond to the different versions of CCJ that are compared in the WABI 2017 paper submission.   
+Original CCJ is the original CCJ detailed in "Algorithms for prediction of RNA pseudoknotted secondary structures" (https://open.library.ubc.ca/cIRcle/collections/ubctheses/24/items/1.0167140).   
+Modified CCJ is a version of Original CCJ that uses the DP09 energy model.   
+Sparse CCJ is a "sparsified" version of Modified CCJ that uses less memory than any of the other versions.     
      
 ##### Organization
-Instructions for installation and usage are in the READMEs of the respective subdirectories.
+Instructions for installation and usage are in the READMEs of the respective subdirectories.   
 
-SimFold is required to be installed as a library before using any version of CCJ and is contained in the simfold subdirectory.
+SimFold is required to be installed as a library before using any version of CCJ.   
 
-Original CCJ is contained in the Original CCJ subdirectory.      
-Both Modifed CCJ and Sparse CCJ are in the Sparse CCJ subdirectory.     
+Original CCJ is contained in the Original CCJ subdirectory.    
+Sparse CCJ is contained in the Sparse CCJ subdirectory.   
+Modified CCJ is used by running Sparse CCJ with a special argument. This is detailed in the README.md in the Sparse CCJ subdirectory. 
+
+Steps for installation:
+1. Install Simfold by following the instructions in the README.md of the Simfold subdirectory.   
+2. Install the version of CCJ you want to use (If you don't know which version to use, use Sparse CCJ) by following the installation instructions in the README.md of the corresponding subdirectory.    
+3. Call CCJ by following the usage instructions in the README.md of the CCJ version you wish to use.   
 
 SimFold is a part of MultiRNAFold (http://www.rnasoft.ca/download.html).     
 
