@@ -29,7 +29,16 @@ Valid agruments include:
 -pcl to print information on the candidate lists  
 -pcl-v to print verbose candidate list information  
 
-Example: 
+Examples: 
+To get the predicted secondary structure for the sequence "GCAACGAUGACAUACAUCGCUAGUCGACGC":
+```
+./CCJ GCAACGAUGACAUACAUCGCUAGUCGACGC -ngc -pta
+```
+To use the Modified CCJ version:
+```
+./CCJ GCAACGAUGACAUACAUCGCUAGUCGACGC -ns
+```
+To use Sparse CCJ with no garbage collection, printing out information on the number of trace arrows used:
 ```
 ./CCJ GCAACGAUGACAUACAUCGCUAGUCGACGC -ngc -pta
 ```
