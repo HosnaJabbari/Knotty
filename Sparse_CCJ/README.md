@@ -1,10 +1,10 @@
 # Sparse CCJ
 
-##### Description:
+#### Description:
 Both the Modified CCJ and the Sparsified CCJ are contained here.   
 Which version is used is based upon arguments supplied when used.   
 
-##### Installation: 
+#### Installation: 
 To install first insure you have installed the simfold library from the simfold folder.    
 Then run from a command line in the Sparse_CCJ directory:    
 ```
@@ -13,10 +13,8 @@ autoreconf -i
 make     
 ```
 
-##### Usage:
-
-Usage: 
-Run from commandline, where \<sequence> is the input RNA sequence and \<arguments> are detailed below:
+#####Usage: 
+Run from a commandline, where \<sequence> is the input RNA sequence and \<arguments> are detailed below:   
 ```
 ./CCJ \<sequence> \<arguments>  
 ```
