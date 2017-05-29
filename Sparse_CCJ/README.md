@@ -5,11 +5,11 @@ Both the Modified CCJ and the Sparsified CCJ are contained here.
 Which version is used is based upon arguments supplied when used.   
 
 #### Installation: 
-To install first insure you have installed the simfold library by following the instructions in the README.md in the simfold subdirectory.    
+To install first insure you have [downloaded the repository](https://github.com/HosnaJabbari/CCJ/archive/master.zip) and installed the simfold library by following the instructions in the README.md in the simfold subdirectory.    
 Then run from a command line in the Sparse_CCJ directory:    
 ```
 autoreconf -i     
-./configure SIMFOLD_HOME=<path to simfold library (default is /usr/local)>     
+./configure SIMFOLD_HOME=<path to simfold library> (default is /usr/local)     
 make     
 ```
 
