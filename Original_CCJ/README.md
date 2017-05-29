@@ -18,10 +18,11 @@ autoreconf -i
 make  
 ```
 ##### Usage:   
-Run from commandline, where \<sequence> is the input RNA sequence:    
+Run from a command line in the Original_CCJ Directory:
 ```
 ./CCJ <sequence>     
 ```
+where \<sequence> is the input RNA sequence.  
 
 Example: 
 ```
