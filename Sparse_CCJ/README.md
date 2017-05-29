@@ -12,8 +12,7 @@ autoreconf -i
 ./configure SIMFOLD_HOME=<path to Simfold library>    
 make     
 ```
-where \<path to Simfold library> is where Simfold was installed.   
-The default is /usr/local. If you did not specify a custom prefix when installing Simfold, use /usr/local.   
+where \<path to Simfold library> is where Simfold was installed. The default path is /usr/local. If you did not specify a custom prefix when installing Simfold, use /usr/local.   
 
 Example:   
 ```
