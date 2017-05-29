@@ -24,7 +24,7 @@ Modified CCJ is used by running Sparse CCJ with a special argument. This is deta
 3. Call CCJ by following the usage instructions in the README.md of the CCJ version you wish to use.   
 
 ##### Licence
-SimFold is a part of MultiRNAFold (http://www.rnasoft.ca/download.html). 
+SimFold is a part of MultiRNAFold (http://www.rnasoft.ca/download.html).     
 CCJ and MultiRNAFold are copyrighted under GNU General Public Licence.
 
 ##### Disclaimer
