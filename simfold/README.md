@@ -20,5 +20,5 @@ make install
 ```
 
 To install the library in to custom path, use
-./configure --prefix=<path>
+./configure --prefix=\<custom library path>
 instead.
