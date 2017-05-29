@@ -14,6 +14,11 @@ make
 
 ##### Usage:   
 Run from commandline, where \<sequence> is the input RNA sequence:    
-./CCJ \<sequence>      
+```
+./CCJ \<sequence>     
+```
 
-Example: ./CCJ "GCAACGAUGACAUACAUCGCUAGUCGACGC"    
+Example: 
+```
+./CCJ "GCAACGAUGACAUACAUCGCUAGUCGACGC"    
+```
