@@ -26,5 +26,5 @@ where \<sequence> is the input RNA sequence.
 
 Example: 
 ```
-./CCJ "GCAACGAUGACAUACAUCGCUAGUCGACGC"    
+./CCJ GCAACGAUGACAUACAUCGCUAGUCGACGC    
 ```
