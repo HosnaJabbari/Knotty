@@ -6,7 +6,7 @@ There are three different versions of CCJ that are compared for the WABI 2017 pa
 For general usage, Sparse CCJ is recommended to be used.   
 
 The different versions are as follows:   
-Original CCJ is the original CCJ detailed in "Algorithms for prediction of RNA pseudoknotted secondary structures" (https://open.library.ubc.ca/cIRcle/collections/ubctheses/24/items/1.0167140).   
+Original CCJ is the original CCJ detailed in ["Algorithms for prediction of RNA pseudoknotted secondary structures"](https://open.library.ubc.ca/cIRcle/collections/ubctheses/24/items/1.0167140).   
 Modified CCJ is a version of Original CCJ that uses the DP09 energy model.   
 Sparse CCJ is a "sparsified" version of Modified CCJ that uses less memory than any of the other versions.     
      
