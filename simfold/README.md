@@ -3,7 +3,7 @@
 ##### Description:
 Simfold library used by CCJ. Install before using CCJ.
 
-Description from Mirela Andronescu's original readme:
+Description from Mirela Andronescu's original readme:   
 SimFold predicts the minimum free energy (MFE) secondary structure of a
 given input RNA or DNA sequence. The current implementation include
 suboptimal folding calculations, as well as partition functions, base
