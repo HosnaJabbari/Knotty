@@ -11,13 +11,13 @@ Modified CCJ is a version of Original CCJ that uses the DP09 energy model.
 Sparse CCJ is a "sparsified" version of Modified CCJ that uses less memory than any of the other versions.     
      
 ##### Organization
-Instructions for installation and usage are in the READMEs of the respective subdirectories.   
-
-SimFold is required to be installed as a library before using any version of CCJ and is contained in the Simfold subdirectory.   
+SimFold is contained in the Simfold subdirectory and is required to be installed as a library before using any version of CCJ.      
 
 Original CCJ is contained in the Original CCJ subdirectory.    
 Sparse CCJ is contained in the Sparse CCJ subdirectory.   
 Modified CCJ is used by running Sparse CCJ with a special argument. This is detailed in the README.md in the Sparse CCJ subdirectory. 
+
+Instructions for installation and usage are in the READMEs of the respective subdirectories.   
 
 ##### Steps for installation:
 1. Install Simfold by following the instructions in the README.md of the Simfold subdirectory.   
