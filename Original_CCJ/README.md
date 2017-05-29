@@ -13,7 +13,7 @@ make
 ```
 
 ##### Usage:   
-Run from commandline, where /<sequence> is the input RNA sequence:
-./CCJ \<sequence>    
+Run from commandline, where /<sequence> is the input RNA sequence:    
+./CCJ \<sequence>      
 
 Example: ./CCJ "GCAACGAUGACAUACAUCGCUAGUCGACGC"    
