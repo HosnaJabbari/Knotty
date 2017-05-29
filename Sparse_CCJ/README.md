@@ -16,7 +16,7 @@ make
 #### Usage: 
 Run from a commandline, where \<sequence> is the input RNA sequence and \<arguments> are detailed below:   
 ```
-./CCJ \<sequence> \<arguments>  
+./CCJ <sequence> <arguments>  
 ```
 Valid agruments include:   
 -ns to use non-sparse or "Modifed CCJ" version  
