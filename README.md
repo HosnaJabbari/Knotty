@@ -13,9 +13,9 @@ Sparse CCJ is a "sparsified" version of Modified CCJ that uses less memory than 
 #### Organization
 SimFold is contained in the Simfold subdirectory and is required to be installed as a library before using any version of CCJ.      
 
-Original CCJ is contained in the Original CCJ subdirectory.    
-Sparse CCJ is contained in the Sparse CCJ subdirectory.   
-Modified CCJ is used by running Sparse CCJ with a special argument. This is detailed in the README.md in the Sparse CCJ subdirectory. 
+Original CCJ is contained in the Original_CCJ subdirectory.    
+Sparse CCJ is contained in the Sparse_CCJ subdirectory.   
+Modified CCJ is used by running Sparse_CCJ with a special argument. This is detailed in the README.md in the Sparse_CCJ subdirectory. 
 
 Instructions for installation and usage are in the READMEs of the respective subdirectories.   
 
