@@ -18,7 +18,7 @@ autoreconf -i
 make  
 ```
 ##### Usage:   
-Run from a command line in the Original_CCJ Directory:
+Run from a command line in the Original_CCJ directory:
 ```
 ./CCJ <sequence>     
 ```
