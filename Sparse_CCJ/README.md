@@ -40,7 +40,7 @@ Valid agruments include:
 Examples:     
 To get the predicted secondary structure for the sequence "GCAACGAUGACAUACAUCGCUAGUCGACGC":
 ```
-./CCJ GCAACGAUGACAUACAUCGCUAGUCGACGC -ngc -pta
+./CCJ GCAACGAUGACAUACAUCGCUAGUCGACGC
 ```
 To use the Modified CCJ version:
 ```
