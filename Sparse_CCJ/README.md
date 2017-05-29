@@ -12,6 +12,12 @@ autoreconf -i
 ./configure SIMFOLD_HOME=<path to simfold library> (default is /usr/local)     
 make     
 ```
+Example:   
+```
+autoreconf -i     
+./configure SIMFOLD_HOME=/usr/local  
+make     
+```
 
 #### Usage: 
 Run from a command line in Sparse_CCJ directory:   
