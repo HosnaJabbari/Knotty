@@ -29,7 +29,7 @@ Valid agruments include:
 -pcl to print information on the candidate lists  
 -pcl-v to print verbose candidate list information  
 
-Examples: 
+Examples:     
 To get the predicted secondary structure for the sequence "GCAACGAUGACAUACAUCGCUAGUCGACGC":
 ```
 ./CCJ GCAACGAUGACAUACAUCGCUAGUCGACGC -ngc -pta
