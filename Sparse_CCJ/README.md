@@ -9,9 +9,12 @@ To install first insure you have [downloaded the repository](https://github.com/
 Then run from a command line in the Sparse_CCJ directory:    
 ```
 autoreconf -i     
-./configure SIMFOLD_HOME=<path to simfold library> (default is /usr/local)     
+./configure SIMFOLD_HOME=<path to Simfold library>    
 make     
 ```
+where \<path to Simfold library> is where Simfold was installed.   
+The default is /usr/local. If you did not specify a custom prefix when installing Simfold, use /usr/local.   
+
 Example:   
 ```
 autoreconf -i     
