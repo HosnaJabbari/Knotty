@@ -4,7 +4,7 @@
 Original 2015 CCJ.    
 
 ##### Installation:     
-To install first insure you have [downloaded the repository](https://github.com/HosnaJabbari/CCJ/archive/master.zip) and installed the simfold library from the simfold folder.   
+To install first insure you have [downloaded the repository](https://github.com/HosnaJabbari/CCJ/archive/master.zip) and installed the Simfold library by following the instructions in the [README.md](https://github.com/HosnaJabbari/CCJ/tree/master/simfold#simfold) in the [Simfold subdirectory](https://github.com/HosnaJabbari/CCJ/tree/master/simfold).      
 Then run from a command line in the Original_CCJ directory: 
 ```
 autoreconf -i   
