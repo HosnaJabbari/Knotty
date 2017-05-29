@@ -16,7 +16,7 @@ make
 ##### Usage:
 
 Usage: 
-Run from commandline, where <sequence> is the input RNA sequence and \<arguments> are detailed below:
+Run from commandline, where \<sequence> is the input RNA sequence and \<arguments> are detailed below:
 ```
 ./CCJ \<sequence> \<arguments>  
 ```
