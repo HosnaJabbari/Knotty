@@ -1,10 +1,11 @@
 # CCJ
 
 ##### Description
-CCJ is a method for predicting the psuedoknotted secondary structures of RNA sequences.   
-For general usage, Sparse CCJ is recommended to be used.
+CCJ is a method for predicting the psuedoknotted secondary structures of RNA sequences.     
+There are three different versions of CCJ that are compared for the WABI 2017 paper submission.   
+For general usage, Sparse CCJ is recommended to be used.   
 
-The different subdirectories correspond to the different versions of CCJ that are compared in the WABI 2017 paper submission:   
+The different versions are as follows:   
 Original CCJ is the original CCJ detailed in "Algorithms for prediction of RNA pseudoknotted secondary structures" (https://open.library.ubc.ca/cIRcle/collections/ubctheses/24/items/1.0167140).   
 Modified CCJ is a version of Original CCJ that uses the DP09 energy model.   
 Sparse CCJ is a "sparsified" version of Modified CCJ that uses less memory than any of the other versions.     
