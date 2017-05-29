@@ -14,10 +14,12 @@ make
 ```
 
 #### Usage: 
-Run from a commandline, where \<sequence> is the input RNA sequence and \<arguments> are detailed below:   
+Run from a commandline:   
 ```
 ./CCJ <sequence> <arguments>  
 ```
+where \<sequence> is the input RNA sequence and \<arguments> are detailed below.
+
 Valid agruments include:   
 -ns to use non-sparse or "Modifed CCJ" version  
 -ngc to not use garbage collection for Sparse CCJ
