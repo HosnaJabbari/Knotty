@@ -18,15 +18,14 @@ Original CCJ is contained in the Original CCJ subdirectory.
 Sparse CCJ is contained in the Sparse CCJ subdirectory.   
 Modified CCJ is used by running Sparse CCJ with a special argument. This is detailed in the README.md in the Sparse CCJ subdirectory. 
 
-Steps for installation:
+##### Steps for installation:
 1. Install Simfold by following the instructions in the README.md of the Simfold subdirectory.   
 2. Install the version of CCJ you want to use (If you don't know which version to use, use Sparse CCJ) by following the installation instructions in the README.md of the corresponding subdirectory.    
 3. Call CCJ by following the usage instructions in the README.md of the CCJ version you wish to use.   
 
-SimFold is a part of MultiRNAFold (http://www.rnasoft.ca/download.html).     
-
 ##### Licence
-CCJ and SimFold are copyrighted under GNU General Public Licence.
+SimFold is a part of MultiRNAFold (http://www.rnasoft.ca/download.html). 
+CCJ and MultiRNAFold are copyrighted under GNU General Public Licence.
 
 ##### Disclaimer
 Although the authors have made every effort to ensure that CCJ correctly implements the underlying models and fullfills the functions described in the documentation, neither the authors nor the University of Alberta guarantee its correctness, fitness for a particular purpose, or future availability.
