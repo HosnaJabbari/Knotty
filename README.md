@@ -20,9 +20,10 @@ Modified CCJ is used by running Sparse_CCJ with a special argument. This is deta
 Instructions for installation and usage are in the READMEs of the respective subdirectories.   
 
 #### Steps for installation:
-1. Install Simfold by following the instructions in the [README.md](https://github.com/HosnaJabbari/CCJ/tree/master/simfold#simfold) of the [Simfold subdirectory](https://github.com/HosnaJabbari/CCJ/tree/master/simfold).   
-2. Install the version of CCJ you want to use (If you don't know which version to use, use [Sparse CCJ](https://github.com/HosnaJabbari/CCJ/tree/master/Sparse_CCJ#sparse-ccj)) by following the installation instructions in the README.md of the corresponding subdirectory.    
-3. Call CCJ by following the usage instructions in the README.md of the CCJ version you wish to use.   
+1. [Download the repository](https://github.com/HosnaJabbari/CCJ/archive/master.zip) and extract the files onto your system.
+2. Install Simfold by following the instructions in the [README.md](https://github.com/HosnaJabbari/CCJ/tree/master/simfold#simfold) of the [Simfold subdirectory](https://github.com/HosnaJabbari/CCJ/tree/master/simfold).   
+3. Install the version of CCJ you want to use (If you don't know which version to use, use [Sparse CCJ](https://github.com/HosnaJabbari/CCJ/tree/master/Sparse_CCJ#sparse-ccj)) by following the installation instructions in the README.md of the corresponding subdirectory.    
+4. Call CCJ by following the usage instructions in the README.md of the CCJ version you wish to use.   
 
 #### Licence
 SimFold is a part of MultiRNAFold (http://www.rnasoft.ca/download.html).     
