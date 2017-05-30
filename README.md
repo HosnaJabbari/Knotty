@@ -15,7 +15,7 @@ SimFold is contained in the [Simfold subdirectory](https://github.com/HosnaJabba
 
 Original CCJ is contained in the [Original_CCJ subdirectory](https://github.com/HosnaJabbari/CCJ/tree/master/Original_CCJ).    
 Sparse CCJ is contained in the [Sparse_CCJ subdirectory](https://github.com/HosnaJabbari/CCJ/tree/master/Sparse_CCJ).   
-Modified CCJ is used by running Sparse_CCJ with a special argument. This is detailed in the [README.md](https://github.com/HosnaJabbari/CCJ/tree/master/Sparse_CCJ#sparse-ccj) in the [Sparse_CCJ subdirectory](https://github.com/HosnaJabbari/CCJ/tree/master/Sparse_CCJ). 
+Modified CCJ is used by running Sparse CCJ with a special argument. This is detailed in the [README.md](https://github.com/HosnaJabbari/CCJ/tree/master/Sparse_CCJ#sparse-ccj) in the [Sparse_CCJ subdirectory](https://github.com/HosnaJabbari/CCJ/tree/master/Sparse_CCJ). 
 
 Instructions for installation and usage are in the READMEs of the respective subdirectories.   
 
