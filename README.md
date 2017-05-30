@@ -1,7 +1,7 @@
 # CCJ
 
 #### Description
-CCJ is a method for predicting the psuedoknotted secondary structures of RNA sequences.     
+CCJ is a MFE (minimum free energy) based method for predicting the psuedoknotted secondary structures of RNA sequences.     
 There are three different versions of CCJ that are compared for the WABI 2017 paper submission.   
 For general usage, Sparse CCJ is recommended to be used.   
 
