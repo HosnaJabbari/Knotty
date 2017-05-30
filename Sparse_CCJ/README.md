@@ -4,6 +4,13 @@
 Both the Modified CCJ and the Sparsified CCJ are contained here.   
 Which version is used is based upon arguments supplied when used.   
 
+
+Memory usage and run time is dependent mainly on the length of the input sequence.   
+Using Sparse CCJ, a 100 base sequence will use just over 1 GB of RAM and take ~7 minutes.
+A 150 base sequence will use ~7 GB of RAM and take about an hour.
+A 200 base sequence will use ~18 GB of RAM and ~3.5 hours.
+The times listed here will depend on your system, but the memory usage will be around the same.
+
 #### Installation: 
 To install first insure you have [downloaded the repository](https://github.com/HosnaJabbari/CCJ/archive/master.zip) and installed the Simfold library by following the instructions in the [README.md](https://github.com/HosnaJabbari/CCJ/tree/master/simfold#simfold) in the [Simfold subdirectory](https://github.com/HosnaJabbari/CCJ/tree/master/simfold).    
 Then run from a command line in the Sparse_CCJ directory:    
