@@ -8,7 +8,7 @@ To install first ensure you have [downloaded the repository](https://github.com/
 Then run from a command line in the Original_CCJ directory: 
 ```
 autoreconf -i   
-./configure SIMFOLD_HOME=<path to simfold library> (default is /usr/local)   
+./configure SIMFOLD_HOME=<path to simfold installation> (default is /usr/local)   
 make  
 ```
 Example: 
