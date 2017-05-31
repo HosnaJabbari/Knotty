@@ -16,7 +16,6 @@
 #include "params.h"
 
 #include "cmd_line_options.h"
-#include "shape_data.h"
 
 #include "CCJ.h"
 
