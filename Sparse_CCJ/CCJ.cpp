@@ -108,7 +108,7 @@ int main (int argc, char *argv[])
         printf ("-pcl to print information on the candidate lists\n");
         printf ("-pcl-v to print verbose candidate list information\n");
         printf ("Example: %s GCAACGAUGACAUACAUCGCUAGUCGACGC -shape=shapedata.txt b=0.64 -ns\n", argv[0]);
-        return 0;
+        return -1;
     }
     cmd_line_options.set_done();
 
