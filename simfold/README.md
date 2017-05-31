@@ -19,6 +19,6 @@ make
 make install
 ```
 
-To install the library in to custom path, use
+To install the library to a custom path, use
 ./configure --prefix=\<custom library path>
 instead.
