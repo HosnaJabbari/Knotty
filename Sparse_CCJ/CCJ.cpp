@@ -32,6 +32,7 @@ int main (int argc, char *argv[])
     strcpy (sequence, argv[1]);
 
     bool cmd_line_error = false;
+    bool w = false;
 
     // important that this is before set_shape_file
     shape.set_sequence_length(strlen(sequence));
@@ -49,6 +50,9 @@ int main (int argc, char *argv[])
                 else
                 if (!strcmp(arg, "-ngc"))
                     cmd_line_options.set_use_garbage_collection(false);
+                else
+		if (!strcmp(arg, "-w"))
+                    w = true;
                 else
                 if (!strcmp(arg, "-pta"))
                     cmd_line_options.set_print_trace_arrow_info(1);
@@ -99,6 +103,7 @@ int main (int argc, char *argv[])
         printf ("-b=number to specify an intercept for the shape data (default is %f)\n",shape.b());
         printf ("-m=number to specify a slope for the shape data (default is %f)\n\n",shape.m());
 
+	printf ("-w to print only the result and energy\n");
         printf ("-pta to print information on the number of trace arrows\n");
         printf ("-pta-v to print verbose trace arrow information\n");
         printf ("-pcl to print information on the candidate lists\n");
@@ -142,8 +147,12 @@ int main (int argc, char *argv[])
 
 	energy = ccj(sequence, structure);
 
-    printf ("Seq: %s\n", sequence);
-    printf ("RES: %s  %.2lf\n", structure, energy);
+    if (w) {
+        printf ("%s %.2lf\n", structure, energy);
+    } else {
+        printf ("Seq: %s\n", sequence);
+        printf ("RES: %s  %.2lf\n", structure, energy);
+    }
 
     return 0;
 }
