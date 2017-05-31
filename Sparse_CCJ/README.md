@@ -39,6 +39,7 @@ Valid agruments include:
 -ns to use non-sparse or "Modifed CCJ" version  
 -ngc to not use garbage collection for Sparse CCJ
 
+-w to print only the result and energy
 -pta to print information on the number of trace arrows  
 -pta-v to print verbose trace arrow information  
 -pcl to print information on the candidate lists  
