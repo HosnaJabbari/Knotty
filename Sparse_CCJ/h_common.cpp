@@ -100,8 +100,9 @@ brack_type *h_pop (brack_stack *st)
 
 
 double ccj(char *sequence, char *structure){
-	W_final *min_fold = new W_final (sequence);
-	if (min_fold == NULL) giveup ("Cannot allocate memory", "CCJ");
+    create_size_penalties(strlen(sequence));
+    W_final *min_fold = new W_final (sequence);
+    if (min_fold == NULL) giveup ("Cannot allocate memory", "CCJ");
 
 	double energy = min_fold->ccj();
     min_fold->return_structure (structure);

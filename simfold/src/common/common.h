@@ -19,6 +19,7 @@
 #define COMMON_H
 
 #include <stdio.h>
+#include <vector>
 #include "structs.h"
 #include "s_partition_function.h"
 
@@ -112,6 +113,22 @@ int is_nucleotide (char base);
 void check_sequence (char *sequence);
 // check sequence for length and alphabet
 
+// Ian Wark Jun 8 2017
+// Array [0..2][0..nb_nucleotides-1]
+// 3 arrays for each H,B,I
+class size_penalties_class {
+private:
+    std::vector< std::vector<PARAMTYPE> > arr;
+    int max_size;
+public:
+    size_penalties_class(int nb_nucleotides);
+    ~size_penalties_class();
+    PARAMTYPE get_size_penalty(int size, char type);
+};
+
+// Actually creates the size_penalties object
+// called by CCJ in h_common.cpp
+void create_size_penalties(int nb_nucleotides);
     
 PARAMTYPE penalty_by_size (int size, char type);
 // PRE:  size is the size of the loop
