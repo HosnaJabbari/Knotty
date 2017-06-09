@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 #include <vector>
+#include <memory>
 #include "structs.h"
 #include "s_partition_function.h"
 
@@ -120,20 +121,33 @@ class size_penalties_class {
 private:
     std::vector< std::vector<PARAMTYPE> > arr;
     int max_size;
+
+    size_penalties_class(size_penalties_class&) { }
 public:
     size_penalties_class(int nb_nucleotides);
-    ~size_penalties_class();
-    PARAMTYPE get_size_penalty(int size, char type);
+
+    ~size_penalties_class() {}
+    inline PARAMTYPE get_size_penalty(int size, char type) {
+             if (type == 'H') type = 0;
+        else if (type == 'B') type = 1;
+        else if (type == 'I') type = 2;
+
+        return arr[type][size];
+    }
+
 };
 
-// Actually creates the size_penalties object
-// called by CCJ in h_common.cpp
+extern std::unique_ptr<size_penalties_class> size_penalties;
+
 void create_size_penalties(int nb_nucleotides);
-    
-PARAMTYPE penalty_by_size (int size, char type);
+
+inline PARAMTYPE penalty_by_size (int size, char type)
 // PRE:  size is the size of the loop
 //       type is HAIRP or INTER or BULGE
 // POST: return the penalty by size of the loop
+{
+    return size_penalties->get_size_penalty(size,type);
+}
 
 //PARAMTYPE IL_penalty_by_size_2D (int size1, int size2);
 
