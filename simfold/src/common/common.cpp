@@ -28,43 +28,56 @@
 #include "common.h"
 
 
-PARAMTYPE asymmetry_penalty (int size1, int size2)
+std::unique_ptr<asymmetry_penalties_class> asymmetry_penalties;
+
+void create_asymmetry_penalties(int nb_nucleotides) {
+    asymmetry_penalties = std::unique_ptr<asymmetry_penalties_class>(new asymmetry_penalties_class(nb_nucleotides));
+}
+
+// pre-compute asymmetry penalties
+asymmetry_penalties_class::asymmetry_penalties_class(int nb_nucleotides)
 {
-    PARAMTYPE penalty = 0;
-    if (parsi_asymmetry == T99)
-        penalty = MIN (misc.asymmetry_penalty_max_correction, abs (size1-size2) * misc.asymmetry_penalty_array [MIN (2, MIN (size1, size2))-1]);
-    //printf ("Asym penalty real: %d\n", penalty);
-    else 
-    {    
-        if (size1 == size2) return 0;
-        if (parsi_asymmetry == PARSI)
-        {
-            penalty = (PARAMTYPE) (internal_asymmetry_initiation + internal_asymmetry_slope * log (abs (size1-size2)));
-        }
-        else if (parsi_asymmetry == LAVISH)
-        {
-            if (abs (size1-size2) < MAXLOOP_ASYM)
-            {
-                // we assume the following model: from asymmetry 1 to 4, we use initiation, slope and int_asym (like an addition)
-                if (abs (size1-size2) <= MAX_EXP_ASYM)
-                {
-                    penalty += internal_asymmetry_initiation;
-                    penalty += (PARAMTYPE) (log (abs (size1-size2)) * internal_asymmetry_slope);
-                    penalty += internal_asymmetry[(int)(abs (size1-size2))];
-                }
-                else
-                {
-                    penalty += internal_asymmetry[(int)(abs (size1-size2))];
-                }
-            }
+    arr.resize(MAXLOOP+1);
+    for(int size1 = 0; size1 < MAXLOOP+1; ++size1) {
+        arr[size1].resize(nb_nucleotides);
+        for (int size2 = 0; size2 < nb_nucleotides; ++size2) {
+            PARAMTYPE penalty = 0;
+            if (parsi_asymmetry == T99)
+                penalty = MIN (misc.asymmetry_penalty_max_correction, abs (size1-size2) * misc.asymmetry_penalty_array [MIN (2, MIN (size1, size2))-1]);
+            //printf ("Asym penalty real: %d\n", penalty);
             else
             {
-                penalty += internal_asymmetry_initiation;
-                penalty += (PARAMTYPE) (log (abs (size1-size2)) * internal_asymmetry_slope);
+                if (size1 == size2) arr[size1][size2] = 0;
+                if (parsi_asymmetry == PARSI)
+                {
+                    penalty = (PARAMTYPE) (internal_asymmetry_initiation + internal_asymmetry_slope * log (abs (size1-size2)));
+                }
+                else if (parsi_asymmetry == LAVISH)
+                {
+                    if (abs (size1-size2) < MAXLOOP_ASYM)
+                    {
+                        // we assume the following model: from asymmetry 1 to 4, we use initiation, slope and int_asym (like an addition)
+                        if (abs (size1-size2) <= MAX_EXP_ASYM)
+                        {
+                            penalty += internal_asymmetry_initiation;
+                            penalty += (PARAMTYPE) (log (abs (size1-size2)) * internal_asymmetry_slope);
+                            penalty += internal_asymmetry[(int)(abs (size1-size2))];
+                        }
+                        else
+                        {
+                            penalty += internal_asymmetry[(int)(abs (size1-size2))];
+                        }
+                    }
+                    else
+                    {
+                        penalty += internal_asymmetry_initiation;
+                        penalty += (PARAMTYPE) (log (abs (size1-size2)) * internal_asymmetry_slope);
+                    }
+                }
             }
+            arr[size1][size2] = penalty;
         }
     }
-    return penalty;
 
     // I tried the following for MODEL == EXTENDED, but I changed my mind
 /*    // assume the size1 + size2 <= MAXLOOP_I. If it's greater, just use the value of the last parameter
@@ -78,7 +91,6 @@ PARAMTYPE asymmetry_penalty (int size1, int size2)
     if (size1 + size2 <= MAXLOOP_I)      return internal_asymmetry [abs (size1-size2)];
     return internal_asymmetry[MAXLOOP_I-2];    */
 }
-
 
 
 void get_sorted_positions (int n, double numbers[], int positions[])

@@ -45,7 +45,33 @@
 
 //#define asymmetry_penalty(size1, size2) (MIN (misc.asymmetry_penalty_max_correction, abs (size1-size2) * misc.asymmetry_penalty_array [MIN (2, MIN ((size1), (size2)))-1]))
 
-PARAMTYPE asymmetry_penalty (int size1, int size2);
+// Ian Wark Jun 8 2017
+// Array [0..30][0..nb_nucleotides-1]
+// 3 arrays for each H,B,I
+class asymmetry_penalties_class {
+private:
+    std::vector< std::vector<PARAMTYPE> > arr;
+    int max_size;
+
+    asymmetry_penalties_class(asymmetry_penalties_class&) { }
+public:
+    asymmetry_penalties_class(int nb_nucleotides);
+
+    ~asymmetry_penalties_class() {}
+    inline PARAMTYPE get_asymmetry_penalty(int size1, char size2) {
+        return arr[size1][size2];
+    }
+
+};
+
+extern std::unique_ptr<asymmetry_penalties_class> asymmetry_penalties;
+
+void create_asymmetry_penalties(int nb_nucleotides);
+
+inline PARAMTYPE asymmetry_penalty (int size1, int size2)
+{
+    return asymmetry_penalties->get_asymmetry_penalty(size1,size2);
+}
 
 #define asymmetry_penalty_enthalpy(size1, size2) (MIN (enthalpy_misc.asymmetry_penalty_max_correction, abs (size1-size2) * enthalpy_misc.asymmetry_penalty_array [MIN (2, MIN ((size1), (size2)))-1]))
 

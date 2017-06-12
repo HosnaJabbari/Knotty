@@ -101,6 +101,8 @@ brack_type *h_pop (brack_stack *st)
 
 double ccj(char *sequence, char *structure){
     create_size_penalties(strlen(sequence));
+    create_asymmetry_penalties(strlen(sequence));
+
     W_final *min_fold = new W_final (sequence);
     if (min_fold == NULL) giveup ("Cannot allocate memory", "CCJ");
 
