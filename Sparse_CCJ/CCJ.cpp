@@ -150,7 +150,7 @@ int main (int argc, char *argv[])
         printf ("%s %.2lf\n", structure, energy);
     } else {
         printf ("Seq: %s\n", sequence);
-        printf ("RES: %s  %.2lf\n", structure, energy);
+        printf ("RES: %s %.2lf\n", structure, energy);
     }
 
     return 0;
