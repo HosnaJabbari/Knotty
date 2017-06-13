@@ -39,6 +39,10 @@ Valid agruments include:
 -ns to use non-sparse or "Modifed CCJ" version  
 -ngc to not use garbage collection for Sparse CCJ
 
+-shape="filename" to specify a file for shape data   
+-b=number to specify an intercept for the shape data (default is -0.600000)   
+-m=number to specify a slope for the shape data (default is 1.800000)   
+
 -w to print only the result and energy
 -pta to print information on the number of trace arrows  
 -pta-v to print verbose trace arrow information  
@@ -50,9 +54,9 @@ To get the predicted secondary structure for the sequence "GCAACGAUGACAUACAUCGCU
 ```
 ./CCJ GCAACGAUGACAUACAUCGCUAGUCGACGC
 ```
-To use the Modified CCJ version:
+To use a file with SHAPE data in the same directory called "shapedata.txt":
 ```
-./CCJ GCAACGAUGACAUACAUCGCUAGUCGACGC -ns
+./CCJ GCAACGAUGACAUACAUCGCUAGUCGACGC -shape=shapedata.txt
 ```
 To use Sparse CCJ with no garbage collection, printing out information on the number of trace arrows used:
 ```
