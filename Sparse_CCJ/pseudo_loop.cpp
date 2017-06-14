@@ -1285,8 +1285,7 @@ void pseudo_loop::compute_PL(int i, int j, int k, int l){
                     if (pl_debug)
                         printf("avoid_trace_arrow PL(%d,%d,%d,%d)->PfromL(%d,%d,%d,%d)\n",i,j,k,l,i+1,j-1,k,l);
                     //  if there is already a trace arrow there (added in get_PLiloop), delete it.
-                    if (ta->PL.exists_trace_arrow_from(i,j,k,l))
-                        ta->PL.delete_trace_arrow(i,j,k,l);
+                    ta->PL.delete_trace_arrow(i,j,k,l);
 
                     ta->PL.avoid_trace_arrow();
                 } else {
@@ -1548,8 +1547,7 @@ void pseudo_loop::compute_PO(int i, int j, int k, int l){
                     if (pl_debug)
                         printf("avoid_trace_arrow PO(%d,%d,%d,%d)->PfromO(%d,%d,%d,%d)\n",i,j,k,l,i+1,j,k,l-1);
                     //  if there is already a trace arrow there (added in get_PLiloop), delete it.
-                    if (ta->PO.exists_trace_arrow_from(i,j,k,l))
-                        ta->PO.delete_trace_arrow(i,j,k,l);
+                    ta->PO.delete_trace_arrow(i,j,k,l);
 
                     ta->PO.avoid_trace_arrow();
                 } else {
@@ -3923,24 +3921,21 @@ int pseudo_loop::get_e_stP(int i, int j){
     }
 }
 
+
 int pseudo_loop::get_e_intP(int i, int ip, int jp, int j){
-    //if (i< 0 || j< 0 || ip < 0 || jp < 0 || i>=nb_nucleotides || j>=nb_nucleotides || ip>= nb_nucleotides || jp>= nb_nucleotides){
-//
-    //}
+//    if (i< 0 || j< 0 || ip < 0 || jp < 0 || i>=nb_nucleotides || j>=nb_nucleotides || ip>= nb_nucleotides || jp>= nb_nucleotides){
+//    return INF;
+//}
 
     int e_int = VBI->get_energy(i,j,ip,jp,int_sequence);
 
     if (e_int < INF/2){
-        //int energy = (int)round(e_intP_penalty * (double)e_int);
-
-        //if (pl_debug){
-        //	printf("----------> internal energy got from simfold is %d and so e_intP(%d,%d,%d,%d)=%d\n", e_int,i,ip,jp,j,energy);
-        //}
         return (int)round(e_intP_penalty * (double)e_int);
     }else{
         return INF;
     }
 }
+
 
 int pseudo_loop::get_energy(int i, int j){
     return get_P(i,j);
@@ -6325,11 +6320,8 @@ void pseudo_loop::back_track_sp(minimum_fold *f, seq_interval *cur_interval)
 
     int min_energy = INF,x=INF,temp=INF,best_d=-1,best_j=-1,best_k=-1,best_w=-1,best_x=-1;
 
-    TraceArrow *trace = nullptr;
-    if (ta->P.exists_trace_arrow_from(i,i+1, l-1, l))
-        trace = ta->P.trace_arrow_from(i,i+1, l-1, l);
-
     // if there is a trace arrow there
+    TraceArrow *trace = ta->P.trace_arrow_from(i,i+1, l-1, l);
     if (trace != nullptr) {
         x = trace->target_energy();
 
@@ -6669,9 +6661,8 @@ void pseudo_loop::trace_continue(int i, int j, int k, int l, char srctype, energ
         trace_update_f(i,j,k,l,srctype);
 
         // if trace arrow points from here, go with that
-        if (src_ta->exists_trace_arrow_from(i,j,k,l)) {
-            const TraceArrow *arrow = src_ta->trace_arrow_from(i,j,k,l);
-            //assert(srctype == arrow->source_type());
+        const TraceArrow *arrow = src_ta->trace_arrow_from(i,j,k,l);
+        if (arrow != nullptr) {
 
             if (node_debug || pl_debug) {
                 printf("trace arrow ");

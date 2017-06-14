@@ -78,10 +78,11 @@ MasterTraceArrows::register_trace_arrow(size_t i, size_t j, size_t k, size_t l,
 
     // If there is already a trace arrow there
     // replace it if the new trace arrow is better
-    if (source->use_replace() && source->exists_trace_arrow_from(i,j,k,l)) {
-        TraceArrow *old = source->trace_arrow_from(i,j,k,l);
+    TraceArrow *old = source->trace_arrow_from(i,j,k,l);
+    if (source->use_replace() && old != nullptr) {
 
         if (e < old->target_energy()) {
+            /*
             if (ta_debug) {
                 printf("Replace trace arrow: \n old trace arrow: ");
                 source->print_type(old->source_type()); printf("(%d,%d,%d,%d) -> ", i,j,k,l);
@@ -91,19 +92,21 @@ MasterTraceArrows::register_trace_arrow(size_t i, size_t j, size_t k, size_t l,
                 source->print_type(tgttype);
                 printf("(%d,%d,%d,%d) e:%d\n",m,n,o,p,e);
             }
+            */
 
             old->replace(i,j,k,l, m,n,o,p, e,srctype,tgttype);
             inc_source_ref_count(m,n,o,p,tgttype);
             source->inc_replaced();
-
         }
     } else {
         // Just add new trace arrow
+        /*
         if (ta_debug) {
             printf("Register Trace Arrow ");
             source->print_type(srctype); printf("(%d,%d,%d,%d)->",i,j,k,l);
             source->print_type(tgttype); printf("(%d,%d,%d,%d) e: %d \n",m,n,o,p, e);
         }
+        */
 
         assert(!source->exists_trace_arrow_from(i,j,k,l));
         source->trace_arrow_add(i,j,k,l,m,n,o,p,e,srctype,tgttype);
@@ -145,11 +148,11 @@ MasterTraceArrows::register_trace_arrow(size_t i, size_t j, size_t k, size_t l,
     assert(i <= j && j <= k && k <= l);
     assert(m <= n && n <= o && o <= p);
 
-    if (ta_debug) {
-        printf("Register Trace Arrow ");
-        source->print_type(srctype); printf("(%d,%d,%d,%d)->",i,j,k,l);
-        source->print_type(tgttype); printf("(%d,%d,%d,%d) e: %d \n",m,n,o,p, e);
-    }
+    //if (ta_debug) {
+    //    printf("Register Trace Arrow ");
+    //    source->print_type(srctype); printf("(%d,%d,%d,%d)->",i,j,k,l);
+    //    source->print_type(tgttype); printf("(%d,%d,%d,%d) e: %d \n",m,n,o,p, e);
+    //}
 
     assert(!source->exists_trace_arrow_from(i,j,k,l));
     source->trace_arrow_add(i,j,k,l,m,n,o,p,e,srctype,tgttype,
@@ -176,15 +179,13 @@ MasterTraceArrows::inc_source_ref_count(size_t i, size_t j, size_t k, size_t l, 
     // Must check from the target arrows structure, not source
     TraceArrows *target = get_arrows_by_type(type);
 
-    // get trace arrow from (i,j,k,l) if it exists
-    if (!target->exists_trace_arrow_from(i,j,k,l)) { return; }
-
     TraceArrow *ta= target->trace_arrow_from(i,j,k,l);
-    ta->inc_src();
+    if (ta != nullptr)
+    	ta->inc_src();
 
-    if (ta_debug) {
-        printf("inc_source_ref_count %c(%d,%d,%d,%d)->%c(%d,%d,%d,%d) ref count:%d\n",ta->source_type(),i,j,k,l, ta->target_type(),ta->i(),ta->j(),ta->k(),ta->l(),ta->source_ref_count());
-    }
+    //if (ta_debug) {
+//        printf("inc_source_ref_count %c(%d,%d,%d,%d)->%c(%d,%d,%d,%d) ref count:%d\n",ta->source_type(),i,j,k,l, ta->target_type(),ta->i(),ta->j(),ta->k(),ta->l(),ta->source_ref_count());
+//    }
 }
 
 /**
@@ -203,16 +204,16 @@ MasterTraceArrows::dec_source_ref_count(size_t i, size_t j, size_t k, size_t l, 
     TraceArrows *target = get_arrows_by_type(type);
 
     // get trace arrow from (i,j,k,l) if it exists
-    if (!target->exists_trace_arrow_from(i,j,k,l)) { return; }
-
     TraceArrow *ta= target->trace_arrow_from(i,j,k,l);
 
-    assert(ta->source_ref_count() > 0);
-    ta->dec_src();
-
-    if (ta_debug) {
-        printf("dec_source_ref_count %c(%d,%d,%d,%d)->%c(%d,%d,%d,%d) ref count:%d\n",ta->source_type(),i,j,k,l, ta->target_type(),ta->i(),ta->j(),ta->k(),ta->l(),ta->source_ref_count());
+    if (ta != nullptr) {
+        assert(ta->source_ref_count() > 0);
+        ta->dec_src();
     }
+
+    //if (ta_debug) {
+    //    printf("dec_source_ref_count %c(%d,%d,%d,%d)->%c(%d,%d,%d,%d) ref count:%d\n",ta->source_type(),i,j,k,l, ta->target_type(),ta->i(),ta->j(),ta->k(),ta->l(),ta->source_ref_count());
+    //}
 }
 
 /** @brief Calls garbage collection of trace arrows on a row of trace arrows
@@ -284,11 +285,11 @@ MasterTraceArrows::gc_trace_arrow(size_t i, size_t j, size_t k, size_t l, TraceA
  */
 bool
 MasterTraceArrows::gc_trace_arrow(int i, int j, SimpleMap<ta_key_pair, TraceArrow>::iterator &col, TraceArrows &source) {
-    int k = col->first.first; int l = col->first.second;
-    assert(k > 0 && l > 0);
-    int ij = index_[i]+j-i;
+    //int k = col->first.first; int l = col->first.second;
+    assert(col->first.first > 0 && col->first.second > 0);
     const TraceArrow ta = col->second;
 
+/*
     if (ta_debug) {
         printf("gc_trace_arrow ");
         source.print_type(ta.source_type());
@@ -296,6 +297,7 @@ MasterTraceArrows::gc_trace_arrow(int i, int j, SimpleMap<ta_key_pair, TraceArro
         source.print_type(ta.target_type());
         printf("(%d,%d,%d,%d) ref_count:%d\n", ta.i(),ta.j(),ta.k(),ta.l(),ta.source_ref_count());
     }
+*/
 
     assert(ta.source_ref_count() >= 0);
     if (ta.source_ref_count() == 0) {
@@ -303,6 +305,7 @@ MasterTraceArrows::gc_trace_arrow(int i, int j, SimpleMap<ta_key_pair, TraceArro
 
         TraceArrows *target = get_arrows_by_type(ta.target_type());
 
+        int ij = index_[i]+j-i;
         source.trace_arrow_[ij].erase(col);
         source.dec_count();
         source.inc_erase();
