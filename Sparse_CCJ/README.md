@@ -54,9 +54,9 @@ To get the predicted secondary structure for the sequence "GCAACGAUGACAUACAUCGCU
 ```
 ./CCJ GCAACGAUGACAUACAUCGCUAGUCGACGC
 ```
-To use a file with SHAPE data in the same directory called "shapedata.txt":
+To use the Modified CCJ version:
 ```
-./CCJ GCAACGAUGACAUACAUCGCUAGUCGACGC -shape=shapedata.txt
+./CCJ GCAACGAUGACAUACAUCGCUAGUCGACGC -ns
 ```
 To use Sparse CCJ with no garbage collection, printing out information on the number of trace arrows used:
 ```
