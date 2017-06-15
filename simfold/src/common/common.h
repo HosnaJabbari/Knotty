@@ -19,6 +19,8 @@
 #define COMMON_H
 
 #include <stdio.h>
+#include <vector>
+#include <memory>
 #include "structs.h"
 #include "s_partition_function.h"
 
@@ -43,7 +45,33 @@
 
 //#define asymmetry_penalty(size1, size2) (MIN (misc.asymmetry_penalty_max_correction, abs (size1-size2) * misc.asymmetry_penalty_array [MIN (2, MIN ((size1), (size2)))-1]))
 
-PARAMTYPE asymmetry_penalty (int size1, int size2);
+// Ian Wark Jun 8 2017
+// Array [0..30][0..nb_nucleotides-1]
+// 3 arrays for each H,B,I
+class asymmetry_penalties_class {
+private:
+    std::vector< std::vector<PARAMTYPE> > arr;
+    int max_size;
+
+    asymmetry_penalties_class(asymmetry_penalties_class&) { }
+public:
+    asymmetry_penalties_class(int nb_nucleotides);
+
+    ~asymmetry_penalties_class() {}
+    inline PARAMTYPE get_asymmetry_penalty(int size1, char size2) {
+        return arr[size1][size2];
+    }
+
+};
+
+extern std::unique_ptr<asymmetry_penalties_class> asymmetry_penalties;
+
+void create_asymmetry_penalties(int nb_nucleotides);
+
+inline PARAMTYPE asymmetry_penalty (int size1, int size2)
+{
+    return asymmetry_penalties->get_asymmetry_penalty(size1,size2);
+}
 
 #define asymmetry_penalty_enthalpy(size1, size2) (MIN (enthalpy_misc.asymmetry_penalty_max_correction, abs (size1-size2) * enthalpy_misc.asymmetry_penalty_array [MIN (2, MIN ((size1), (size2)))-1]))
 
@@ -112,11 +140,40 @@ int is_nucleotide (char base);
 void check_sequence (char *sequence);
 // check sequence for length and alphabet
 
-    
-PARAMTYPE penalty_by_size (int size, char type);
+// Ian Wark Jun 8 2017
+// Array [0..2][0..nb_nucleotides-1]
+// 3 arrays for each H,B,I
+class size_penalties_class {
+private:
+    std::vector< std::vector<PARAMTYPE> > arr;
+    int max_size;
+
+    size_penalties_class(size_penalties_class&) { }
+public:
+    size_penalties_class(int nb_nucleotides);
+
+    ~size_penalties_class() {}
+    inline PARAMTYPE get_size_penalty(int size, char type) {
+             if (type == 'H') type = 0;
+        else if (type == 'B') type = 1;
+        else if (type == 'I') type = 2;
+
+        return arr[type][size];
+    }
+
+};
+
+extern std::unique_ptr<size_penalties_class> size_penalties;
+
+void create_size_penalties(int nb_nucleotides);
+
+inline PARAMTYPE penalty_by_size (int size, char type)
 // PRE:  size is the size of the loop
 //       type is HAIRP or INTER or BULGE
 // POST: return the penalty by size of the loop
+{
+    return size_penalties->get_size_penalty(size,type);
+}
 
 //PARAMTYPE IL_penalty_by_size_2D (int size1, int size2);
 

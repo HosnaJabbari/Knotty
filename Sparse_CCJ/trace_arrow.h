@@ -82,20 +82,6 @@ public:
 	: energy_(e),ref_count(0), srctype_(srctype), tgttype_(tgttype),
       i_(i), j_(j), k_(k), l_(l), W_type_(-1), W_i_(-1), W_l_(-1)
     {
-        // Asserts to ensure that the values fit within the data type
-        /*
-        /// TODO i'm a bit confused by size_t
-        int assert_i = i;
-        int assert_j = j;
-        int assert_k = k;
-        int assert_l = l;
-
-        assert((-32768 < assert_i) && (assert_i < 32767));
-        assert((-32768 < assert_j) && (assert_j < 32767));
-        assert((-32768 < assert_k) && (assert_k < 32767));
-        assert((-32768 < assert_l) && (assert_l < 32767));
-        assert((-32768 < e) && (e < 32767));
-        */
     }
 
     // Other things are for when it also has a WB, WBP, WP, or WPP
@@ -106,23 +92,6 @@ public:
 	: energy_(e),ref_count(0), srctype_(srctype), tgttype_(tgttype),
 	  i_(i), j_(j), k_(k), l_(l), W_type_(W_type), W_i_(W_i), W_l_(W_l)
     {
-        // Asserts to ensure that the values fit within the data type
-        /*
-        int assert_i = i;
-        int assert_j = j;
-        int assert_k = k;
-        int assert_l = l;
-        int assert_W_i = W_i;
-        int assert_W_l = W_l;
-
-        assert((-32768 < assert_i) && (assert_i < 32767));
-        assert((-32768 < assert_j) && (assert_j < 32767));
-        assert((-32768 < assert_k) && (assert_k < 32767));
-        assert((-32768 < assert_l) && (assert_l < 32767));
-        assert((-32768 < assert_W_i) && (assert_W_i < 32767));
-        assert((-32768 < assert_W_l) && (assert_W_l < 32767));
-        assert((-32768 < e) && (e < 32767));
-        */
     }
 
     void replace(index_t src_i, index_t src_j, index_t src_k, index_t src_l,
@@ -135,20 +104,6 @@ public:
 
         energy_ = e;
         tgttype_ = tgttype;
-
-        // asserts to ensure values fit into data types
-        /*
-        int assert_i = i;
-        int assert_j = j;
-        int assert_k = k;
-        int assert_l = l;
-
-        assert((-32768 < assert_i) && (assert_i < 32767));
-        assert((-32768 < assert_j) && (assert_j < 32767));
-        assert((-32768 < assert_k) && (assert_k < 32767));
-        assert((-32768 < assert_l) && (assert_l < 32767));
-        assert((-32768 < e) && (e < 32767));
-        */
     }
 
     /**
@@ -285,7 +240,12 @@ public:
     const TraceArrow *
     trace_arrow_from(size_t i, size_t j, size_t k, size_t l) const {
         int ij = index_[i]+j-i;
-        return &trace_arrow_[ij].find(ta_key_pair(k,l))->second;
+        auto iter = trace_arrow_[ij].find(ta_key_pair(k,l));
+
+        if (iter != trace_arrow_[ij].end())
+            return &iter->second;
+        else
+            return nullptr;
     }
 
     /**
@@ -301,7 +261,12 @@ public:
     TraceArrow *
     trace_arrow_from(size_t i, size_t j, size_t k, size_t l) {
         int ij = index_[i]+j-i;
-        return &trace_arrow_[ij].find(ta_key_pair(k,l))->second;
+        auto iter = trace_arrow_[ij].find(ta_key_pair(k,l));
+
+        if (iter != trace_arrow_[ij].end())
+            return &iter->second;
+        else
+            return nullptr;
     }
 
     /**
@@ -322,7 +287,12 @@ public:
     void
     delete_trace_arrow(size_t i, size_t j, size_t k, size_t l) {
         int ij = index_[i]+j-i;
-        trace_arrow_[ij].erase(ta_key_pair(k,l));
+        auto iter = trace_arrow_[ij].find(ta_key_pair(k,l));
+
+        if (iter != trace_arrow_[ij].end())
+            trace_arrow_[ij].erase(iter);
+
+        //trace_arrow_[ij].erase(ta_key_pair(k,l));
     }
 
     /**

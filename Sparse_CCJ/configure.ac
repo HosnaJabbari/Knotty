@@ -21,6 +21,26 @@ dnl --> set these variables instead of CXXFLAGS or LDFLAGS
 AC_SUBST([AM_CXXFLAGS])
 AC_SUBST([AM_LDFLAGS])
 
+dnl #################
+dnl # Debug option
+dnl 
+AC_MSG_CHECKING([whether to build with debug information])
+debuger=no
+AC_ARG_ENABLE([debug],
+    AC_HELP_STRING(
+        [--enable-debug],
+        [enable debug data generation (def=no)]
+    ),
+    debuger="$enableval"
+)
+AC_MSG_RESULT($debuger)
+if test x"$debuger" = x"yes"; then
+    AC_DEFINE([DEBUG], [], [Define to 1 for turning on debugging])
+    CXXFLAGS="$CXXFLAGS -g -Wall"
+else
+    AC_DEFINE([NDEBUG], [], [Define to 1 for turning off debugging])
+fi
+
 ## check pkg-config
 AC_CHECK_PROG([PKG_CONFIG_AVAILABLE],pkg-config,[true],[false])
 

@@ -28,43 +28,56 @@
 #include "common.h"
 
 
-PARAMTYPE asymmetry_penalty (int size1, int size2)
+std::unique_ptr<asymmetry_penalties_class> asymmetry_penalties;
+
+void create_asymmetry_penalties(int nb_nucleotides) {
+    asymmetry_penalties = std::unique_ptr<asymmetry_penalties_class>(new asymmetry_penalties_class(nb_nucleotides));
+}
+
+// pre-compute asymmetry penalties
+asymmetry_penalties_class::asymmetry_penalties_class(int nb_nucleotides)
 {
-    PARAMTYPE penalty = 0;
-    if (parsi_asymmetry == T99)
-        penalty = MIN (misc.asymmetry_penalty_max_correction, abs (size1-size2) * misc.asymmetry_penalty_array [MIN (2, MIN (size1, size2))-1]);
-    //printf ("Asym penalty real: %d\n", penalty);
-    else 
-    {    
-        if (size1 == size2) return 0;
-        if (parsi_asymmetry == PARSI)
-        {
-            penalty = (PARAMTYPE) (internal_asymmetry_initiation + internal_asymmetry_slope * log (abs (size1-size2)));
-        }
-        else if (parsi_asymmetry == LAVISH)
-        {
-            if (abs (size1-size2) < MAXLOOP_ASYM)
-            {
-                // we assume the following model: from asymmetry 1 to 4, we use initiation, slope and int_asym (like an addition)
-                if (abs (size1-size2) <= MAX_EXP_ASYM)
-                {
-                    penalty += internal_asymmetry_initiation;
-                    penalty += (PARAMTYPE) (log (abs (size1-size2)) * internal_asymmetry_slope);
-                    penalty += internal_asymmetry[(int)(abs (size1-size2))];
-                }
-                else
-                {
-                    penalty += internal_asymmetry[(int)(abs (size1-size2))];
-                }
-            }
+    arr.resize(MAXLOOP+1);
+    for(int size1 = 0; size1 < MAXLOOP+1; ++size1) {
+        arr[size1].resize(nb_nucleotides);
+        for (int size2 = 0; size2 < nb_nucleotides; ++size2) {
+            PARAMTYPE penalty = 0;
+            if (parsi_asymmetry == T99)
+                penalty = MIN (misc.asymmetry_penalty_max_correction, abs (size1-size2) * misc.asymmetry_penalty_array [MIN (2, MIN (size1, size2))-1]);
+            //printf ("Asym penalty real: %d\n", penalty);
             else
             {
-                penalty += internal_asymmetry_initiation;
-                penalty += (PARAMTYPE) (log (abs (size1-size2)) * internal_asymmetry_slope);
+                if (size1 == size2) arr[size1][size2] = 0;
+                if (parsi_asymmetry == PARSI)
+                {
+                    penalty = (PARAMTYPE) (internal_asymmetry_initiation + internal_asymmetry_slope * log (abs (size1-size2)));
+                }
+                else if (parsi_asymmetry == LAVISH)
+                {
+                    if (abs (size1-size2) < MAXLOOP_ASYM)
+                    {
+                        // we assume the following model: from asymmetry 1 to 4, we use initiation, slope and int_asym (like an addition)
+                        if (abs (size1-size2) <= MAX_EXP_ASYM)
+                        {
+                            penalty += internal_asymmetry_initiation;
+                            penalty += (PARAMTYPE) (log (abs (size1-size2)) * internal_asymmetry_slope);
+                            penalty += internal_asymmetry[(int)(abs (size1-size2))];
+                        }
+                        else
+                        {
+                            penalty += internal_asymmetry[(int)(abs (size1-size2))];
+                        }
+                    }
+                    else
+                    {
+                        penalty += internal_asymmetry_initiation;
+                        penalty += (PARAMTYPE) (log (abs (size1-size2)) * internal_asymmetry_slope);
+                    }
+                }
             }
+            arr[size1][size2] = penalty;
         }
     }
-    return penalty;
 
     // I tried the following for MODEL == EXTENDED, but I changed my mind
 /*    // assume the size1 + size2 <= MAXLOOP_I. If it's greater, just use the value of the last parameter
@@ -78,7 +91,6 @@ PARAMTYPE asymmetry_penalty (int size1, int size2)
     if (size1 + size2 <= MAXLOOP_I)      return internal_asymmetry [abs (size1-size2)];
     return internal_asymmetry[MAXLOOP_I-2];    */
 }
-
 
 
 void get_sorted_positions (int n, double numbers[], int positions[])
@@ -649,89 +661,111 @@ PARAMTYPE IL_penalty_by_size_2D (int size1, int size2)
 }
 */
 
+std::unique_ptr<size_penalties_class> size_penalties;
 
-
-PARAMTYPE penalty_by_size (int size, char type)
-// PRE:  size is the size of the loop
-//       type is HAIRP or INTER or BULGE
-// POST: return the penalty by size of the loop
-{
-    PARAMTYPE penalty30, penalty;
-    double logval;
-    //return 500.0;
-    int end;
-    
-    if (parsi_length == T99)
-    {
-        if (type == 'H')    end = MAXLOOP_H_T99;
-        if (type == 'B')    end = MAXLOOP_B_T99;
-        if (type == 'I')    end = MAXLOOP_I_T99;
-    }
-    else if (parsi_length == PARSI || parsi_length == ZL)
-    {
-        if (type == 'H')    end = MAXLOOP_H_PARSI;
-        if (type == 'B')    end = MAXLOOP_B_PARSI;
-        if (type == 'I')    end = MAXLOOP_I_PARSI;
-    }
-    else if (parsi_length == LAVISH)
-    {
-        if (type == 'H')    end = MAXLOOP_H_LAVISH;
-        if (type == 'B')    end = MAXLOOP_B_LAVISH;
-        if (type == 'I')    end = MAXLOOP_I_LAVISH;    
-    }   
-    
-    // the penalties for size <= MAXLOOP _H, _B, _I should be read from the file "loop"
-    //if (size <= MAXLOOP)
-    if (type == 'H' && size <= end)
-    {
-        //printf ("real:   size=%d, penalty=%g\n", size, hairpin_penalty_by_size[size]);
-        //return 50.0;
-        //return hairpin_penalty_by_size[size]/100;
-        return hairpin_penalty_by_size[size];
-    }
-    if (type == 'I' && size <= end)
-    {
-        //return 50.0;
-        return internal_penalty_by_size[size];
-    }
-    if (type == 'B' && size <= end)
-    {
-        //return 50.0;
-        return bulge_penalty_by_size[size];
-    }
-
-    //return 50.0;
-    // size > MAXLOOP _H, _B, _I
-    if (type == 'H')
-    {
-        penalty30 = hairpin_penalty_by_size[end];
-        logval = log (1.0*size/end);
-    }        
-    else if (type == 'I')
-    {
-        penalty30 = internal_penalty_by_size[end];
-        logval = log (1.0*size/end);
-    }
-    else if (type == 'B')
-    {
-        penalty30 = bulge_penalty_by_size[end];
-        logval = log (1.0*size/end);
-    }
-    else
-    {
-        printf ("ERROR! type is not valid, ABORT!\n");
-        exit(1);
-    }
-
-    penalty = (PARAMTYPE) (penalty30 + 100.0*misc.param_greater30 * logval);
-    //if (type == 'H')
-    //    printf ("real:   size=%d, penalty=%g\n", size, penalty);
-    //printf ("penalty big = %d\n", penalty);
-    //printf ("gr30: %.2lf, logval=%.2lf, penalty of %d = %d\n", misc.param_greater30, logval, size, penalty);
-
-    return penalty;
+void create_size_penalties(int nb_nucleotides) {
+    size_penalties = std::unique_ptr<size_penalties_class>(new size_penalties_class(nb_nucleotides));
 }
 
+size_penalties_class::size_penalties_class(int nb_nucleotides) {
+    max_size = nb_nucleotides;
+    arr.resize(3);
+    for(int type = 0; type < 3; type++) {
+        // 0 is H, 1 is B, 2 is I
+        int end;
+        if (parsi_length == T99)
+        {
+            switch(type) {
+                case 0:
+                    end = MAXLOOP_H_T99; break;
+                case 1:
+                    end = MAXLOOP_B_T99; break;
+                case 2:
+                    end = MAXLOOP_I_T99; break;
+                default:
+                    printf("Error in simfold/src/common/common.cpp creation of size_penalties\n");
+                    exit(-1);
+            }
+        }
+        else if (parsi_length == PARSI || parsi_length == ZL)
+        {
+            switch(type) {
+                case 0:
+                    end = MAXLOOP_H_PARSI; break;
+                case 1:
+                    end = MAXLOOP_B_PARSI; break;
+                case 2:
+                    end = MAXLOOP_I_PARSI; break;
+                default:
+                    printf("Error in simfold/src/common/common.cpp creation of size_penalties\n");
+                    exit(-1);
+            }
+        }
+        else if (parsi_length == LAVISH)
+        {
+            switch(type) {
+                case 0:
+                    end = MAXLOOP_H_LAVISH; break;
+                case 1:
+                    end = MAXLOOP_B_LAVISH; break;
+                case 2:
+                    end = MAXLOOP_I_LAVISH; break;
+                default:
+                    printf("Error in simfold/src/common/common.cpp creation of size_penalties\n");
+                    exit(-1);
+            }
+        }
+
+        arr[type].resize(max_size);
+        for (int size=0; size < max_size; size++) {
+            PARAMTYPE penalty30, penalty;
+            double logval;
+
+            // the penalties for size <= MAXLOOP _H, _B, _I should be read from the file "loop"
+            //if (size <= MAXLOOP)
+            if (type == 0 && size <= end)
+            {
+                penalty = hairpin_penalty_by_size[size];
+            }
+            else if (type == 1 && size <= end)
+            {
+                penalty = bulge_penalty_by_size[size];
+            }
+            else if (type == 2 && size <= end)
+            {
+                penalty = internal_penalty_by_size[size];
+            }
+            else {
+                //return 50.0;
+                // size > MAXLOOP _H, _B, _I
+                if (type == 0)
+                {
+                    penalty30 = hairpin_penalty_by_size[end];
+                    logval = log (1.0*size/end);
+                }
+                else if (type == 1)
+                {
+                    penalty30 = bulge_penalty_by_size[end];
+                    logval = log (1.0*size/end);
+                }
+                else if (type == 2)
+                {
+                    penalty30 = internal_penalty_by_size[end];
+                    logval = log (1.0*size/end);
+                }
+                else
+                {
+                    printf ("ERROR! type is not valid, ABORT!\n");
+                    exit(1);
+                }
+
+                penalty = (PARAMTYPE) (penalty30 + 100.0*misc.param_greater30 * logval);
+            }
+
+            arr[type][size] = penalty;
+        }
+    }
+}
 
 PARAMTYPE penalty_by_size_enthalpy (int size, char type)
 // PRE:  size is the size of the loop
