@@ -47,8 +47,8 @@
 
 // Ian Wark Jun 8 2017
 // Class for holding precomputed asymmetry penalties
-// input size1 < 30 and size2 < nb_nucleotides-1
-// Array [0..30][0..nb_nucleotides-1]
+// input size1 < MAXLOOP and size2 < nb_nucleotides-1
+// Array [0..MAXLOOP][0..nb_nucleotides-1]
 class asymmetry_penalties_class {
 private:
     std::vector< std::vector<PARAMTYPE> > arr;
