@@ -109,12 +109,15 @@ brack_type *h_pop (brack_stack *st)
 
 
 double ccj(char *sequence, char *structure){
+    // Ian Wark June 2017
+    // tell simfold to precompute penalties.
+    // essential to not seg-faulting	
     create_size_penalties(strlen(sequence));
     create_asymmetry_penalties(strlen(sequence));
 
-	W_final *min_fold = new W_final (sequence);
-	if (min_fold == NULL) giveup ("Cannot allocate memory", "CCJ");
-	double energy = min_fold->ccj();
+    W_final *min_fold = new W_final (sequence);
+    if (min_fold == NULL) giveup ("Cannot allocate memory", "CCJ");
+    double energy = min_fold->ccj();
     min_fold->return_structure (structure);
     return energy;
 
