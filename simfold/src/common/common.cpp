@@ -30,17 +30,24 @@
 
 std::unique_ptr<asymmetry_penalties_class> asymmetry_penalties;
 
+// Simply creates the class object with nb_nucleotides and assigns it to the pointer
 void create_asymmetry_penalties(int nb_nucleotides) {
     asymmetry_penalties = std::unique_ptr<asymmetry_penalties_class>(new asymmetry_penalties_class(nb_nucleotides));
 }
 
 // pre-compute asymmetry penalties
+// nb_nucleotides is the length of the sequence (number of nucleotides)
 asymmetry_penalties_class::asymmetry_penalties_class(int nb_nucleotides)
 {
+    // possible inputs: 0 < size1 < MAXLOOP and 0 < size2 < nb_nucleotides-1
+    // so vector is accessed by [0..MAXLOOP][0..nb_nucleotides-1]
     arr.resize(MAXLOOP+1);
+    // for each possible size1 input:
     for(int size1 = 0; size1 < MAXLOOP+1; ++size1) {
         arr[size1].resize(nb_nucleotides);
+        // for each possible size2 input:
         for (int size2 = 0; size2 < nb_nucleotides; ++size2) {
+            // calculate the result at input (size1,size2) and store at arr[size1][size2]
             PARAMTYPE penalty = 0;
             if (parsi_asymmetry == T99)
                 penalty = MIN (misc.asymmetry_penalty_max_correction, abs (size1-size2) * misc.asymmetry_penalty_array [MIN (2, MIN (size1, size2))-1]);
@@ -663,13 +670,19 @@ PARAMTYPE IL_penalty_by_size_2D (int size1, int size2)
 
 std::unique_ptr<size_penalties_class> size_penalties;
 
+// Simply creates the class object with nb_nucleotides and assigns it to the pointer
 void create_size_penalties(int nb_nucleotides) {
     size_penalties = std::unique_ptr<size_penalties_class>(new size_penalties_class(nb_nucleotides));
 }
 
+// precompute size penalties
+// nb_nucleotides is the length of the sequence (number of nucleotides)
 size_penalties_class::size_penalties_class(int nb_nucleotides) {
-    max_size = nb_nucleotides;
+    // for each possible output, calculate output and store in arr[type][size]
+    // possible inputs: 0 < size < nb_nucleotides-1 and type = H(0), B(1), or I(2)
+    // so vector is accessed by [0..2][0..nb_nucleotides-1]
     arr.resize(3);
+    // for each type (0..2)
     for(int type = 0; type < 3; type++) {
         // 0 is H, 1 is B, 2 is I
         int end;
@@ -716,8 +729,9 @@ size_penalties_class::size_penalties_class(int nb_nucleotides) {
             }
         }
 
-        arr[type].resize(max_size);
-        for (int size=0; size < max_size; size++) {
+        arr[type].resize(nb_nucleotides);
+        // for each possible size (0..nb_nucleotides-1)
+        for (int size=0; size < nb_nucleotides; size++) {
             PARAMTYPE penalty30, penalty;
             double logval;
 
