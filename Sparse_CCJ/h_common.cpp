@@ -100,6 +100,9 @@ brack_type *h_pop (brack_stack *st)
 
 
 double ccj(char *sequence, char *structure){
+    // Ian Wark June 2017
+    // tell simfold to precompute penalties.
+    // essential to not seg-faulting
     create_size_penalties(strlen(sequence));
     create_asymmetry_penalties(strlen(sequence));
 
