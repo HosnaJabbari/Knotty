@@ -54,6 +54,7 @@ private:
     std::vector< std::vector<PARAMTYPE> > arr;
   
 public:
+    // creates and fills the precomputed penalty vector
     // nb_nucleotides is the length of the sequence (number of nucleotides)
     asymmetry_penalties_class(int nb_nucleotides);
 
@@ -149,9 +150,9 @@ void check_sequence (char *sequence);
 class size_penalties_class {
 private:
     std::vector< std::vector<PARAMTYPE> > arr;
-    int max_size;
   
 public:
+    // creates and fills the precomputed penalty vector
     // nb_nucleotides is the length of the sequence (number of nucleotides)
     size_penalties_class(int nb_nucleotides);
 
