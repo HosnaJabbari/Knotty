@@ -21,6 +21,8 @@ make
 ```
 where \<path to Simfold installation> is where Simfold was installed. The default path is /usr/local. If you did not specify a custom prefix when installing Simfold, use /usr/local.   
 
+To enable asserts in the code use --enable-debug as an argument in configure.
+
 Example:   
 ```
 autoreconf -i     
