@@ -217,7 +217,7 @@ MasterTraceArrows::dec_source_ref_count(size_t i, size_t j, size_t k, size_t l, 
 }
 
 /** @brief Calls garbage collection of trace arrows on a row of trace arrows
- *  @param i is the i for the row to collect on
+ *  @param i is the which row to garbage collect on
  *  @param source trace arrow container
  */
 void
@@ -238,7 +238,8 @@ MasterTraceArrows::gc_row( size_t i, TraceArrows &source ) {
 
         // Call garbage collection on all the trace arrows at ij
         while (it != source.trace_arrow_[ij].end()) {
-
+    
+            // gc_trace_arrow returns true on successful deletion of a trace arrow, else false
             // If gc_trace_arrow erased that trace arrow go back one before continuing
             if(gc_trace_arrow(i,j,it,source)) {
                 if (at_front) {
@@ -246,7 +247,7 @@ MasterTraceArrows::gc_row( size_t i, TraceArrows &source ) {
                     it = source.trace_arrow_[ij].front();
                     prev = source.trace_arrow_[ij].front();
                 } else {
-                    // return to safe fallback point before continuing
+                    // return to safe fallback point before continuing to delete
                     it = prev;
 
                     if (it == source.trace_arrow_[ij].front())
@@ -264,29 +265,18 @@ MasterTraceArrows::gc_row( size_t i, TraceArrows &source ) {
     }
 }
 
-/** @brief Garbage collection of trace arrows
- *  @return true if that trace arrow was erased
- */
-bool
-MasterTraceArrows::gc_trace_arrow(size_t i, size_t j, size_t k, size_t l, TraceArrows &source){
-    int ij = index_[i]+j-i;
-    int kl = index_[k]+l-k;
-
-    assert( source.trace_arrow_[ij].exists(ta_key_pair(k,l)) );
-    SimpleMap<ta_key_pair, TraceArrow>::iterator col = source.trace_arrow_[ij].find(ta_key_pair(k,l));
-
-    assert(col->first.first == k && col->first.second == l);
-
-    return gc_trace_arrow(i, j, col, source);
-}
-
-/** @brief Garbage collection of trace arrows
- *  @return true if that trace arrow was erased
+/** @brief Garbage collection of a trace arrow (TA)
+ *  If TA's source_ref_count == 0, deletes it 
+ *  and calls gc_to_target on what TA it is pointing at 
+ *  (to change target TA's source_ref_count and possibly delete that TA as well).
+ *  Called primarily by gc_row and gc_to_target
+ *  @return true if that trace arrow was erased, else false
  */
 bool
 MasterTraceArrows::gc_trace_arrow(int i, int j, SimpleMap<ta_key_pair, TraceArrow>::iterator &col, TraceArrows &source) {
-    //int k = col->first.first; int l = col->first.second;
+    //     col->first.first is k   col->first.second is L
     assert(col->first.first > 0 && col->first.second > 0);
+    // get source trace arrow
     const TraceArrow ta = col->second;
 
 /*
@@ -301,27 +291,46 @@ MasterTraceArrows::gc_trace_arrow(int i, int j, SimpleMap<ta_key_pair, TraceArro
 
     assert(ta.source_ref_count() >= 0);
     if (ta.source_ref_count() == 0) {
+        // Save i,j,k,l of target trace arrow before deleting source arrow
         int tgt_i = ta.i(), tgt_j = ta.j(), tgt_k = ta.k(), tgt_l = ta.l();
 
+        // get container trace arrows of target_type
         TraceArrows *target = get_arrows_by_type(ta.target_type());
 
+        // erase source trace arrow
         int ij = index_[i]+j-i;
         source.trace_arrow_[ij].erase(col);
         source.dec_count();
         source.inc_erase();
 
-        // continue to what arrow is pointing at
         assert(ta.source_ref_count() == 0);
         assert(target != nullptr);
 
         // Only continue on and delete what it is pointing at if it is going backwards
         if (tgt_i > i)
+            // continue to what source arrow was pointing at
             gc_to_target(tgt_i, tgt_j, tgt_k, tgt_l, *target);
 
         return true;
     }
 
     return false;
+}
+
+/** @brief Garbage collection of a trace arrow
+ *  @return true if that trace arrow was erased, else false
+ */
+bool
+MasterTraceArrows::gc_trace_arrow(size_t i, size_t j, size_t k, size_t l, TraceArrows &source){
+    int ij = index_[i]+j-i;
+    int kl = index_[k]+l-k;
+
+    assert( source.trace_arrow_[ij].exists(ta_key_pair(k,l)) );
+    SimpleMap<ta_key_pair, TraceArrow>::iterator col = source.trace_arrow_[ij].find(ta_key_pair(k,l));
+
+    assert(col->first.first == k && col->first.second == l);
+
+    return gc_trace_arrow(i, j, col, source);
 }
 
 /** @brief Get trace arrow from the target if one exists and call gc_trace_arrow on it
