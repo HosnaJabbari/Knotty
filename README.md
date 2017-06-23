@@ -5,6 +5,8 @@ CCJ is a MFE (minimum free energy) based method for predicting the psuedoknotted
 There are three different versions of CCJ that are compared for the WABI 2017 paper submission.   
 For general usage, Sparse CCJ is recommended to be used.   
 
+CCJ should work on most Linux and Mac machines.
+
 The different versions are as follows:   
 Original CCJ is the original CCJ detailed in ["Algorithms for prediction of RNA pseudoknotted secondary structures"](https://open.library.ubc.ca/cIRcle/collections/ubctheses/24/items/1.0167140).   
 Modified CCJ is a version of Original CCJ that uses the DP09 energy model.   
