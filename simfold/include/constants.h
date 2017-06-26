@@ -95,11 +95,7 @@
 
 #define NUM_DANG       48        // there are 48 dangling ends 
 
-#define A               0
-#define C               1
-#define G               2
-#define U               3
-#define T               3
+enum bases {A,C,G,T,U=3};
 
 #define INF             1600000      // a very big value (infinity)
 #define NUCL            4            // number of nucleotides: 4: A, C, G, T
