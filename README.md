@@ -26,7 +26,7 @@ Instructions for usage are in the READMEs of the respective subdirectories.
 2. From a command line run
 ```
 cmake -H. -Bbuild
-cmake --build build -- -j3
+cmake --build build
 ```   
 3. Run CCJ by navigating to the directory of the CCJ version you wish to use and following the usage instructions in the README.md of that directory.   
 
