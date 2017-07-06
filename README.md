@@ -5,7 +5,7 @@ CCJ is a MFE (minimum free energy) based method for predicting the psuedoknotted
 There are three different versions of CCJ that are compared for the WABI 2017 paper submission.   
 For general usage, Sparse CCJ is recommended to be used.   
 
-CCJ should work on most Linux and Mac machines.
+CCJ should work on most Linux, Mac or Windows machines.
 
 The different versions are as follows:   
 Original CCJ is the original CCJ detailed in ["Algorithms for prediction of RNA pseudoknotted secondary structures"](https://open.library.ubc.ca/cIRcle/collections/ubctheses/24/items/1.0167140).   
@@ -19,13 +19,16 @@ Original CCJ is contained in the [Original_CCJ subdirectory](https://github.com/
 Sparse CCJ is contained in the [Sparse_CCJ subdirectory](https://github.com/HosnaJabbari/CCJ/tree/master/Sparse_CCJ).   
 Modified CCJ is used by running Sparse CCJ with a special argument. This is detailed in the [README.md](https://github.com/HosnaJabbari/CCJ/tree/master/Sparse_CCJ#sparse-ccj) in the [Sparse_CCJ subdirectory](https://github.com/HosnaJabbari/CCJ/tree/master/Sparse_CCJ). 
 
-Instructions for installation and usage are in the READMEs of the respective subdirectories.   
+Instructions for usage are in the READMEs of the respective subdirectories.   
 
 #### Steps for installation:
 1. [Download the repository](https://github.com/HosnaJabbari/CCJ/archive/master.zip) and extract the files onto your system.
-2. Install Simfold by following the instructions in the [README.md](https://github.com/HosnaJabbari/CCJ/tree/master/simfold#simfold) of the [Simfold subdirectory](https://github.com/HosnaJabbari/CCJ/tree/master/simfold).   
-3. Install the version of CCJ you want to use (If you don't know which version to use, use [Sparse CCJ](https://github.com/HosnaJabbari/CCJ/tree/master/Sparse_CCJ#sparse-ccj)) by following the installation instructions in the README.md of the corresponding subdirectory.    
-4. Run CCJ by following the usage instructions in the README.md of the CCJ version you wish to use.   
+2. From a command line run
+```
+cmake -H. -Bbuild
+cmake --build build -- -j3
+```   
+3. Run CCJ by navigating to the directory of the CCJ version you wish to use and following the usage instructions in the README.md of that directory.   
 
 #### Licence
 SimFold is a part of MultiRNAFold (http://www.rnasoft.ca/download.html).     
