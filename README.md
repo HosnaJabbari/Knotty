@@ -22,7 +22,7 @@ Modified CCJ is used by running Sparse CCJ with a special argument. This is deta
 Instructions for usage are in the READMEs of the respective subdirectories.   
 
 ### Installation:    
-First, you must have CMake installed on your computer. If it is already installed on your machine you can [skip ahead](https://github.com/HosnaJabbari/CCJ/blob/master/README.md#steps-for-installation).   
+First, [CMake](https://cmake.org/install/) must be installed. If it is already installed on your machine you can [skip ahead to steps for installation](https://github.com/HosnaJabbari/CCJ/blob/master/README.md#steps-for-installation).   
 To test if your Mac or Linux machine already has CMake, you can type into a terminal:     
 ```
 which cmake
