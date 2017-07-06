@@ -1,3 +1,5 @@
+# Ian Wark July 6 2017
+
 # ensure SIMFOLD_HOME == CMAKE_CURRENT_SOURCE_DIR
 # if not, give error
 if(${SIMFOLD_HOME} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR}) 
