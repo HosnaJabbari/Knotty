@@ -23,7 +23,7 @@ Instructions for usage are in the READMEs of the respective subdirectories.
 
 #### Steps for installation:
 1. [Download the repository](https://github.com/HosnaJabbari/CCJ/archive/master.zip) and extract the files onto your system.
-2. From a command line run
+2. From a command line in the root directory (where this README.md normally is) run
 ```
 cmake -H. -Bbuild
 cmake --build build
