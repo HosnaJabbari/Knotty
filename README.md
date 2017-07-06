@@ -21,8 +21,14 @@ Modified CCJ is used by running Sparse CCJ with a special argument. This is deta
 
 Instructions for usage are in the READMEs of the respective subdirectories.   
 
-### Steps for installation:    
-1. Install [CMake](https://cmake.org/install/) with version 2.8 or greater.   
+### Installation:    
+First, you must have CMake installed on your computer. If it is already installed on your machine you can [skip ahead](https://github.com/HosnaJabbari/CCJ/blob/master/README.md#steps-for-installation).   
+To test if your Mac or Linux machine already has CMake, you can type into a terminal:     
+```
+which cmake
+```
+If it prints a path such as "/usr/bin/cmake/", cmake is installed.     
+If it does not print anything, you will have to install CMake depending on your operating system.
 
 #### Mac:    
 Easiest way is to install homebrew and use that to install CMake.    
@@ -46,14 +52,14 @@ make install
 ```
 [Linux instructions source](https://geeksww.com/tutorials/operating_systems/linux/installation/downloading_compiling_and_installing_cmake_on_linux.php)
 
-   
-2. [Download the repository](https://github.com/HosnaJabbari/CCJ/archive/master.zip) and extract the files onto your system.
-3. From a command line in the root directory (where this README.md normally is) run
+#### Steps for installation   
+1. [Download the repository](https://github.com/HosnaJabbari/CCJ/archive/master.zip) and extract the files onto your system.
+2. From a command line in the root directory (where this README.md normally is) run
 ```
 cmake -H. -Bbuild
 cmake --build build
 ```   
-4. Run CCJ by navigating to the directory of the CCJ version you wish to use and following the usage instructions in the README.md of that directory.   
+3. Run CCJ by navigating to the directory of the CCJ version you wish to use and following the usage instructions in the README.md of that directory.   
 
 ### Licence
 SimFold is a part of MultiRNAFold (http://www.rnasoft.ca/download.html).     
