@@ -54,7 +54,7 @@ make install
 
 #### Steps for installation   
 1. [Download the repository](https://github.com/HosnaJabbari/CCJ/archive/master.zip) and extract the files onto your system.
-2. From a command line in the root directory (where this README.md normally is) run
+2. From a command line in the root directory (where this README.md is) run
 ```
 cmake -H. -Bbuild
 cmake --build build
