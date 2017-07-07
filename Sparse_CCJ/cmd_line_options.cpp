@@ -62,7 +62,7 @@ void shape_info::set_data(std::string filename) {
                 exit(-1);
             }
 
-            data_[i] = stof(input);
+            data_[i] = atof(input.c_str());
             ++i;
         }
 
