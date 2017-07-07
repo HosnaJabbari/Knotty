@@ -1,5 +1,6 @@
 #include "cmd_line_options.h"
 #include <stdlib.h>    
+#include <string>
 
 cmd_line_args cmd_line_options;
 shape_info shape = shape_info();
