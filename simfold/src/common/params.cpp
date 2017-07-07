@@ -1733,7 +1733,8 @@ double get_feature_counts_restricted (char *sequence, char *structure, double *c
     if (ignore_dangles)     no_dangling_ends = 1;
     else                    no_dangling_ends = 0;
     ignore_AU_penalty = ignore_first_AU_penalty;
-    double energy = count_each_structure_type (sequence, structure, "", c, f, reset_c);
+    char restricted[1] = "";
+    double energy = count_each_structure_type (sequence, structure, restricted, c, f, reset_c);
     return energy;
     
     // I tried to some check below, but if reset_c is 0, then it won't work.
@@ -7152,7 +7153,8 @@ void compute_gradient_f_smart (char *input_file, PFTYPE *f_gradient)
             continue;
         
         //printf ("Seq: |%s|\nStr: |%s|\nRes: |%s|\n", sequence, real_structure, restricted);
-        count_each_structure_type (sequence, real_structure, "", counter, f, 1);
+        char restricted[1] = "";
+        count_each_structure_type (sequence, real_structure, restricted, counter, f, 1);
         simfold_gradient_smart (sequence, logZ_gradient);        
         for (i = 0; i < num_params; i++)
         {
@@ -7212,8 +7214,9 @@ PFTYPE compute_f_and_gradient_f_smart (char *input_file, PFTYPE *f_gradient)
         if (!get_info_from_file (file, sequence, real_structure, restricted)) 
             continue;
         
-        //printf ("Seq: |%s|\nStr: |%s|\nRes: |%s|\n", sequence, real_structure, restricted);
-        count_each_structure_type (sequence, real_structure, "", counter, free_value, 1);
+        //printf ("Seq: |%s|\nStr: |%s|\nRes: |%s|\n", sequence, real_structure, restricted); 
+        char restricted[1] = "";
+        count_each_structure_type (sequence, real_structure, restricted, counter, free_value, 1);
         energy = free_energy_simfold (sequence, real_structure); 
         Z = simfold_f_and_gradient_smart (sequence, NULL, logZ_gradient);
         neglogli += 1.0*beta*energy + log(Z);
@@ -9613,13 +9616,14 @@ void fill_similarity_rule_with_optical_melting_reference (char *xml_filename)
         get_data_from_buffer (buffer, "sequence=\"", '\"', sequence);
         get_data_from_buffer (buffer, "structure=\"", '\"', structure);    
     
+        char restricted[1] = "";
         if (strcmp (sequence0, "") != 0)
         {            
-            count_each_structure_type (sequence0, structure0, "", counter0, f, 1);            
+            count_each_structure_type (sequence0, structure0, restricted, counter0, f, 1);            
         }  
         //printf ("Sequence:  %s\n", sequence);
         //printf ("Structure: %s\n", structure);
-        count_each_structure_type (sequence, structure, "", counter_min, f, 1);
+        count_each_structure_type (sequence, structure, restricted, counter_min, f, 1);
         //printf ("DONE %s\n", exp_id);
 
         for (i=0; i < num_params; i++)
