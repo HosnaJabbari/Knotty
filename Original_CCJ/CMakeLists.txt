@@ -10,11 +10,6 @@ SET(SOURCE
   CCJ.h CCJ.cpp 
 )
 
-# enable c++11
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
 # pass SIMFOLD_HOME to binary
 add_definitions("-DSIMFOLD_HOME=\"${SIMFOLD_HOME}\"")
 
