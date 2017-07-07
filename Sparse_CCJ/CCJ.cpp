@@ -72,7 +72,7 @@ int main (int argc, char *argv[])
                     std::string str = std::string(arg);
                     str = str.substr(3,str.length()-2);
                     if (shape.is_number(str))
-                        shape.set_b(stof(str));
+                        shape.set_b(atof(str.c_str()));
                     else
                         cmd_line_error = true;
                 }
@@ -81,7 +81,7 @@ int main (int argc, char *argv[])
                     std::string str = std::string(arg);
                     str = str.substr(3,str.length()-2);
                     if (shape.is_number(str))
-                        shape.set_m(stof(str));
+                        shape.set_m(atof(str.c_str()));
                     else
                         cmd_line_error = true;
                 }
