@@ -283,7 +283,7 @@ void fill_similarity_rule_with_optical_melting_reference (char *xml_filename);
 
 void fill_similarity_rules ();
 
-int get_data_from_buffer (char *buffer, char *header, char last_char, char *output);
+int get_data_from_buffer (char *buffer, const char *header, char last_char, char *output);
 // function to get the sequence, structure etc data from the XML lines
 
 int apply_rule_1 (int i, int j, int &i_rule1, int &j_rule1);

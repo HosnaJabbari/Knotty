@@ -356,7 +356,7 @@ int structure_type_index (char type[])
   // Mirela: Nov 23, 2003
   // Given the type as a string, return the index in string_params
 // TO EXTEND    
-{
+{ 
   int i, found;
   found = 0;
   
@@ -2883,7 +2883,7 @@ void initialize_correct_int22_expadd (int ii, int jj, int kk, int ll, int mm, in
 }
 
 
-int traverse_features_and_do_work (char *calling_function, PARAMTYPE *array, const char *filename)
+int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *array, const char *filename)
 // This function should be called by create_string_params and other functions, with the name of the calling function as argument
 // The purpose of it is to traverse the model's features in only one function instead of in many functions as it was up until now.
 // Make sure the calling_function string is properly dealt with at the beginning of this function
@@ -7489,7 +7489,7 @@ void compute_counts_matrix_LP (char *input_file, int train_samples)
 }
 
 
-void find_indeces_of_bbtypes (int &first, int &last, char *bbtype, int num_params)
+void find_indeces_of_bbtypes (int &first, int &last, const char *bbtype, int num_params)
 // PRE: the string_params are filled
 // assumes the bb of type are consecutive
 {
@@ -9186,7 +9186,7 @@ void print_parameters_in_ViennaRNA_format ()
     // the numbering of bases in the Vienna RNA format is ours + 1
     // i.e. A=1, C=2, G=3, U=4.
     int num_base_pairs = 6;
-    char *pnames[] = {"CG", "GC", "GU", "UG", "AU", "UA", " @"};
+    const char *pnames[] = {"CG", "GC", "GU", "UG", "AU", "UA", " @"};
     char bnames[] = "@ACGU";
 
     
@@ -9516,7 +9516,7 @@ void print_parameters_in_ViennaRNA_format ()
 }
 
 // functions to read from the thermodynamic set XML file
-int get_data_from_buffer (char *buffer, char *header, char last_char, char *output)
+int get_data_from_buffer (char *buffer, const char *header, char last_char, char *output)
 // function to get the sequence, structure etc data from the XML lines
 {
     char *begin;
