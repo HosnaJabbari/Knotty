@@ -21,9 +21,11 @@ Modified CCJ is used by running Sparse CCJ with a special argument. This is deta
 
 Instructions for usage are in the READMEs of the respective subdirectories.   
 
-### Installation:    
-First, [CMake](https://cmake.org/install/) version 3.1 or greater must be installed. If it is already installed on your system you can [skip ahead to steps for installation](https://github.com/HosnaJabbari/CCJ/blob/master/README.md#steps-for-installation).   
-To test if your Mac or Linux system already has CMake, you can type into a terminal:     
+### Installation:  
+Requirements: A compiler that supports C++11 standard and CMake version 3.1 or greater.    
+
+[CMake](https://cmake.org/install/) version 3.1 or greater must be installed.    
+To test if your Mac or Linux system already has CMake, you can type into a terminal:      
 ```
 cmake --version
 ```
@@ -58,6 +60,13 @@ make install
 cmake -H. -Bbuild
 cmake --build build
 ```   
+If you need to specify your computer to use a specific compiler, such as g++, you can instead run something like   
+```
+cmake -H. -Bbuild -DCMAKE_CXX_COMPILER=g++
+cmake --build build
+```   
+This can be useful for specifiying a compile that can use the C++11 standard.
+
 3. Run CCJ by navigating to the directory of the CCJ version you wish to use and following the usage instructions in the README.md of that directory.   
 
 ### Licence
