@@ -24,6 +24,9 @@ set(LIBRARY_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 # create library at LIBRARY_OUTPUT_PATH
 add_library (simfold ${SOURCE})
 
+# enable required C++11 features
+target_compile_features(simfold PRIVATE cxx_nullptr)
+
 # Enable compiler to find files for simfold library
 target_include_directories (simfold PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories (simfold PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

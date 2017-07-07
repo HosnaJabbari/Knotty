@@ -19,5 +19,8 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 add_executable(Original_CCJ ${SOURCE})
 set_target_properties(Original_CCJ PROPERTIES OUTPUT_NAME CCJ)
 
+# enable required C++11 features
+target_compile_features(Original_CCJ PRIVATE cxx_nullptr)
+
 # link to simfold
 target_link_libraries(Original_CCJ LINK_PUBLIC simfold)
