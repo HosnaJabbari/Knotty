@@ -50,7 +50,7 @@ void shape_info::set_data(std::string filename) {
 
         // the first number is in input
         // it starts from 1
-        data_[1] = std::stof(input);
+        data_[1] = stof(input);
         // go through where each word is a shape data number
         int i = 2;
         while (infile >> input) {
