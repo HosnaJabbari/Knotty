@@ -18,11 +18,6 @@ SET(SOURCE
   src/simfold/s_sub_folding.cpp src/simfold/s_partition_function.cpp
 )
 
-# enable c++11
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
 # set location to make .a file
 set(LIBRARY_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 
