@@ -53,7 +53,7 @@ make install
 ```
 [Linux instructions source](https://geeksww.com/tutorials/operating_systems/linux/installation/downloading_compiling_and_installing_cmake_on_linux.php)
 
-#### Windows (CURRENTLY NOT SUPPORTED):
+#### Windows:
 [Windows instructions with pictures](http://tulip.labri.fr/TulipDrupal/?q=node/1081)
 Download CMake from https://cmake.org/download/.
 Run CMake installer, making sure to add CMake to the system PATH when prompted.
