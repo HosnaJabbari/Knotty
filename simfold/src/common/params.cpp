@@ -352,11 +352,19 @@ void set_up_index_int_12_34 (char *type, int start0, int start1, int start2, int
         start = start3;
 }
     
-int structure_type_index (char type[])
+int structure_type_index (const char input[])
   // Mirela: Nov 23, 2003
   // Given the type as a string, return the index in string_params
 // TO EXTEND    
 { 
+  // Ian Wark July 7 2017
+  // A kind of hacky way of supressing the warnings 
+  // structure_type_index is called in mulitple places with just a string,
+  // ex. strucute_type_index("blugeA"), so the function should have const char* as input
+  // It needs to be normal char*, so instead just copy the const char* input into a normal char*
+  char type[strlen(input)+1];
+  strncpy(type, input, strlen(input)+1);  
+
   int i, found;
   found = 0;
   

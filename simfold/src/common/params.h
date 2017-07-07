@@ -60,7 +60,7 @@ void count_penalty_by_size (int size, char type, double *counter);
 
 void IL_count_penalty_by_size_2D (int size1, int size2, double *counter);
 
-int structure_type_index (char type[]);
+int structure_type_index (const char input[]);
   // Mirela: Nov 23, 2003
   // Given the type as a string, return the index in string_params
 
