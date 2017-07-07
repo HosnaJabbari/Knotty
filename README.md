@@ -24,7 +24,7 @@ Instructions for usage are in the READMEs of the respective subdirectories.
 ### Installation:  
 Requirements: A compiler that supports C++11 standard and CMake version 3.1 or greater.    
 
-[CMake](https://cmake.org/install/) version 3.1 or greater must be installed.    
+[CMake](https://cmake.org/install/) version 3.1 or greater must be installed in a way that CCJ can find it.    
 To test if your Mac or Linux system already has CMake, you can type into a terminal:      
 ```
 cmake --version
@@ -60,12 +60,12 @@ make install
 cmake -H. -Bbuild
 cmake --build build
 ```   
-If you need to specify your computer to use a specific compiler, such as g++, you can instead run something like   
+If you need to specify a specific compiler, such as g++, you can instead run something like   
 ```
 cmake -H. -Bbuild -DCMAKE_CXX_COMPILER=g++
 cmake --build build
 ```   
-This can be useful for specifiying a compile that can use the C++11 standard.
+This can be useful if you are getting errors about your compiler not having C++11 features.
 
 3. Run CCJ by navigating to the directory of the CCJ version you wish to use and following the usage instructions in the README.md of that directory.   
 
