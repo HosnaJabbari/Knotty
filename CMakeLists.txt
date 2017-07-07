@@ -1,6 +1,6 @@
 # Ian Wark July 6 2017
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.1)
 project(CCJ)
 
 # set SIMFOLD_HOME to simfold folder so CCJ binary can find it
