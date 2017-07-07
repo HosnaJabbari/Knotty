@@ -11,7 +11,10 @@ SET(SOURCE
 )
 
 # enable c++11
-add_compile_options(-std=c++11)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 # pass SIMFOLD_HOME to binary
 add_definitions("-DSIMFOLD_HOME=\"${SIMFOLD_HOME}\"")
 
