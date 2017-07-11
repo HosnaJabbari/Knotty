@@ -578,7 +578,7 @@ MasterTraceArrows::compactify() {
 
 void
 MasterTraceArrows::print_ta_sizes(){
-    int size = P.size() + PK.size() + PfromL.size() + PfromM.size() + PfromO.size() + PfromR.size()
+    unsigned long long size = P.size() + PK.size() + PfromL.size() + PfromM.size() + PfromO.size() + PfromR.size()
     + PL.size() + PR.size() + PM.size() + PO.size()
     + PLmloop.size() + PRmloop.size() + PMmloop.size() + POmloop.size()
     + PLmloop10.size() + PLmloop00.size()
@@ -586,7 +586,7 @@ MasterTraceArrows::print_ta_sizes(){
     + PMmloop10.size() + PMmloop01.size() + PMmloop00.size()
     + POmloop10.size() + POmloop00.size();
 
-    int erased = P.erased() + PK.erased() + PfromL.erased() + PfromM.erased() + PfromO.erased() + PfromR.erased()
+    unsigned long long erased = P.erased() + PK.erased() + PfromL.erased() + PfromM.erased() + PfromO.erased() + PfromR.erased()
     + PL.erased() + PR.erased() + PM.erased() + PO.erased()
     + PLmloop.erased() + PRmloop.erased() + PMmloop.erased() + POmloop.erased()
     + PLmloop10.erased() + PLmloop00.erased()
@@ -594,7 +594,7 @@ MasterTraceArrows::print_ta_sizes(){
     + PMmloop10.erased() + PMmloop01.erased() + PMmloop00.erased()
     + POmloop10.erased() + POmloop00.erased();
 
-    int avoided = P.avoided() + PK.avoided() + PfromL.avoided() + PfromM.avoided() + PfromO.avoided() + PfromR.avoided()
+    unsigned long long avoided = P.avoided() + PK.avoided() + PfromL.avoided() + PfromM.avoided() + PfromO.avoided() + PfromR.avoided()
     + PL.avoided() + PR.avoided() + PM.avoided() + PO.avoided()
     + PLmloop.avoided() + PRmloop.avoided() + PMmloop.avoided() + POmloop.avoided()
     + PLmloop10.avoided() + PLmloop00.avoided()
@@ -602,7 +602,7 @@ MasterTraceArrows::print_ta_sizes(){
     + PMmloop10.avoided() + PMmloop01.avoided() + PMmloop00.avoided()
     + POmloop10.avoided() + POmloop00.avoided();
 
-    int shortcut = P.shortcut() + PK.shortcut() + PfromL.shortcut() + PfromM.shortcut() + PfromO.shortcut() + PfromR.shortcut()
+    unsigned long long shortcut = P.shortcut() + PK.shortcut() + PfromL.shortcut() + PfromM.shortcut() + PfromO.shortcut() + PfromR.shortcut()
     + PL.shortcut() + PR.shortcut() + PM.shortcut() + PO.shortcut()
     + PLmloop.shortcut() + PRmloop.shortcut() + PMmloop.shortcut() + POmloop.shortcut()
     + PLmloop10.shortcut() + PLmloop00.shortcut()
@@ -610,7 +610,7 @@ MasterTraceArrows::print_ta_sizes(){
     + PMmloop10.shortcut() + PMmloop01.shortcut() + PMmloop00.shortcut()
     + POmloop10.shortcut() + POmloop00.shortcut();
 
-    int replaced = P.replaced() + PK.replaced() + PfromL.replaced() + PfromM.replaced() + PfromO.replaced() + PfromR.replaced()
+    unsigned long long replaced = P.replaced() + PK.replaced() + PfromL.replaced() + PfromM.replaced() + PfromO.replaced() + PfromR.replaced()
     + PL.replaced() + PR.replaced() + PM.replaced() + PO.replaced()
     + PLmloop.replaced() + PRmloop.replaced() + PMmloop.replaced() + POmloop.replaced()
     + PLmloop10.replaced() + PLmloop00.replaced()
@@ -618,7 +618,7 @@ MasterTraceArrows::print_ta_sizes(){
     + PMmloop10.replaced() + PMmloop01.replaced() + PMmloop00.replaced()
     + POmloop10.replaced() + POmloop00.replaced();
 
-    int max = P.max() + PK.max() + PfromL.max() + PfromM.max() + PfromO.max() + PfromR.max()
+    unsigned long long max = P.max() + PK.max() + PfromL.max() + PfromM.max() + PfromO.max() + PfromR.max()
     + PL.max() + PR.max() + PM.max() + PO.max()
     + PLmloop.max() + PRmloop.max() + PMmloop.max() + POmloop.max()
     + PLmloop10.max() + PLmloop00.max()

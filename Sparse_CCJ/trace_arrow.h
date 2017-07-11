@@ -141,6 +141,8 @@ public:
     }
 };
 
+
+
 /**
  * @brief Collection of trace arrows
  *
@@ -341,14 +343,14 @@ public:
     size_t
     capacity() const;
 
-    size_t size() const {return ta_count_;}
-    size_t erased() const {return ta_erase_;}
-    size_t avoided() const {return ta_avoid_;}
-    size_t shortcut() const {return ta_shortcut_;}
-    size_t replaced() const {return ta_replace_;}
-    size_t max() const {return ta_max_;}
+    unsigned long long size() const {return ta_count_;}
+    unsigned long long erased() const {return ta_erase_;}
+    unsigned long long avoided() const {return ta_avoid_;}
+    unsigned long long shortcut() const {return ta_shortcut_;}
+    unsigned long long replaced() const {return ta_replace_;}
+    unsigned long long max() const {return ta_max_;}
     void print_ta_size() const {
-        printf("size: %d avoided: %d shortcut:%d replaced: %d erased: %d max: %d\n",size(),avoided(),shortcut(),replaced(),erased(),max());
+        std::cout << "size: " << size() << "avoided: " << avoided() << "shortcut: " << shortcut() << "replaced: " << replaced() << "erased: " << erased() << "max: " << max() << std:endl;
     }
 
     void
