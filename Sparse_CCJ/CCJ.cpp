@@ -28,18 +28,17 @@ int main (int argc, char *argv[])
     char structures[MAXSUBSTR][MAXSLEN];
     double energies[MAXSUBSTR];
 
-    strcpy (sequence, argv[1]);
-
     bool cmd_line_error = false;
     bool w = false;
-
-    // important that this is before set_shape_file
-    cmd_line_options.set_sequence_length(strlen(sequence));
 
     if (argc < 2)
         cmd_line_error = true;
     else
     {
+        strcpy (sequence, argv[1]);
+	// important that this is before set_shape_file
+        cmd_line_options.set_sequence_length(strlen(sequence));
+
         if (argc > 2) {
             for (int i = 2; i < argc; ++i) {
                 char * arg = argv[i];
