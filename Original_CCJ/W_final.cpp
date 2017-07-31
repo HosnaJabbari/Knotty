@@ -25,10 +25,14 @@
 W_final::W_final(char *seq):s_min_folding(seq)
 {
 	this->nb_nucleotides = strlen(seq);
-	this->int_sequence = new int[this->nb_nucleotides];
-	if (int_sequence == NULL) giveup ("Cannot allocate memory", "W_final");
-	int i;
-    for (i=0; i < this->nb_nucleotides; i++) int_sequence[i] = nuc_to_int(seq[i]);
+
+	// Ian Wark July 21 2017
+	// we don't need this, this is done in s_min_folding
+	//this->int_sequence = new int[this->nb_nucleotides];
+	//if (int_sequence == NULL) giveup ("Cannot allocate memory", "W_final");
+	//int i;
+    //for (i=0; i < this->nb_nucleotides; i++) int_sequence[i] = nuc_to_int(seq[i]);
+
 	space_allocation();
 }
 
@@ -38,8 +42,10 @@ W_final::~W_final()
 	delete vm;
 	delete v;
 	delete P;
-	delete [] int_sequence;
 
+	// Ian Wark July 21 2017
+	// we don't need this, this is done in s_min_folding
+	//delete [] int_sequence;
 }
 
 // allocates space for P object and V_final
@@ -59,7 +65,7 @@ void W_final::space_allocation(){
 
     P = new pseudo_loop (sequence,v,this->H,this->S,this->VBI,vm);
     if (P == NULL) giveup ("Cannot allocate memory", "W_final");
-	
+
     vm->set_V_matrix(v);
     vm->set_P_matrix(P);
 
@@ -70,42 +76,42 @@ void W_final::space_allocation(){
 
 
 double W_final::ccj(){
-	
+
 	double energy=INF;
     int i=0, j=0;
-	   
+
     // set the VM matrix for VM_final
     vm->set_VM_matrix(VM);
-	
-	
-	
-	
+
+
+
+
 	// 1) fill all th ematrices simfold needs (i.e. pk free ones)
 	// This is done similar to s_min_folding::fold_sequence_restricted()
 	for (j=0; j < nb_nucleotides; j++)
     {
         for (i =j; i >= 0; i--)//for (i=0; i<=j; i++)
-        {            
-            
+        {
+
             V->compute_energy(i, j);
 			//if (debug){
 			//	printf("W_final line 90: V(%d,%d) type %c and V_final(%d,%d) type %c \n",i,j, V->get_type(i,j),i,j,v->get_type (i,j));
 			//}
-			
+
         }
         // if I put this before V calculation, WM(i,j) cannot be calculated, because it returns infinity
         VM->compute_energy_WM(j);
     }
-	
+
 	//printf("W_final::ccj() done with V matrices!\n");
 	for(i=nb_nucleotides; i>=0; i--)
 	//for (j=0; j < nb_nucleotides; j++)
     {
 		for(j=i; j<nb_nucleotides; j++)
         //for (i =j; i >= 0; i--)//for (i=0; i<=j; i++)
-        {            
+        {
 			P->compute_energies(i,j);
-			
+
 			vm->WM_compute_energy(i,j);
 			//        	if (debug){
 			//        		printf("WM_final(%d,%d) = %d \n",i,j,vm->get_energy_WM(i,j));
@@ -114,22 +120,22 @@ double W_final::ccj(){
 			//	printf("W_final line 111: V(%d,%d) type %c \n",i,j, v->get_type (i,j));
 			//}
         }
-		
+
 	}
-	
-	
-	
+
+
+
 	for (j= 1; j < nb_nucleotides; j++)
     {
     	this->compute_W(j);
     }
     energy = this->W[nb_nucleotides-1]/100.0;
 	//printf("energy = %f \n", energy);
-	
-	
-	
-	
-	
+
+
+
+
+
     // backtrack
     // first add (0,n-1) on the stack
     stack_interval = new seq_interval;
@@ -138,9 +144,9 @@ double W_final::ccj(){
     stack_interval->energy = W[nb_nucleotides-1];
     stack_interval->type = FREE;
     stack_interval->next = NULL;
-	
+
     seq_interval *cur_interval = stack_interval;
-	
+
     while ( cur_interval != NULL)
     {
         stack_interval = stack_interval->next;
@@ -148,23 +154,23 @@ double W_final::ccj(){
         delete cur_interval;    // this should make up for the new in the insert_node
         cur_interval = stack_interval;
     }
-	
+
 	if(debug){
 		printf("Backtrack DONE successfully! \n");
 	}
 	// Hosna: Feb 18, 2014
 	// after the backtrack is done, now we can fill the structure array with the help of minimum_fold array, f
 	fill_structure();
-	
+
     if (debug)
     {
         print_result ();
     }
 
 	delete stack_interval;
-	
+
     return energy;
-	
+
 }
 
 
@@ -183,7 +189,7 @@ void W_final::compute_W(int j)
     m1 = W[j-1];
     m2 = compute_W_br2(j);
     m3 = compute_W_br3(j);
-	
+
 	W[j] = MIN(m1,MIN(m2,m3));
 	if (debug){
 		int branch=-1;
@@ -196,7 +202,7 @@ void W_final::compute_W(int j)
 		}
 		if (j==22){
 			printf("W(22) = %d coming from branch %d\n",W[j],branch);
-			
+
 		}
 	}
 }
@@ -210,15 +216,15 @@ int W_final::compute_W_br2(int j)
     int chosen = 0;
     int best_i = 0;
 
-	
-    for (i=0; i<=j-1; i++)    
+
+    for (i=0; i<=j-1; i++)
     {
         // We don't need to make sure i and j don't have to pair with something else,
         //  because that would be INF - done in fold_sequence_restricted
         acc = (i-1>0) ? W[i-1]: 0;
 
         energy_ij = v->get_energy(i,j);
-		
+
         if (energy_ij < INF)
         {
             tmp = energy_ij + acc+ AU_penalty (int_sequence[i],int_sequence[j]);
@@ -233,13 +239,13 @@ int W_final::compute_W_br2(int j)
 		if (energy_ij < INF)
 		{
 			tmp = energy_ij + acc + AU_penalty (int_sequence[i+1],int_sequence[j]);
-		
+
 			PARAMTYPE dan = dangle_bot [int_sequence[j]]
 									[int_sequence[i+1]]
 										[int_sequence[i]];
-				
+
 			tmp += dan;
-			
+
 			if (tmp < min_energy)
 			{
 				min_energy = tmp;
@@ -252,12 +258,12 @@ int W_final::compute_W_br2(int j)
 		{
 			PARAMTYPE AU_pen=AU_penalty (int_sequence[i],int_sequence[j-1]);
 			tmp = energy_ij + acc +AU_pen;
-			
+
 			PARAMTYPE dan = dangle_top  [int_sequence [j-1]]
 										[int_sequence [i]]
 										[int_sequence [j]];
 			tmp += dan;
-			 
+
 			if (tmp < min_energy)
 			{
 				min_energy = tmp;
@@ -268,18 +274,18 @@ int W_final::compute_W_br2(int j)
         energy_ij = v->get_energy(i+1,j-1);
 		if (energy_ij < INF)
 		{
-			tmp = energy_ij + acc +AU_penalty (int_sequence[i+1],int_sequence[j-1]);	
-			
+			tmp = energy_ij + acc +AU_penalty (int_sequence[i+1],int_sequence[j-1]);
+
 			PARAMTYPE dan_bot = dangle_bot [int_sequence[j-1]]
 										[int_sequence[i+1]]
 										[int_sequence[i]];
 			PARAMTYPE dan_top = dangle_top [int_sequence [j-1]]
 								[int_sequence [i+1]]
 								[int_sequence [j]];
-	
+
 			tmp += dan_bot;
 			tmp += dan_top;
-			 
+
 			if (tmp < min_energy)
 			{
 				min_energy = tmp;
@@ -296,7 +302,7 @@ int W_final::compute_W_br2(int j)
 
 
 int W_final::compute_W_br3(int j){
-	
+
 	int min_energy = INF, tmp, energy_ij = INF, acc=INF;
     int i=-1;
     int chosen = 0;
@@ -304,7 +310,7 @@ int W_final::compute_W_br3(int j){
 
     for (i=0; i<=j-1; i++)    // TURN shouldn't be there
     {
-        
+
 		// We only chop W to W + P when the bases before P are free
 		//if (i == 0){
 
@@ -339,7 +345,7 @@ int W_final::compute_W_br3(int j){
 				}
 			}
 
-	        
+
 	        energy_ij = P->get_energy(i,j-1);
 			if (energy_ij < INF)
 			{
@@ -385,7 +391,7 @@ int W_final::compute_W_br3(int j){
 
 void W_final::backtrack(seq_interval *cur_interval){
     char type;
-	
+
 	//Hosna, March 8, 2012
 	// changing nested if to switch for optimality
 	switch (cur_interval->type){
@@ -395,7 +401,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			int j = cur_interval->j;
 			if (i >= j)
 				return;
-			f[i].pair = j; 
+			f[i].pair = j;
 			f[j].pair = i;
 
 			structure[i] = '(';
@@ -485,18 +491,18 @@ void W_final::backtrack(seq_interval *cur_interval){
 							best_k = k;
 							best_row = 1;
 						  }
-						  
+
 						  tmp = vm->get_energy_WM (i+2,k) + vm->get_energy_WM (k+1, j-1) +
 							dangle_top [int_sequence[i]][int_sequence[j]][int_sequence[i+1]] +
 							misc.multi_free_base_penalty;
-					
+
 						if (tmp < min_energy)
 						{
 							min_energy = tmp;
 							best_k = k;
 							best_row = 2;
 						}
-						
+
 						  tmp = vm->get_energy_WM (i+1,k) + vm->get_energy_WM (k+1, j-2) +
 							dangle_bot [int_sequence[i]][int_sequence[j]][int_sequence[j-1]] +
 							misc.multi_free_base_penalty;
@@ -507,7 +513,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 							best_k = k;
 							best_row = 3;
 						}
-						
+
 						  tmp = vm->get_energy_WM (i+2,k) + vm->get_energy_WM (k+1, j-2) +
 							dangle_top [int_sequence[i]][int_sequence[j]][int_sequence[i+1]] +
 							dangle_bot [int_sequence[i]][int_sequence[j]][int_sequence[j-1]] +
@@ -519,7 +525,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 							best_k = k;
 							best_row = 4;
 						}
-						
+
 
 						// Hosna: June 28, 2007
 						// the last branch of VM, which is WMB_(i+1),(j-1)
@@ -567,7 +573,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			}
 		}
 			break;
-		case FREE:    
+		case FREE:
 		{
 			int j = cur_interval->j;
 
@@ -584,13 +590,13 @@ void W_final::backtrack(seq_interval *cur_interval){
 				min_energy = tmp;
 				best_row = 0;
 			}
-			
+
 			for (i=0; i<=j-1; i++)    // no TURN
 			{
 
 				acc = (i-1>0) ? W[i-1] : 0;
 				energy_ij = v->get_energy(i,j);
-				
+
 				if (energy_ij < INF)
 				{
 					tmp = energy_ij + acc + AU_penalty (int_sequence[i],int_sequence[j]);
@@ -606,7 +612,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 				if (energy_ij < INF)
 				{
 					tmp = energy_ij + acc +AU_penalty (int_sequence[i+1],int_sequence[j]);
-				
+
 					tmp += dangle_bot [int_sequence[j]]
 						[int_sequence[i+1]]
 						[int_sequence[i]];
@@ -617,7 +623,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 						best_i = i;
 						best_row = 2;
 					}
-				
+
 				}
 				energy_ij = v->get_energy(i,j-1);
 				if (energy_ij < INF)
@@ -634,7 +640,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 						best_i = i;
 						best_row = 3;
 					}
-					
+
 				}
 				energy_ij = v->get_energy(i+1,j-1);
 				if (energy_ij > 0)
@@ -661,11 +667,11 @@ void W_final::backtrack(seq_interval *cur_interval){
 				acc = (i-1>0) ? W[i-1]: 0;
 
 				energy_ij = P->get_energy(i,j);
-				
+
 				if (energy_ij < INF)
 				{
 					tmp = energy_ij + acc + PS_penalty;
-					
+
 					if (tmp < min_energy)
 					{
 						min_energy = tmp;
@@ -683,9 +689,9 @@ void W_final::backtrack(seq_interval *cur_interval){
 						min_energy = tmp;
 						best_row = 6;
 						best_i = i;
-					
+
 					}
-				}					
+				}
 				energy_ij = P->get_energy(i,j-1);
 				if (energy_ij < INF)
 				{
@@ -695,7 +701,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 						min_energy = tmp;
 						best_row = 7;
 						best_i = i;
-						
+
 					}
 				}
 
@@ -708,7 +714,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 						min_energy = tmp;
 						best_row = 8;
 						best_i = i;
-						
+
 					}
 				}
 			}
@@ -718,29 +724,29 @@ void W_final::backtrack(seq_interval *cur_interval){
 					if (debug)
 						printf("W(%d) case 0: inserting Free (0,%d)\n",j,j-1);
 					insert_node (0, j-1, FREE); break;
-				case 1: 
+				case 1:
 					if (debug)
 						printf("W(%d) case 1: inserting Loop(%d,%d) and Free (0,%d)\n",j,best_i,j,best_i-1);
 					insert_node (best_i, j, LOOP);
 					if (best_i-1 > 0)     // it was TURN instead of 0  - not sure if TURN shouldn't be here
 						insert_node (0, best_i-1, FREE);
 					break;
-				case 2: 
+				case 2:
 					if (debug)
 						printf("W(%d) case 2: inserting Loop(%d,%d) and Free (0,%d)\n",j,best_i+1,j,best_i);
 					insert_node (best_i+1, j, LOOP);
 					if (best_i >= 0)// Hosna, March 26, 2012, was best_i-1 instead of best_i
 						insert_node (0, best_i, FREE);
 					break;
-				case 3: 
+				case 3:
 					if (debug)
 						printf("W(%d) case 3: inserting Loop(%d,%d) and Free (0,%d)\n",j,best_i,j-1,best_i-1);
 					insert_node (best_i, j-1, LOOP);
 					if (best_i-1 > 0)
 						insert_node (0, best_i-1, FREE);
 					break;
-				case 4: 
-					if (debug) 
+				case 4:
+					if (debug)
 						printf("W(%d) case 4: inserting Loop(%d,%d) and Free (0,%d)\n",j,best_i+1,j-1,best_i);
 					insert_node (best_i+1, j-1, LOOP);
 					if (best_i >= 0) // Hosna, March 26, 2012, was best_i-1 instead of best_i
@@ -755,22 +761,22 @@ void W_final::backtrack(seq_interval *cur_interval){
 					if (best_i-1 > 0)     // it was TURN instead of 0  - not sure if TURN shouldn't be here
 						insert_node (0, best_i-1, FREE);
 					break;
-				case 6: 
+				case 6:
 					if (debug)
 						printf("W(%d) case 6: inserting P(%d,%d) and Free (0,%d)\n",j,best_i+1,j,best_i);
 					insert_node (best_i+1, j, P_P);
 					if (best_i >= 0) // Hosna, March 26, 2012, was best_i-1 instead of best_i
 						insert_node (0, best_i, FREE);
 					break;
-				case 7: 
+				case 7:
 					if (debug)
 						printf("W(%d) case 7: inserting P(%d,%d) and Free (0,%d)\n",j,best_i,j-1,best_i-1);
 					insert_node (best_i, j-1, P_P);
 					if (best_i-1 > 0)
 						insert_node (0, best_i-1, FREE);
 					break;
-				case 8: 
-					if (debug)	
+				case 8:
+					if (debug)
 						printf("W(%d) case 8: inserting P(%d,%d) and Free (0,%d)\n",j,best_i+1,j-1,best_i);
 					insert_node (best_i+1, j-1, P_P);
 					if (best_i >= 0) // Hosna, March 26, 2012, was best_i-1 instead of best_i
@@ -786,14 +792,14 @@ void W_final::backtrack(seq_interval *cur_interval){
 			int j = cur_interval->j;
 			int tmp, min_energy = INF;
 			int best_k, best_row;
-			
+
 			if (debug)
 				printf ("\t (%d,%d) M_WM\n", i,j);
 
 			tmp = v->get_energy(i,j) +
 				AU_penalty (int_sequence[i], int_sequence[j]) +
 				misc.multi_helix_penalty;
-			
+
 			if (tmp < min_energy)
 			{
 				min_energy = tmp;
@@ -806,13 +812,13 @@ void W_final::backtrack(seq_interval *cur_interval){
 					[int_sequence[i]] +
 					misc.multi_helix_penalty +
 					misc.multi_free_base_penalty;
-			
+
 			if (tmp < min_energy)
 			{
 				min_energy = tmp;
 				best_row = 2;
 			}
-			
+
 			tmp = v->get_energy(i,j-1) +
 						AU_penalty (int_sequence[i], int_sequence[j-1]) +
 						dangle_top [int_sequence[j-1]]
@@ -826,7 +832,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 				min_energy = tmp;
 				best_row = 3;
 			}
-			
+
 			tmp = v->get_energy(i+1,j-1) +
 						AU_penalty (int_sequence[i+1], int_sequence[j-1]) +
 						dangle_bot [int_sequence[j-1]]
@@ -842,14 +848,14 @@ void W_final::backtrack(seq_interval *cur_interval){
 				min_energy = tmp;
 				best_row = 4;
 			}
-			
+
 			tmp = vm->get_energy_WM (i+1,j) + misc.multi_free_base_penalty;
 			if (tmp < min_energy)
 			{
 				min_energy = tmp;
 				best_row = 5;
 			}
-			
+
 			tmp = vm->get_energy_WM (i,j-1) + misc.multi_free_base_penalty;
 			if (tmp < min_energy)
 			{
@@ -866,7 +872,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 					best_row = 7;
 				}
 			}
-			  
+
 			  // the last branch of WM, which is P_i,j
 			tmp = P->get_energy(i,j)+PSM_penalty;
 			  if (tmp < min_energy){
@@ -936,7 +942,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			//structure = P->get_structure();
 			f = P->get_minimum_fold();
 		}
-			break;	
+			break;
 		case P_PR:
 		{
 			P->set_stack_interval(stack_interval);
@@ -967,7 +973,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			// Hosna, Feb 18, 2014
 			// removed structure in pseudoloop backtrack, see pseudoloop.cpp for detail
 			//P->back_track(structure,f,cur_interval);
-			P->back_track(f,cur_interval);			
+			P->back_track(f,cur_interval);
 			stack_interval = P->get_stack_interval();
 			//structure = P->get_structure();
 			f = P->get_minimum_fold();
@@ -979,7 +985,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			// Hosna, Feb 18, 2014
 			// removed structure in pseudoloop backtrack, see pseudoloop.cpp for detail
 			//P->back_track(structure,f,cur_interval);
-			P->back_track(f,cur_interval);			
+			P->back_track(f,cur_interval);
 			stack_interval = P->get_stack_interval();
 			//structure = P->get_structure();
 			f = P->get_minimum_fold();
@@ -992,7 +998,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			// removed structure in pseudoloop backtrack, see pseudoloop.cpp for detail
 			//P->back_track(structure,f,cur_interval);
 			P->back_track(f,cur_interval);
-			
+
 			stack_interval = P->get_stack_interval();
 			//structure = P->get_structure();
 			f = P->get_minimum_fold();
@@ -1005,7 +1011,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			// removed structure in pseudoloop backtrack, see pseudoloop.cpp for detail
 			//P->back_track(structure,f,cur_interval);
 			P->back_track(f,cur_interval);
-			
+
 			stack_interval = P->get_stack_interval();
 			//structure = P->get_structure();
 			f = P->get_minimum_fold();
@@ -1018,7 +1024,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			// removed structure in pseudoloop backtrack, see pseudoloop.cpp for detail
 			//P->back_track(structure,f,cur_interval);
 			P->back_track(f,cur_interval);
-			
+
 			stack_interval = P->get_stack_interval();
 			//structure = P->get_structure();
 			f = P->get_minimum_fold();
@@ -1031,7 +1037,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			// removed structure in pseudoloop backtrack, see pseudoloop.cpp for detail
 			//P->back_track(structure,f,cur_interval);
 			P->back_track(f,cur_interval);
-			
+
 			stack_interval = P->get_stack_interval();
 			//structure = P->get_structure();
 			f = P->get_minimum_fold();
@@ -1044,7 +1050,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			// removed structure in pseudoloop backtrack, see pseudoloop.cpp for detail
 			//P->back_track(structure,f,cur_interval);
 			P->back_track(f,cur_interval);
-			
+
 			stack_interval = P->get_stack_interval();
 			//structure = P->get_structure();
 			f = P->get_minimum_fold();
@@ -1057,7 +1063,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			// removed structure in pseudoloop backtrack, see pseudoloop.cpp for detail
 			//P->back_track(structure,f,cur_interval);
 			P->back_track(f,cur_interval);
-			
+
 			stack_interval = P->get_stack_interval();
 			//structure = P->get_structure();
 			f = P->get_minimum_fold();
@@ -1070,7 +1076,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			// removed structure in pseudoloop backtrack, see pseudoloop.cpp for detail
 			//P->back_track(structure,f,cur_interval);
 			P->back_track(f,cur_interval);
-			
+
 			stack_interval = P->get_stack_interval();
 			//structure = P->get_structure();
 			f = P->get_minimum_fold();
@@ -1083,7 +1089,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			// removed structure in pseudoloop backtrack, see pseudoloop.cpp for detail
 			//P->back_track(structure,f,cur_interval);
 			P->back_track(f,cur_interval);
-			
+
 			stack_interval = P->get_stack_interval();
 			//structure = P->get_structure();
 			f = P->get_minimum_fold();
@@ -1096,7 +1102,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			// removed structure in pseudoloop backtrack, see pseudoloop.cpp for detail
 			//P->back_track(structure,f,cur_interval);
 			P->back_track(f,cur_interval);
-			
+
 			stack_interval = P->get_stack_interval();
 			//structure = P->get_structure();
 			f = P->get_minimum_fold();
@@ -1109,7 +1115,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			// removed structure in pseudoloop backtrack, see pseudoloop.cpp for detail
 			//P->back_track(structure,f,cur_interval);
 			P->back_track(f,cur_interval);
-			
+
 			stack_interval = P->get_stack_interval();
 			//structure = P->get_structure();
 			f = P->get_minimum_fold();
@@ -1122,7 +1128,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			// removed structure in pseudoloop backtrack, see pseudoloop.cpp for detail
 			//P->back_track(structure,f,cur_interval);
 			P->back_track(f,cur_interval);
-			
+
 			stack_interval = P->get_stack_interval();
 			//structure = P->get_structure();
 			f = P->get_minimum_fold();
@@ -1135,7 +1141,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			// removed structure in pseudoloop backtrack, see pseudoloop.cpp for detail
 			//P->back_track(structure,f,cur_interval);
 			P->back_track(f,cur_interval);
-			
+
 			stack_interval = P->get_stack_interval();
 			//structure = P->get_structure();
 			f = P->get_minimum_fold();
@@ -1148,7 +1154,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			// removed structure in pseudoloop backtrack, see pseudoloop.cpp for detail
 			//P->back_track(structure,f,cur_interval);
 			P->back_track(f,cur_interval);
-			
+
 			stack_interval = P->get_stack_interval();
 			//structure = P->get_structure();
 			f = P->get_minimum_fold();
@@ -1161,7 +1167,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			// removed structure in pseudoloop backtrack, see pseudoloop.cpp for detail
 			//P->back_track(structure,f,cur_interval);
 			P->back_track(f,cur_interval);
-			
+
 			stack_interval = P->get_stack_interval();
 			//structure = P->get_structure();
 			f = P->get_minimum_fold();
@@ -1174,7 +1180,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			// removed structure in pseudoloop backtrack, see pseudoloop.cpp for detail
 			//P->back_track(structure,f,cur_interval);
 			P->back_track(f,cur_interval);
-			
+
 			stack_interval = P->get_stack_interval();
 			//structure = P->get_structure();
 			f = P->get_minimum_fold();
@@ -1187,7 +1193,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			// removed structure in pseudoloop backtrack, see pseudoloop.cpp for detail
 			//P->back_track(structure,f,cur_interval);
 			P->back_track(f,cur_interval);
-			
+
 			stack_interval = P->get_stack_interval();
 			//structure = P->get_structure();
 			f = P->get_minimum_fold();
@@ -1200,7 +1206,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			// removed structure in pseudoloop backtrack, see pseudoloop.cpp for detail
 			//P->back_track(structure,f,cur_interval);
 			P->back_track(f,cur_interval);
-			
+
 			stack_interval = P->get_stack_interval();
 			//structure = P->get_structure();
 			f = P->get_minimum_fold();
@@ -1213,7 +1219,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			// removed structure in pseudoloop backtrack, see pseudoloop.cpp for detail
 			//P->back_track(structure,f,cur_interval);
 			P->back_track(f,cur_interval);
-			
+
 			stack_interval = P->get_stack_interval();
 			//structure = P->get_structure();
 			f = P->get_minimum_fold();
@@ -1226,7 +1232,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			// removed structure in pseudoloop backtrack, see pseudoloop.cpp for detail
 			//P->back_track(structure,f,cur_interval);
 			P->back_track(f,cur_interval);
-			
+
 			stack_interval = P->get_stack_interval();
 			//structure = P->get_structure();
 			f = P->get_minimum_fold();
@@ -1239,7 +1245,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			// removed structure in pseudoloop backtrack, see pseudoloop.cpp for detail
 			//P->back_track(structure,f,cur_interval);
 			P->back_track(f,cur_interval);
-			
+
 			stack_interval = P->get_stack_interval();
 			//structure = P->get_structure();
 			f = P->get_minimum_fold();
@@ -1252,7 +1258,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			// removed structure in pseudoloop backtrack, see pseudoloop.cpp for detail
 			//P->back_track(structure,f,cur_interval);
 			P->back_track(f,cur_interval);
-			
+
 			stack_interval = P->get_stack_interval();
 			//structure = P->get_structure();
 			f = P->get_minimum_fold();
@@ -1265,7 +1271,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			// removed structure in pseudoloop backtrack, see pseudoloop.cpp for detail
 			//P->back_track(structure,f,cur_interval);
 			P->back_track(f,cur_interval);
-			
+
 			stack_interval = P->get_stack_interval();
 			//structure = P->get_structure();
 			f = P->get_minimum_fold();
@@ -1278,7 +1284,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			// removed structure in pseudoloop backtrack, see pseudoloop.cpp for detail
 			//P->back_track(structure,f,cur_interval);
 			P->back_track(f,cur_interval);
-			
+
 			stack_interval = P->get_stack_interval();
 			//structure = P->get_structure();
 			f = P->get_minimum_fold();
@@ -1291,7 +1297,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			// removed structure in pseudoloop backtrack, see pseudoloop.cpp for detail
 			//P->back_track(structure,f,cur_interval);
 			P->back_track(f,cur_interval);
-			
+
 			stack_interval = P->get_stack_interval();
 			//structure = P->get_structure();
 			f = P->get_minimum_fold();
@@ -1304,7 +1310,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			// removed structure in pseudoloop backtrack, see pseudoloop.cpp for detail
 			//P->back_track(structure,f,cur_interval);
 			P->back_track(f,cur_interval);
-			
+
 			stack_interval = P->get_stack_interval();
 			//structure = P->get_structure();
 			f = P->get_minimum_fold();
@@ -1317,7 +1323,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			// removed structure in pseudoloop backtrack, see pseudoloop.cpp for detail
 			//P->back_track(structure,f,cur_interval);
 			P->back_track(f,cur_interval);
-			
+
 			stack_interval = P->get_stack_interval();
 			//structure = P->get_structure();
 			f = P->get_minimum_fold();
@@ -1330,7 +1336,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			// removed structure in pseudoloop backtrack, see pseudoloop.cpp for detail
 			//P->back_track(structure,f,cur_interval);
 			P->back_track(f,cur_interval);
-			
+
 			stack_interval = P->get_stack_interval();
 			//structure = P->get_structure();
 			f = P->get_minimum_fold();
@@ -1346,7 +1352,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 
 // Hosna, Feb 18, 2014
 // TODO: COMPLETE
-// PRE backtrack was called and is complete, so f was filled with base pairing information 
+// PRE backtrack was called and is complete, so f was filled with base pairing information
 // POST structure is filled with dot brackets
 
 // Hosna, Feb 19, 2014
@@ -1366,7 +1372,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 //			band[num_bands] -> end = f[i].pair;
 //			band[num_bands]->open = e->open;
 //			band[num_bands]->close = e->close;
-//			
+//
 //		}
 //	}else{ //having the closing base pair
 //		for (int j= 0; j < num_bands; j++){
@@ -1384,13 +1390,13 @@ void W_final::backtrack(seq_interval *cur_interval){
 void W_final::fill_structure()
 {
     std::stack < brack_type > st;
-    
+
     //	brack_stack *st;
     //	st = new brack_stack;
     // Hosna, April 3, 2014
     // to make sure I have correct news and deletes I don't call h_init and copy its code here
     //h_init(st);
-    
+
     //	st->top = STACK_EMPTY;
     //    brack_type e1;
     //	e1 = new brack_type;
@@ -1398,40 +1404,40 @@ void W_final::fill_structure()
     //	e1->close = '>';
     //	h_push(st,e1);
     st.push(brack_type('<','>'));
-    
+
     //	brack_type *e2;
     //	e2 = new brack_type;
     //	e2->open = '{';
     //	e2->close = '}';
     //	h_push(st,e2);
     st.push(brack_type('{','}'));
-    
+
     //	brack_type *e3;
     //	e3 = new brack_type;
     //	e3->open = '[';
     //	e3->close = ']';
     //	h_push(st,e3);
     st.push(brack_type('[',']'));
-    
+
     //	brack_type *e4;
     //	e4 = new brack_type;
     //	e4->open = '(';
     //	e4->close = ')';
     //	h_push(st,e4);
     st.push(brack_type('(',')'));
-    
-    
-    
-    
+
+
+
+
     int isInABand=0;
     int num_crossing_bands=0;
-    
+
     //	band_elem *head = new band_elem;
     //    initNode(head,0,0,0,0);
     //    display(head);
     std::list <band_elem > bands;
     bands.push_back(band_elem('|','|',0,0,0,0));
-    
+
     //if(debug){
     //printf("queue_pointer outer_end = %d ---> root node created!\n",queue_pointer->outer_end);
     //}
@@ -1448,9 +1454,9 @@ void W_final::fill_structure()
             if(debug){
                 printf("base %d is unpaired => structure %c \n",i, structure[i]);
             }
-            
+
         }else if (i < ipair){
-            
+
             if(debug){
                 printf("base %d is paired with %d (%d<%d) \n",i,ipair,i,ipair);
             }
@@ -1472,7 +1478,7 @@ void W_final::fill_structure()
                     break;
                 }
             }
-            
+
             if (!isInABand){
                 if(debug){
                     printf("%d is NOT in a band, so we need a new paran type \n",i);
@@ -1483,7 +1489,7 @@ void W_final::fill_structure()
                 brack_type e = st.top();
                 st.pop();
                 //				st->top = st->top -1 ;
-                
+
                 num_crossing_bands++;
                 // create a new node
                 //				band_elem *tmp;
@@ -1496,14 +1502,14 @@ void W_final::fill_structure()
                 //				tmp->close = e->close;
                 //				tmp->next = NULL;
                 //                addNode(head,ipair,i,ipair,i,e.open,e.close);
-                
+
                 bands.push_back(band_elem(e.open,e.close,i,ipair,i,ipair));
                 structure[i] = e.open;
                 structure[ipair] = e.close;
                 if(debug){
                     printf("structure[%d]=%c and structure[%d]=%c \n",i,structure[i],ipair,structure[ipair]);
                 }
-                
+
                 //				band_elem *p;
                 //				p=queue_pointer;
                 //				if (p == NULL){
@@ -1523,11 +1529,11 @@ void W_final::fill_structure()
                 //						printf("current->end =%d \n",current->outer_end);
                 //					}
                 //				}
-                
-                
+
+
             }
             //             display(head);
-            
+
         }else{ //having the closing base pair i>pair[i]
             if(debug){
                 printf("base %d is paired with %d (%d>%d) \n",i,ipair,i,ipair);
@@ -1539,14 +1545,14 @@ void W_final::fill_structure()
                     // Hosna, September 16, 2014
                     // in pseudoknot free loops brackets don't get freed so we end up with ((..))..[[..]].{{..}}
                     // I think it was because of scope of new, so after the if there would be no element pushed back into stack!
-                    
+
                     //					brack_type e;
                     //					e = new brack_type;
                     //					e->open = current->open;
                     //					e->close = current->close;
                     //					h_push(st,e);
                     st.push(brack_type((*current).open,(*current).close));
-                    
+
                     //                    if (debug) printf("stack's top is currently at: %d \n",st->top);
                     //                    st->top = st->top +1 ;
                     //                    brack_type *e = &(st->elem[st->top]);
@@ -1558,8 +1564,8 @@ void W_final::fill_structure()
             if (debug) printf("%d > %d, stack's size is: %d, open=%c, close=%c\n",i,ipair,st.size(),(st.top()).open,(st.top()).close);
         }
     }
-    
-    
+
+
     //delete head;
     // before deleting the stack we need to make sure we delete all elements we pushed in it.
     //	delete e1;
@@ -1573,7 +1579,7 @@ void W_final::fill_structure()
      delete e8;
      */
     // now delete the stack itself
-    //	delete st;	
+    //	delete st;
 }
 
 

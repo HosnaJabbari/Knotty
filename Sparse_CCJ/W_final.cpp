@@ -22,8 +22,12 @@
 W_final::W_final(char *seq):s_min_folding(seq)
 {
 	this->nb_nucleotides = strlen(seq);
-	int i;
-    for (i=0; i < this->nb_nucleotides; i++) int_sequence[i] = nuc_to_int(seq[i]);
+
+	// Ian Wark July 21 2017
+	// we don't need this, this is done in s_min_folding
+	//int i;
+    //for (i=0; i < this->nb_nucleotides; i++) int_sequence[i] = nuc_to_int(seq[i]);
+
 	space_allocation();
 }
 

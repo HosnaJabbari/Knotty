@@ -111,7 +111,7 @@ brack_type *h_pop (brack_stack *st)
 double ccj(char *sequence, char *structure){
     // Ian Wark June 2017
     // tell simfold to precompute penalties.
-    // essential to not seg-faulting	
+    // essential to not seg-faulting
     create_size_penalties(strlen(sequence));
     create_asymmetry_penalties(strlen(sequence));
 
@@ -119,13 +119,16 @@ double ccj(char *sequence, char *structure){
     if (min_fold == NULL) giveup ("Cannot allocate memory", "CCJ");
     double energy = min_fold->ccj();
     min_fold->return_structure (structure);
+
+    delete min_fold;
+
     return energy;
 
 }
 
 //penalty for z unpaired bases in an internal loop that spans a band
 int alpha1P(int z)
-{ 
+{
 	//return 0;
 	// Hosna, April 2nd, 2014
 	// for simplicity I am not checking to see what type of internal loop (i.e. I, B, or H) I have that spans a band, and I am assuming it is an intetnal loop of type I
@@ -141,15 +144,15 @@ int alpha1P(int z)
 		penalty = (int) round(penalty_by_size(z,'I')*e_intP_penalty);
 	}
 	return penalty;
-}					
+}
 
 // penalty for closing pair i.l of an internal loop that spans a band
 int alpha2P( int int_sequence_i, int int_sequence_l, int int_sequence_iplus1, int int_sequence_lminus1)
 {
-	
+
 	//return 0;
 	// Hosna April 2, 2014
-	// I added this similar to calculation of closing base pair contribution in a general internal loop in simfold and 
+	// I added this similar to calculation of closing base pair contribution in a general internal loop in simfold and
 	// multiplied that to the intP_penalty for an internal loop that spans a band
 	double energy = tstacki[int_sequence_i][int_sequence_l]
 							[int_sequence_iplus1][int_sequence_lminus1];
@@ -157,9 +160,9 @@ int alpha2P( int int_sequence_i, int int_sequence_l, int int_sequence_iplus1, in
 	/* if(debug){
 			printf("alpha2P(%d,%d,%d,%d) = %d \n",int_sequence_i,int_sequence_l,int_sequence_iplus1,int_sequence_lminus1,a2p);
 		}
-	 */	
+	 */
 	return a2p;
-}				
+}
 
 //penalty for asymmetry of z in an internal loop that spans a band
 int alpha3P(int z)
@@ -171,7 +174,7 @@ int alpha3P(int z)
 	// Hosna April 2, 2014
 	// since here we have only one value passed, I will simply put a 0 on the branch1 side
 	return (int) round(asymmetry_penalty (0,z) *e_intP_penalty );
-}					
+}
 
 // penalty for closing pair i.l or l.i of an ordinary multiloop
 int beta2(int i, int l)
@@ -180,7 +183,7 @@ int beta2(int i, int l)
 	// I don't think this is the complete value, but since HFold's WM and CCJ's Vmloop recurrences are the same I am not changing this value here, unless I find out it is needed
 	// the correct value should be: Non-GC-penalty(i,l)+b_penalty
 	return b_penalty;
-}		
+}
 
 
 // penalty for closing pair i.l or l.i of a multiloop that spans a band
@@ -190,7 +193,7 @@ int beta2P(int i, int l)
 	// I don't think this is the complete value, but since HFold's WM and CCJ's Vmloop recurrences are the same I am not changing this value here, unless I find out it is needed
 	// the correct value should be: Non-GC-penalty(i,l) *0.74 + bp_penalty
 	return bp_penalty;
-}		
+}
 
 // penalty for closing pair i.l or l.i of a pseudoloop
 int gamma2(int i, int l)
@@ -202,7 +205,7 @@ int gamma2(int i, int l)
 	// Hosna July 17, 2014
 	// To avoid addition of single base pair bands I am giving a very small non-zero value to gamma2
 	return 1;
-}		
+}
 
 void initNode(struct band_elem *head,int outer_end, int outer_start, int inner_end, int inner_start){
     head->outer_end = 0; //this value is a dummy showing the root
@@ -210,7 +213,7 @@ void initNode(struct band_elem *head,int outer_end, int outer_start, int inner_e
     head->inner_end = 0; //this value is a dummy showing the root
     head->inner_start=0; //this value is a dummy showing the root
     head->next =NULL;
-    
+
 }
 
 // apending
@@ -223,8 +226,8 @@ void addNode(struct band_elem *head, int outer_end, int outer_start, int inner_e
 //    newNode->open = open;
 //    newNode->close = close;
 //    newNode->next = NULL;
-//    
-//    
+//
+//
 //    band_elem *cur = head;
 //    while(cur) {
 //        if(cur->next == NULL) {
