@@ -60,14 +60,17 @@ make install
 cmake -H. -Bbuild
 cmake --build build
 ```   
-If you need to specify a specific compiler, such as g++, you can instead run something like   
+If you are getting errors about your comiler not having C++11 features, you may need to specify a specific compiler, such as g++.
+If you want to do so you can instead run something like   
 ```
 cmake -H. -Bbuild -DCMAKE_CXX_COMPILER=g++
 cmake --build build
 ```   
-This can be useful if you are getting errors about your compiler not having C++11 features.
 
 3. Run CCJ by navigating to the directory of the CCJ version you wish to use and following the usage instructions in the README.md of that directory.   
+
+[Sparse_CCJ Readme (recommended)](https://github.com/HosnaJabbari/CCJ/tree/master/Sparse_CCJ/README.md)      
+[Original_CCJ Readme](https://github.com/HosnaJabbari/CCJ/tree/master/Original_CCJ/README.md)     
 
 If you move the folders and wish to recompile, you should first delete the created "build" folder before recompiling.
 
