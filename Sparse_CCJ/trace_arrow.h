@@ -350,7 +350,7 @@ public:
     unsigned long long replaced() const {return ta_replace_;}
     unsigned long long max() const {return ta_max_;}
     void print_ta_size() const {
-        std::cout << "size: " << size() << "avoided: " << avoided() << "shortcut: " << shortcut() << "replaced: " << replaced() << "erased: " << erased() << "max: " << max() << std:endl;
+        std::cout << "size: " << size() << "avoided: " << avoided() << "shortcut: " << shortcut() << "replaced: " << replaced() << "erased: " << erased() << "max: " << max() << std::endl;
     }
 
     void
