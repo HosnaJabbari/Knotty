@@ -352,11 +352,19 @@ void set_up_index_int_12_34 (char *type, int start0, int start1, int start2, int
         start = start3;
 }
     
-int structure_type_index (char type[])
+int structure_type_index (const char input[])
   // Mirela: Nov 23, 2003
   // Given the type as a string, return the index in string_params
 // TO EXTEND    
-{
+{ 
+  // Ian Wark July 7 2017
+  // A kind of hacky way of supressing the warnings 
+  // structure_type_index is called in mulitple places with just a string,
+  // ex. strucute_type_index("blugeA"), so the function should have const char* as input
+  // It needs to be normal char*, so instead just copy the const char* input into a normal char*
+  char type[strlen(input)+1];
+  strncpy(type, input, strlen(input)+1);  
+
   int i, found;
   found = 0;
   
@@ -1725,7 +1733,8 @@ double get_feature_counts_restricted (char *sequence, char *structure, double *c
     if (ignore_dangles)     no_dangling_ends = 1;
     else                    no_dangling_ends = 0;
     ignore_AU_penalty = ignore_first_AU_penalty;
-    double energy = count_each_structure_type (sequence, structure, "", c, f, reset_c);
+    char restricted[1] = "";
+    double energy = count_each_structure_type (sequence, structure, restricted, c, f, reset_c);
     return energy;
     
     // I tried to some check below, but if reset_c is 0, then it won't work.
@@ -2883,7 +2892,7 @@ void initialize_correct_int22_expadd (int ii, int jj, int kk, int ll, int mm, in
 }
 
 
-int traverse_features_and_do_work (char *calling_function, PARAMTYPE *array, char *filename)
+int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *array, const char *filename)
 // This function should be called by create_string_params and other functions, with the name of the calling function as argument
 // The purpose of it is to traverse the model's features in only one function instead of in many functions as it was up until now.
 // Make sure the calling_function string is properly dealt with at the beginning of this function
@@ -5801,7 +5810,7 @@ int create_string_params ()
 
 
 
-void fill_data_structures_with_new_parameters (char *filename)
+void fill_data_structures_with_new_parameters (const char *filename)
   // Mirela: Dec 16, 2003
   // reads parameters from a file, and writes them in the internal data structures
   // PRE: first read the actual standard parameters, to be able to figure out which of them are
@@ -5889,7 +5898,7 @@ int check_stability_and_size (int k, int l, int o, int p)
 
 // OBSOLETE. Now it's part of traverse_features_and_do_work
 /*
-void fill_data_structures_with_new_parameters (char *filename)
+void fill_data_structures_with_new_parameters (const char *filename)
   // Mirela: Dec 16, 2003
   // reads parameters from a file, and writes them in the internal data structures
   // PRE: first read the actual standard parameters, to be able to figure out which of them are
@@ -6617,7 +6626,7 @@ void fill_data_structures_with_new_parameters (char *filename)
 
 
 
-void save_paramtypes (char *filename)
+void save_paramtypes (const char *filename)
 // PRE: call create_string_params ()
 // save all parameter types in the given file
 {
@@ -6639,7 +6648,7 @@ void save_paramtypes (char *filename)
 }
 
 
-void save_paramtypes_machine_readable (char *filename)
+void save_paramtypes_machine_readable (const char *filename)
 // PRE: call create_string_params ()
 // save all parameter types in the given file
 {
@@ -6661,7 +6670,7 @@ void save_paramtypes_machine_readable (char *filename)
 }
 
 
-void save_parameters (char *filename)
+void save_parameters (const char *filename)
   // Mirela: Dec 16, 2003
   // save all parameters in the given file
 {
@@ -7144,7 +7153,8 @@ void compute_gradient_f_smart (char *input_file, PFTYPE *f_gradient)
             continue;
         
         //printf ("Seq: |%s|\nStr: |%s|\nRes: |%s|\n", sequence, real_structure, restricted);
-        count_each_structure_type (sequence, real_structure, "", counter, f, 1);
+        char restricted[1] = "";
+        count_each_structure_type (sequence, real_structure, restricted, counter, f, 1);
         simfold_gradient_smart (sequence, logZ_gradient);        
         for (i = 0; i < num_params; i++)
         {
@@ -7204,8 +7214,9 @@ PFTYPE compute_f_and_gradient_f_smart (char *input_file, PFTYPE *f_gradient)
         if (!get_info_from_file (file, sequence, real_structure, restricted)) 
             continue;
         
-        //printf ("Seq: |%s|\nStr: |%s|\nRes: |%s|\n", sequence, real_structure, restricted);
-        count_each_structure_type (sequence, real_structure, "", counter, free_value, 1);
+        //printf ("Seq: |%s|\nStr: |%s|\nRes: |%s|\n", sequence, real_structure, restricted); 
+        char restricted[1] = "";
+        count_each_structure_type (sequence, real_structure, restricted, counter, free_value, 1);
         energy = free_energy_simfold (sequence, real_structure); 
         Z = simfold_f_and_gradient_smart (sequence, NULL, logZ_gradient);
         neglogli += 1.0*beta*energy + log(Z);
@@ -7489,7 +7500,7 @@ void compute_counts_matrix_LP (char *input_file, int train_samples)
 }
 
 
-void find_indeces_of_bbtypes (int &first, int &last, char *bbtype, int num_params)
+void find_indeces_of_bbtypes (int &first, int &last, const char *bbtype, int num_params)
 // PRE: the string_params are filled
 // assumes the bb of type are consecutive
 {
@@ -8284,7 +8295,7 @@ void search_bb (char *sequence, double *old_counts, int threshold, int num_param
 
 
 /*
-void fill_data_structures_with_new_parameters_fixed_dangles (char *filename, char *dangfilename)
+void fill_data_structures_with_new_parameters_fixed_dangles (const char *filename, char *dangfilename)
 // reads all params from filename, except the dangling parameters, which reads from a different file
 // assumes the fm363 model  
 
@@ -9186,7 +9197,7 @@ void print_parameters_in_ViennaRNA_format ()
     // the numbering of bases in the Vienna RNA format is ours + 1
     // i.e. A=1, C=2, G=3, U=4.
     int num_base_pairs = 6;
-    char *pnames[] = {"CG", "GC", "GU", "UG", "AU", "UA", " @"};
+    const char *pnames[] = {"CG", "GC", "GU", "UG", "AU", "UA", " @"};
     char bnames[] = "@ACGU";
 
     
@@ -9516,7 +9527,7 @@ void print_parameters_in_ViennaRNA_format ()
 }
 
 // functions to read from the thermodynamic set XML file
-int get_data_from_buffer (char *buffer, char *header, char last_char, char *output)
+int get_data_from_buffer (char *buffer, const char *header, char last_char, char *output)
 // function to get the sequence, structure etc data from the XML lines
 {
     char *begin;
@@ -9605,13 +9616,14 @@ void fill_similarity_rule_with_optical_melting_reference (char *xml_filename)
         get_data_from_buffer (buffer, "sequence=\"", '\"', sequence);
         get_data_from_buffer (buffer, "structure=\"", '\"', structure);    
     
+        char restricted[1] = "";
         if (strcmp (sequence0, "") != 0)
         {            
-            count_each_structure_type (sequence0, structure0, "", counter0, f, 1);            
+            count_each_structure_type (sequence0, structure0, restricted, counter0, f, 1);            
         }  
         //printf ("Sequence:  %s\n", sequence);
         //printf ("Structure: %s\n", structure);
-        count_each_structure_type (sequence, structure, "", counter_min, f, 1);
+        count_each_structure_type (sequence, structure, restricted, counter_min, f, 1);
         //printf ("DONE %s\n", exp_id);
 
         for (i=0; i < num_params; i++)

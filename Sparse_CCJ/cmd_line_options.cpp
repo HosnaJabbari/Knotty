@@ -1,4 +1,5 @@
 #include "cmd_line_options.h"
+#include <stdlib.h>   
 
 cmd_line_args cmd_line_options;
 shape_info shape = shape_info();
@@ -48,7 +49,7 @@ void shape_info::set_data(std::string filename) {
 
         // the first number is in input
         // it starts from 1
-        data_[1] = stof(input);
+        data_[1] = atof(input.c_str());
         // go through where each word is a shape data number
         int i = 2;
         while (infile >> input) {
@@ -61,7 +62,7 @@ void shape_info::set_data(std::string filename) {
                 exit(-1);
             }
 
-            data_[i] = stof(input);
+            data_[i] = atof(input.c_str());
             ++i;
         }
 

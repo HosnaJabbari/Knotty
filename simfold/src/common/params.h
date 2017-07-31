@@ -60,7 +60,7 @@ void count_penalty_by_size (int size, char type, double *counter);
 
 void IL_count_penalty_by_size_2D (int size1, int size2, double *counter);
 
-int structure_type_index (char type[]);
+int structure_type_index (const char input[]);
   // Mirela: Nov 23, 2003
   // Given the type as a string, return the index in string_params
 
@@ -70,7 +70,7 @@ void count_asymmetry_penalty (int size1, int size2, double *counter);
 //       Note that if size1 == size2, pen is 0
 // Mirela: Nov 23, 2003
 
-void save_parameters (char *filename);
+void save_parameters (const char *filename);
   // Mirela: Dec 16, 2003
   // save all parameters in the given file
 
@@ -91,10 +91,10 @@ int get_num_params ();
 // returns the number of parameters in the model
 // right now calls create_string_params, which is inefficient, but
 
-void save_paramtypes (char *filename);
+void save_paramtypes (const char *filename);
 // PRE: call create_string_params ()
 // save all parameter types in the given file  
-void save_paramtypes_machine_readable (char *filename);
+void save_paramtypes_machine_readable (const char *filename);
 
 void set_starters ();
 // set all the starters to the appropriate values, to be used in structure_type_index
@@ -167,7 +167,7 @@ void print_counter (double *counter, double free_value);
 
 double simfold_restricted_logZ (char *sequence, char *real_structure, char *restricted, double &min_energy, double &max_energy, int &actual_num_str);
 
-void fill_data_structures_with_new_parameters (char *filename);
+void fill_data_structures_with_new_parameters (const char *filename);
   // Mirela: Dec 16, 2003
   // reads parameters from a file, and writes them in the internal data structures
   // PRE: first read the actual standard parameters, to be able to figure out which of them are
@@ -179,9 +179,9 @@ void fill_data_structures_with_new_parameters_from_array (PARAMTYPE *array);
   // PRE: first read the actual standard parameters, to be able to figure out which of them are
   // < INF, and maybe to also keep some old values.
 
-void fill_data_structures_with_new_parameters_double (char *filename);
+void fill_data_structures_with_new_parameters_double (const char *filename);
 
-void fill_data_structures_with_new_parameters_fixed_dangles (char *filename, char *dangfilename);
+void fill_data_structures_with_new_parameters_fixed_dangles (const char *filename, char *dangfilename);
 // reads all params from filename, except the dangling parameters, which reads from a different file
 // assumes the fm363 model  
 
@@ -283,7 +283,7 @@ void fill_similarity_rule_with_optical_melting_reference (char *xml_filename);
 
 void fill_similarity_rules ();
 
-int get_data_from_buffer (char *buffer, char *header, char last_char, char *output);
+int get_data_from_buffer (char *buffer, const char *header, char last_char, char *output);
 // function to get the sequence, structure etc data from the XML lines
 
 int apply_rule_1 (int i, int j, int &i_rule1, int &j_rule1);

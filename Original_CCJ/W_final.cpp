@@ -53,7 +53,7 @@ void W_final::space_allocation(){
 
 
 
-	v = new V_final();
+	v = new V_final(nb_nucleotides);
 	if (v == NULL) giveup ("Cannot allocate memory", "W_final");
 	v->setloops(this->V,vm);
 
