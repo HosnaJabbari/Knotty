@@ -53,11 +53,6 @@ make install
 ```
 [Linux instructions source](https://geeksww.com/tutorials/operating_systems/linux/installation/downloading_compiling_and_installing_cmake_on_linux.php)
 
-#### Windows:
-[Windows instructions with pictures](http://tulip.labri.fr/TulipDrupal/?q=node/1081)
-Download CMake from https://cmake.org/download/.
-Run CMake installer, making sure to add CMake to the system PATH when prompted.
-
 #### Steps for installation   
 1. [Download the repository](https://github.com/HosnaJabbari/CCJ/archive/master.zip) and extract the files onto your system.
 2. From a command line in the root directory (where this README.md is) run
@@ -72,13 +67,9 @@ cmake --build build
 ```   
 This can be useful if you are getting errors about your compiler not having C++11 features.
 
-On Windows this helped:
-```
-cmake -H. -Bbuild -G "MinGW Makefiles"
-cmake --build build
-```   
-
 3. Run CCJ by navigating to the directory of the CCJ version you wish to use and following the usage instructions in the README.md of that directory.   
+
+If you move the folders and wish to recompile, you should first delete the created "build" folder before recompiling.
 
 ### Licence
 SimFold is a part of MultiRNAFold (http://www.rnasoft.ca/download.html).     
