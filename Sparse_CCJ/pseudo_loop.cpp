@@ -991,7 +991,7 @@ void pseudo_loop::compute_WPP(int i, int l){
 
 void pseudo_loop::compute_P_sp(int i, int l){
     int min_energy = INF, temp=INF;
-    index_t best_j = -1, best_d = -1, best_k = -1, best_w = INF;
+    int best_j = -1, best_d = -1, best_k = -1, best_w = INF;
     // Hosna, April 3, 2014
     // adding impossible cases
     if (i<0 || l<0 || i>=nb_nucleotides || l>=nb_nucleotides || i>= l){
@@ -1001,7 +1001,7 @@ void pseudo_loop::compute_P_sp(int i, int l){
 
     for (const candidate_PK c : PK_CL[l]) {
         // get_PK(i,j,d+1,k) + get_PK(j+1,d,k+1,l);
-        index_t j = c.j(), d = c.d(), k = c.k(), w = c.w();
+        int j = c.j(), d = c.d(), k = c.k(), w = c.w();
 
         temp = get_PK(i, j-1, d+1, k-1) + w;
 
