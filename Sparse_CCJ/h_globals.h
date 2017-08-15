@@ -1,6 +1,9 @@
 #ifndef H_GLOBALS_H_
 #define H_GLOBALS_H_
 #include <math.h>
+#include "cmd_line_options.h"
+
+cmd_line_args cmd_line_options;
 
 // Hosna, Nov. 1st, 2011 changed the parameter values based on HOtKNots v2
 int PS_penalty = -138; //960; 		//exterior pseudoloop initiation penalty (9.6 Kcal/mol)

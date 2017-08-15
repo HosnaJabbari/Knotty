@@ -3,7 +3,7 @@
 SET(SOURCE
   h_externs.h h_globals.h h_struct.h	
   base.h simple_map.h 
-  cmd_line_options.h cmd_line_options.cpp  
+  cmd_line_options.h
   W_final.h W_final.cpp 
   pseudo_loop.h pseudo_loop.cpp 
   V_final.h V_final.cpp 

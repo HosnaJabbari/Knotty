@@ -13,15 +13,11 @@ private:
 
     bool use_sparse_ = true; // use sparse pseudo loop
     bool use_garbage_collection_ = true;
-    bool use_shape_data_ = false;
-    std::string shape_file_;
+
     char print_trace_arrow_info_ = 0;
     char print_candidate_list_info_ = 0;
 
 public:
-    // prepares filename to be stored in shape_file
-    void set_shape_file(std::string filename);
-
     void set_sequence_length(int length) {
         if (changeable)
             seq_len_ = length;
@@ -55,14 +51,6 @@ public:
         return seq_len_;
     }
 
-    const std::string shape_file() const{
-        return shape_file_;
-    }
-
-    const bool use_shape_data() const {
-        return use_shape_data_;
-    }
-
     const bool use_sparse() const {
         return use_sparse_;
     }
@@ -81,39 +69,6 @@ public:
 
 }cmd_line_args;
 
-class shape_info
-{
-private:
-    /// TODO should maybe be changed/changeable
-    /// Also, they should be with the other values, not here
-    float b_ = -0.6; // intercept
-    float m_ = 1.8; // slope
-    double *data_;
-
-public:
-    shape_info() {}
-
-    // based on http://stackoverflow.com/questions/4654636/how-to-determine-if-a-string-is-a-number-with-c
-    bool is_number(const std::string& s)
-    {
-        std::string::const_iterator it = s.begin();
-        while (it != s.end()
-                && (std::isdigit(*it) || *it == '.' || *it == '-' || *it == '+')
-              ) ++it;
-        return !s.empty() && it == s.end();
-    }
-
-    void set_data(std::string filename);
-    void set_b(float b) { b_ = b; }
-    void set_m(float m) { m_ = m; }
-
-    double data(int index) { return data_[index]; }
-    float b() { return b_; }
-    float m() { return m_; }
-
-};
-
 extern cmd_line_args cmd_line_options;
-extern shape_info shape;
 
 

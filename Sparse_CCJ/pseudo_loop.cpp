@@ -9,6 +9,7 @@
 #include "constants.h"
 #include "h_struct.h"
 #include "externs.h"
+#include "h_globals.h"
 #include "h_externs.h"
 #include "h_common.h"
 #include "s_hairpin_loop.h"

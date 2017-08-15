@@ -10,7 +10,6 @@
 // include the simfold header files
 #include "simfold.h"
 #include "externs.h"
-#include "h_globals.h"
 #include "h_externs.h"
 #include "constants.h"
 #include "params.h"
@@ -64,27 +63,6 @@ int main (int argc, char *argv[])
                 if (!strcmp(arg, "-pcl-v"))
                     cmd_line_options.set_print_candidate_list_info(2);
                 else
-                if (!strncmp(arg, "-shape=", 7))
-                    cmd_line_options.set_shape_file(std::string(arg));
-                else
-                if (!strncmp(arg, "-b=",3)) {
-                    std::string str = std::string(arg);
-                    str = str.substr(3,str.length()-2);
-                    if (shape.is_number(str))
-                        shape.set_b(atof(str.c_str()));
-                    else
-                        cmd_line_error = true;
-                }
-                else
-                if (!strncmp(arg, "-m=",3)) {
-                    std::string str = std::string(arg);
-                    str = str.substr(3,str.length()-2);
-                    if (shape.is_number(str))
-                        shape.set_m(atof(str.c_str()));
-                    else
-                        cmd_line_error = true;
-                }
-                else
                     cmd_line_error = true;
             }
         }
@@ -93,7 +71,7 @@ int main (int argc, char *argv[])
 
     if (cmd_line_error) {
         printf ("Usage: %s <sequence> <arguments>\n", argv[0]);
-        printf ("Valid agruments include: \n");
+        printf ("Valid arguments include: \n");
         printf ("-ns to use non-sparse or \"Modifed CCJ\" version\n");
         printf ("-ngc to not use garbage collection \n \n");
 
@@ -131,7 +109,7 @@ int main (int argc, char *argv[])
 
     // initialize the thermodynamic parameters
     // call init_data only once for the same dna_or_rna and same temperature
-    // if one of them changes, call init_data again  
+    // if one of them changes, call init_data again
     init_data (argv[0], config_file, dna_or_rna, temperature);
 
 	// Hosna, July 18, 2012
