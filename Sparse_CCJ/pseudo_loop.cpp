@@ -3540,9 +3540,9 @@ int pseudo_loop::get_PRmloop(int i, int j, int k, int l){
 
     if (sparsify && min_energy < INF/2 && (!ta->PLmloop.exists_trace_arrow_from(i,j,k,l))) {
         if (best_branch == 1)
-            ta->register_trace_arrow(i,j,k,l, i+1,j-1,k,l,min_energy,P_PRmloop,P_PRmloop10);
+            ta->register_trace_arrow(i,j,k,l, i,j,k+1,l-1,min_energy,P_PRmloop,P_PRmloop10);
         if (best_branch == 2)
-            ta->register_trace_arrow(i,j,k,l, i+1,j-1,k,l,min_energy,P_PRmloop,P_PRmloop01);
+            ta->register_trace_arrow(i,j,k,l, i,j,k+1,l-1,min_energy,P_PRmloop,P_PRmloop01);
     }
 
 	return min_energy;
