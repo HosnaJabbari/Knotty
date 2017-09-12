@@ -72,6 +72,7 @@ cmake --build build
 [Sparse_CCJ Readme (recommended)](https://github.com/HosnaJabbari/CCJ/tree/master/Sparse_CCJ/README.md)      
 [Original_CCJ Readme](https://github.com/HosnaJabbari/CCJ/tree/master/Original_CCJ/README.md)     
 
+After installing you can move the executables wherever you wish, but you should not delete or move the simfold folder, or you must recompile the executables.
 If you move the folders and wish to recompile, you should first delete the created "build" folder before recompiling.
 
 ### Licence
