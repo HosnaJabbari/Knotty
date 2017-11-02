@@ -7,7 +7,7 @@ ta_key_pair::ta_key_pair(index_t k, index_t l) {
     second = l;
     value_ = first*ta_n - second;
 
-    assert(value_ > 0 && value_ < 65535);
+    assert(value_ > 0 && value_ < 4294967295);
 }
 
 TraceArrows::TraceArrows(size_t n, char srctype)
@@ -238,7 +238,7 @@ MasterTraceArrows::gc_row( size_t i, TraceArrows &source ) {
 
         // Call garbage collection on all the trace arrows at ij
         while (it != source.trace_arrow_[ij].end()) {
-    
+
             // gc_trace_arrow returns true on successful deletion of a trace arrow, else false
             // If gc_trace_arrow erased that trace arrow go back one before continuing
             if(gc_trace_arrow(i,j,it,source)) {
@@ -266,8 +266,8 @@ MasterTraceArrows::gc_row( size_t i, TraceArrows &source ) {
 }
 
 /** @brief Garbage collection of a trace arrow (TA)
- *  If TA's source_ref_count == 0, deletes it 
- *  and calls gc_to_target on what TA it is pointing at 
+ *  If TA's source_ref_count == 0, deletes it
+ *  and calls gc_to_target on what TA it is pointing at
  *  (to change target TA's source_ref_count and possibly delete that TA as well).
  *  Called primarily by gc_row and gc_to_target
  *  @return true if that trace arrow was erased, else false
