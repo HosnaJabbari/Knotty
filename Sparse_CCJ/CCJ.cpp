@@ -30,40 +30,52 @@ int main (int argc, char *argv[])
     bool cmd_line_error = false;
     bool w = false;
 
+    // reading arguments
     if (argc < 2)
-        cmd_line_error = true;
+        cmd_line_error = true; // need at least 2 arguments (CCJ and sequence)
     else
     {
+	// get sequence
         strcpy (sequence, argv[1]);
 	// important that this is before set_shape_file
         cmd_line_options.set_sequence_length(strlen(sequence));
 
+	// addtional arguments
         if (argc > 2) {
             for (int i = 2; i < argc; ++i) {
                 char * arg = argv[i];
 
+		// -ns uses non-sparse version ("modified CCJ")
                 if (!strcmp(arg, "-ns"))
                     cmd_line_options.set_use_sparse(false);
                 else
+		
+		// ** The following arguments are primarily debug options **
+		// -ngc does not use garbage collection (sparse version only)
                 if (!strcmp(arg, "-ngc"))
                     cmd_line_options.set_use_garbage_collection(false);
-                else
+                else	
+		// -w for web printing (used for web server)
                 if (!strcmp(arg, "-w"))
                     w = true;
                 else
+		// -pta prints extra trace arrow info
                 if (!strcmp(arg, "-pta"))
                     cmd_line_options.set_print_trace_arrow_info(1);
                 else
+		// -pta-v prints even more verbose trace arrow info
                 if (!strcmp(arg, "-pta-v"))
                     cmd_line_options.set_print_trace_arrow_info(2);
                 else
+		// -pcl print extra candidate list info
                 if (!strcmp(arg, "-pcl"))
                     cmd_line_options.set_print_candidate_list_info(1);
                 else
+		// -pcl-v prints even more verbose candidate list info
                 if (!strcmp(arg, "-pcl-v"))
                     cmd_line_options.set_print_candidate_list_info(2);
                 else
-                    cmd_line_error = true;
+                    cmd_line_error = true; // argument is invalid
             }
         }
     }
@@ -74,10 +86,6 @@ int main (int argc, char *argv[])
         printf ("Valid arguments include: \n");
         printf ("-ns to use non-sparse or \"Modifed CCJ\" version\n");
         printf ("-ngc to not use garbage collection \n \n");
-
-        //printf ("-shape=\"filename\" to specify a file for shape data\n");
-        //printf ("-b=number to specify an intercept for the shape data (default is %f)\n",shape.b());
-        //printf ("-m=number to specify a slope for the shape data (default is %f)\n\n",shape.m());
 
         printf ("-w to print only the result and energy\n");
         printf ("-pta to print information on the number of trace arrows\n");
