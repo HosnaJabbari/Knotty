@@ -424,7 +424,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 					else
 					{
 						printf ("NOT GOOD STACK, i=%d, j=%d\n", i, j);
-						exit (0);
+						exit (1);
 					}
 
 				}
@@ -471,7 +471,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 					else
 					{
 						printf ("NOT GOOD INTER, i=%d, j=%d, best_ip=%d, best_jp=%d\n", i, j, best_ip, best_jp);
-						exit (0);
+						exit (1);
 					}
 				}
 					break;

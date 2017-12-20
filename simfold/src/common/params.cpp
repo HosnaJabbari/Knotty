@@ -14,7 +14,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
+
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
@@ -62,8 +62,8 @@ void print_tstacki_dangling_energies()
     for (k=0; k < NUCL; k++)
         for (l=0; l < NUCL; l++)
         {
-            met = 0;            
-            for (i=0; i < NUCL; i++)            
+            met = 0;
+            for (i=0; i < NUCL; i++)
                 for (j=0; j < NUCL; j++)
                 {
                     if (tstacki[i][j][k][l] < INF)
@@ -73,10 +73,10 @@ void print_tstacki_dangling_energies()
                         printf ("d3(%c,%c,%c) = %5d\t", int_to_nuc(i), int_to_nuc(j), int_to_nuc(k), dangle_top[i][j][k]);
                         printf ("d5(%c,%c,%c) = %5d\t", int_to_nuc(i), int_to_nuc(j), int_to_nuc(l), dangle_bot[i][j][l]);
                         printf ("Diff = %5d\n", tstacki[i][j][k][l] - dangle_top[i][j][k] - dangle_bot[i][j][l]);
-                    }    
-                }    
+                    }
+                }
             if (met) printf ("---\n");
-        }            
+        }
 }
 
 
@@ -88,8 +88,8 @@ void print_stack_dangling_energies()
     for (k=0; k < NUCL; k++)
         for (l=0; l < NUCL; l++)
         {
-            met = 0;            
-            for (i=0; i < NUCL; i++)            
+            met = 0;
+            for (i=0; i < NUCL; i++)
                 for (j=0; j < NUCL; j++)
                 {
                     if (stack[i][j][k][l] < INF)
@@ -99,10 +99,10 @@ void print_stack_dangling_energies()
                         printf ("d3(%c,%c,%c) = %5d\t", int_to_nuc(i), int_to_nuc(j), int_to_nuc(k), dangle_top[i][j][k]);
                         printf ("d5(%c,%c,%c) = %5d\t", int_to_nuc(i), int_to_nuc(j), int_to_nuc(l), dangle_bot[i][j][l]);
                         printf ("Diff = %5d\n", stack[i][j][k][l] - dangle_top[i][j][k] - dangle_bot[i][j][l]);
-                    }    
-                }    
+                    }
+                }
             if (met) printf ("---\n");
-        }            
+        }
 }
 
 
@@ -119,8 +119,8 @@ void print_stack_equation_dangling()
     for (k=0; k < NUCL; k++)
         for (l=0; l < NUCL; l++)
         {
-            met = 0;            
-            for (i=0; i < NUCL; i++)            
+            met = 0;
+            for (i=0; i < NUCL; i++)
                 for (j=0; j < NUCL; j++)
                 {
                     if (stack[i][j][k][l] < INF)
@@ -128,10 +128,10 @@ void print_stack_equation_dangling()
                         met = 1;
                         printf ("stack(%c,%c,%c,%c) = %5d\t", int_to_nuc(i), int_to_nuc(j), int_to_nuc(k), int_to_nuc(l), stack[i][j][k][l]);
                         printf (" eq = %5.2lf\n", x*dangle_top[i][j][k] + y*dangle_bot[i][j][l] + z*dangle_top[l][k][j] + t*dangle_bot[l][k][i]);
-                    }    
-                }    
+                    }
+                }
             if (met) printf ("---\n");
-        }            
+        }
 }
 
 void print_int22_tstacki()
@@ -139,22 +139,22 @@ void print_int22_tstacki()
 {
     int met = 0;
     int i,j,k,l,m,n,o,p;
-    for (i=0; i < NUCL; i++)            
-        for (j=0; j < NUCL; j++)    
+    for (i=0; i < NUCL; i++)
+        for (j=0; j < NUCL; j++)
             for (k=0; k < NUCL; k++)
                 for (l=0; l < NUCL; l++)
-                    for (m=0; m < NUCL; m++)            
-                        for (n=0; n < NUCL; n++)    
+                    for (m=0; m < NUCL; m++)
+                        for (n=0; n < NUCL; n++)
                             for (o=0; o < NUCL; o++)
                                 for (p=0; p < NUCL; p++)
                                 {
                                     if (int22[i][j][k][l][m][n][o][p] < INF)
                                     {
-                                        printf ("int22(%c,%c,%c,%c,%c,%c,%c,%c) = %5d -- %5d = \t", int_to_nuc(i), int_to_nuc(j), 
+                                        printf ("int22(%c,%c,%c,%c,%c,%c,%c,%c) = %5d -- %5d = \t", int_to_nuc(i), int_to_nuc(j),
                                             int_to_nuc(k), int_to_nuc(l), int_to_nuc(m), int_to_nuc(n), int_to_nuc(o), int_to_nuc(p),
                                             int22[i][j][k][l][m][n][o][p], tstacki[i][j][k][l]+tstacki[n][m][p][o]);
-                                        printf ("tstacki(%c,%c,%c,%c) + tstacki(%c,%c,%c,%c) = %5d + %5d\n",    
-                                            int_to_nuc(i), int_to_nuc(j), int_to_nuc(k), int_to_nuc(l), 
+                                        printf ("tstacki(%c,%c,%c,%c) + tstacki(%c,%c,%c,%c) = %5d + %5d\n",
+                                            int_to_nuc(i), int_to_nuc(j), int_to_nuc(k), int_to_nuc(l),
                                             int_to_nuc(n), int_to_nuc(m), int_to_nuc(p), int_to_nuc(o), tstacki[i][j][k][l], tstacki[n][m][p][o]);
                                     }
                                 }
@@ -166,13 +166,13 @@ void print_int22()
 {
     int met = 0;
     int i,j,k,l,m,n,o,p;
-    for (i=0; i < NUCL; i++)            
+    for (i=0; i < NUCL; i++)
         for (j=0; j < NUCL; j++)
             if (can_pair(i,j))
-            { 
+            {
                 for (k=0; k < NUCL; k++)
                     for (l=0; l < NUCL; l++)
-                        for (m=0; m < NUCL; m++)            
+                        for (m=0; m < NUCL; m++)
                             for (n=0; n < NUCL; n++)
                                 if (can_pair(m,n))
                                 {
@@ -183,7 +183,7 @@ void print_int22()
                                             // int22[i][j][k][l][m][n][o][p] is the same as int22[n][m][p][o][j][i][l][k]
                                             if (i*10000000 + j*1000000 + k*100000 + l*10000 + m*1000 + n*100 + o*10 + p <=
                                                 n*10000000 + m*1000000 + p*100000 + o*10000 + j*1000 + i*100 + l*10 + k)
-                                            {    
+                                            {
                                                 printf ("%.2lf\n",
                                                 //int22[%c][%c][%c][%c][%c][%c][%c][%c]=
                                                 //int_to_nuc(i), int_to_nuc(j), int_to_nuc(k), int_to_nuc(l),
@@ -191,7 +191,7 @@ void print_int22()
                                                 int22[i][j][k][l][m][n][o][p]/100.0);
                                             }
                                         }
-                                }                                        
+                                }
             }
 }
 
@@ -231,11 +231,11 @@ void test_int22_differences()
                                 for (p=0; p < NUCL; p++)
                                 {
                                     if (sint[i][j][k][l][m][n][o][p] != int22[i][j][k][l][m][n][o][p])
-                                        //printf ("int22[%d][%d][%d][%d][%d][%d][%d][%d]  tur=%d, com=%d, diff=%d\n", 
+                                        //printf ("int22[%d][%d][%d][%d][%d][%d][%d][%d]  tur=%d, com=%d, diff=%d\n",
                                         //          i,j,k,l,m,n,o,p, sint[i][j][k][l][m][n][o][p], int22[i][j][k][l][m][n][o][p], int22[i][j][k][l][m][n][o][p]-sint[i][j][k][l][m][n][o][p]);
                                         printf ("int22[5'%c%c%c%c/3'%c%c%c%c]    T99=%3d    MAextra=%3d    T99-MAextra=%d\n",
                                                   int_to_nuc(i), int_to_nuc(k), int_to_nuc(o), int_to_nuc(m), int_to_nuc(j), int_to_nuc(l), int_to_nuc(p), int_to_nuc(n), sint[i][j][k][l][m][n][o][p], int22[i][j][k][l][m][n][o][p], sint[i][j][k][l][m][n][o][p]-int22[i][j][k][l][m][n][o][p]);
-                                } 
+                                }
 }
 
 void test_tstacki_differences()
@@ -340,7 +340,7 @@ void test_int11_differences()
 
 
 void set_up_index_int_12_34 (char *type, int start0, int start1, int start2, int start3, int &start)
-// return newstart        
+// return newstart
 {
     if (type[12] == '0' || (type[6] == '_' && type[34] == '0'))  //int21[1][x][0]
         start = start0;
@@ -351,32 +351,32 @@ void set_up_index_int_12_34 (char *type, int start0, int start1, int start2, int
     if (type[12] == '3' || (type[6] == '_' && type[34] == '3'))  //int21[1][x][3]
         start = start3;
 }
-    
+
 int structure_type_index (const char input[])
   // Mirela: Nov 23, 2003
   // Given the type as a string, return the index in string_params
-// TO EXTEND    
-{ 
+// TO EXTEND
+{
   // Ian Wark July 7 2017
-  // A kind of hacky way of supressing the warnings 
+  // A kind of hacky way of supressing the warnings
   // structure_type_index is called in mulitple places with just a string,
   // ex. strucute_type_index("blugeA"), so the function should have const char* as input
   // It needs to be normal char*, so instead just copy the const char* input into a normal char*
   char type[strlen(input)+1];
-  strncpy(type, input, strlen(input)+1);  
+  strncpy(type, input, strlen(input)+1);
 
   int i, found;
   found = 0;
-  
-  // if type is internal/hairpin/bulge penalty by size, which is bigger than MAXLOOP_X, 
+
+  // if type is internal/hairpin/bulge penalty by size, which is bigger than MAXLOOP_X,
   //    then type is actually MAXLOOP_X
   int size;
   // do it later, only if this is penalty, for faster runtime. This actually helps a bit.
- 
+
 
   // just a hack to make this faster than linear. NOT GOOD IF THE (NUMBER OF) PARAMETERS CHANGES!!!
     int start = 0;
-    
+
     /*
     #if (MODEL == SIMPLE)
     if (type[0] == 's')     // stack
@@ -396,7 +396,7 @@ int structure_type_index (const char input[])
         }
         else if (type[1] == 'l')    // tloop
             start = 333;
-    }    
+    }
     else if (type[0] == 'm')    // misc....
     {
         if (type[5] == 'i')
@@ -411,7 +411,7 @@ int structure_type_index (const char input[])
                     start = 205;
                 else if (type[15] == '2')   // misc.internal22_
                     start = 255;
-            }            
+            }
         }
         else    // al other misc
             start = 324;
@@ -452,7 +452,7 @@ int structure_type_index (const char input[])
                     //printf ("size = %d\n", size);
                     sprintf (type, "internal_penalty_by_size[%d]", MAXLOOP_I);
                 }
-            }            
+            }
         }
     }
     else if (type[0] == 'd')    // dangle_top or dangle_bot
@@ -473,7 +473,7 @@ int structure_type_index (const char input[])
                 //printf ("size = %d\n", size);
                 sprintf (type, "bulge_penalty_by_size[%d]", MAXLOOP_B);
             }
-        }        
+        }
     }
     else if (type[0] == 'h')    // hairpin_penalty_by_size
     {
@@ -486,25 +486,25 @@ int structure_type_index (const char input[])
                 //printf ("size = %d\n", size);
                 sprintf (type, "hairpin_penalty_by_size[%d]", MAXLOOP_H);
             }
-        }        
+        }
     }
     #elif (MODEL == EXTENDED)
     */
                 // next internal
     int end;
     if (parsi_length == T99)               end = MAXLOOP_I_T99;
-    else if (parsi_length == PARSI || parsi_length == ZL)        end = MAXLOOP_I_PARSI; 
-    else if (parsi_length == LAVISH)       end = MAXLOOP_I_LAVISH; 
+    else if (parsi_length == PARSI || parsi_length == ZL)        end = MAXLOOP_I_PARSI;
+    else if (parsi_length == LAVISH)       end = MAXLOOP_I_LAVISH;
     if (sscanf (type, "internal_penalty_by_size[%d]", &size))
     {
         if (size > end)
         {
             sprintf (type, "internal_penalty_by_size[%d]", end);
         }
-    }            
+    }
     if (parsi_length == T99)               end = MAXLOOP_B_T99;
-    else if (parsi_length == PARSI || parsi_length == ZL)        end = MAXLOOP_B_PARSI; 
-    else if (parsi_length == LAVISH)       end = MAXLOOP_B_LAVISH; 
+    else if (parsi_length == PARSI || parsi_length == ZL)        end = MAXLOOP_B_PARSI;
+    else if (parsi_length == LAVISH)       end = MAXLOOP_B_LAVISH;
     if (sscanf (type, "bulge_penalty_by_size[%d]", &size))
     {
         if (size > end)
@@ -512,10 +512,10 @@ int structure_type_index (const char input[])
                 //printf ("size = %d\n", size);
             sprintf (type, "bulge_penalty_by_size[%d]", end);
         }
-    }        
+    }
     if (parsi_length == T99)               end = MAXLOOP_H_T99;
-    else if (parsi_length == PARSI || parsi_length == ZL)        end = MAXLOOP_H_PARSI; 
-    else if (parsi_length == LAVISH)       end = MAXLOOP_H_LAVISH; 
+    else if (parsi_length == PARSI || parsi_length == ZL)        end = MAXLOOP_H_PARSI;
+    else if (parsi_length == LAVISH)       end = MAXLOOP_H_LAVISH;
     if (sscanf (type, "hairpin_penalty_by_size[%d]", &size))
     {
         if (size > end)
@@ -523,10 +523,10 @@ int structure_type_index (const char input[])
                 //printf ("size = %d\n", size);
             sprintf (type, "hairpin_penalty_by_size[%d]", end);
         }
-    }        
-    
-    // instead of giving the raw numbers, first figure out each category once, 
-    //        by calling the function set_starters 
+    }
+
+    // instead of giving the raw numbers, first figure out each category once,
+    //        by calling the function set_starters
     if (type[0] == 's')     // stack or special_hl
     {
         if (type[1] == 't')   // stack
@@ -550,7 +550,7 @@ int structure_type_index (const char input[])
             if (type[10] == 'n')    // misc.internal
             {
                 if (type[14] == 's')    // misc.internal_special
-                    start = start_misc_last;                
+                    start = start_misc_last;
                 else if (type[13] == '_')    // misc.internal_AU_closure etc
                     start = start_internal;
                 else if (type[13] == '1')   // misc.internal11_AU_closure etc
@@ -571,16 +571,16 @@ int structure_type_index (const char input[])
     {
         if (type[6] == 'h')         start = 21;     // tstackh
         else if (type[6] == 'i')    start = start_internal;   // tstacki      // same as misc.internal_AU_closure
-            
-    }    
+
+    }
     else if (type[0] == 'b')    // bulgeA-U, bulge1 or bulge_penalty_by_size
     {
         if (type[5] == '_')  start = start_bulge_size;  // bulge_penalty_by_size
-        else                 start = start_bulge;   // bulgeA-U or bulge1            
-    }    
+        else                 start = start_bulge;   // bulgeA-U or bulge1
+    }
     else if (type[0] == 'h')   start = start_hairpin_size;   // hairpin_penalty_by_size
-        
-    else if (type[0] == 'i')    // internal_penalty_by_size, internal_asymmetry, int11, int21, int22, 
+
+    else if (type[0] == 'i')    // internal_penalty_by_size, internal_asymmetry, int11, int21, int22,
     {
         if (type[3] == 'e')     // internal_penalty_by_size or internal_asymmetry
             start = start_internal_size;
@@ -601,24 +601,24 @@ int structure_type_index (const char input[])
             {
                 if (type[6] == '0' || (type[6] == '_' && type[28] == '0'))  //int21[0]
                 {
-                    set_up_index_int_12_34 (type, start_internal21_AUA, start_internal21_AUC, 
+                    set_up_index_int_12_34 (type, start_internal21_AUA, start_internal21_AUC,
                             start_internal21_AUG, start_internal21_AUU, start);
                 }
-                if (type[6] == '1' || (type[6] == '_' && type[28] == '1'))  //int21[1]                                    
+                if (type[6] == '1' || (type[6] == '_' && type[28] == '1'))  //int21[1]
                 {
-                    set_up_index_int_12_34 (type, start_internal21_CGA, start_internal21_CGC, 
+                    set_up_index_int_12_34 (type, start_internal21_CGA, start_internal21_CGC,
                             start_internal21_CGG, start_internal21_CGU, start);
-                }                    
+                }
                 if (type[6] == '2' || (type[6] == '_' && type[28] == '2'))  //int21[2]
                 {
                     if (type[9] == '1' || (type[6] == '_' && type[31] == '1'))  //int21[2][1]
                     {
-                        set_up_index_int_12_34 (type, start_internal21_GCA, start_internal21_GCC, 
+                        set_up_index_int_12_34 (type, start_internal21_GCA, start_internal21_GCC,
                                 start_internal21_GCG, start_internal21_GCU, start);
                     }
                     else if (type[9] == '3' || (type[6] == '_' && type[31] == '3'))  //int21[2][3]
                     {
-                        set_up_index_int_12_34 (type, start_internal21_GUA, start_internal21_GUC, 
+                        set_up_index_int_12_34 (type, start_internal21_GUA, start_internal21_GUC,
                                 start_internal21_GUG, start_internal21_GUU, start);
                     }
                 }
@@ -626,38 +626,38 @@ int structure_type_index (const char input[])
                 {
                     if (type[9] == '0' || (type[6] == '_' && type[31] == '0'))  //int21[3][0]
                     {
-                        set_up_index_int_12_34 (type, start_internal21_UAA, start_internal21_UAC, 
+                        set_up_index_int_12_34 (type, start_internal21_UAA, start_internal21_UAC,
                                 start_internal21_UAG, start_internal21_UAU, start);
                     }
                     else if (type[9] == '2' || (type[6] == '_' && type[31] == '2'))  //int21[3][2]
                     {
-                        set_up_index_int_12_34 (type, start_internal21_GUA, start_internal21_UGC, 
+                        set_up_index_int_12_34 (type, start_internal21_GUA, start_internal21_UGC,
                                 start_internal21_UGG, start_internal21_UGU, start);
-                    }                
+                    }
                 }
             }
             else                    // int22
             {
                 if (type[6] == '0' || (type[6] == '_' && type[28] == '0'))  //int22[0]
                 {
-                    set_up_index_int_12_34 (type, start_internal22_AUA, start_internal22_AUC, 
+                    set_up_index_int_12_34 (type, start_internal22_AUA, start_internal22_AUC,
                             start_internal22_AUG, start_internal22_AUU, start);
                 }
-                if (type[6] == '1' || (type[6] == '_' && type[28] == '1'))  //int22[1]                                    
+                if (type[6] == '1' || (type[6] == '_' && type[28] == '1'))  //int22[1]
                 {
-                    set_up_index_int_12_34 (type, start_internal22_CGA, start_internal22_CGC, 
+                    set_up_index_int_12_34 (type, start_internal22_CGA, start_internal22_CGC,
                             start_internal22_CGG, start_internal22_CGU, start);
-                }                    
+                }
                 if (type[6] == '2' || (type[6] == '_' && type[28] == '2'))  //int22[2]
                 {
                     if (type[9] == '1' || (type[6] == '_' && type[31] == '1'))  //int22[2][1]
                     {
-                        set_up_index_int_12_34 (type, start_internal22_GCA, start_internal22_GCC, 
+                        set_up_index_int_12_34 (type, start_internal22_GCA, start_internal22_GCC,
                                 start_internal22_GCG, start_internal22_GCU, start);
                     }
                     else if (type[9] == '3' || (type[6] == '_' && type[31] == '3'))  //int22[2][3]
                     {
-                        set_up_index_int_12_34 (type, start_internal22_GUA, start_internal22_GUC, 
+                        set_up_index_int_12_34 (type, start_internal22_GUA, start_internal22_GUC,
                                 start_internal22_GUG, start_internal22_GUU, start);
                     }
                 }
@@ -665,24 +665,24 @@ int structure_type_index (const char input[])
                 {
                     if (type[9] == '0' || (type[6] == '_' && type[31] == '0'))  //int22[3][0]
                     {
-                        set_up_index_int_12_34 (type, start_internal22_UAA, start_internal22_UAC, 
+                        set_up_index_int_12_34 (type, start_internal22_UAA, start_internal22_UAC,
                                 start_internal22_UAG, start_internal22_UAU, start);
                     }
                     else if (type[9] == '2' || (type[6] == '_' && type[31] == '2'))  //int22[3][2]
                     {
-                        set_up_index_int_12_34 (type, start_internal22_GUA, start_internal22_UGC, 
+                        set_up_index_int_12_34 (type, start_internal22_GUA, start_internal22_UGC,
                                 start_internal22_UGG, start_internal22_UGU, start);
-                    }                
-                }            
+                    }
+                }
             }
-        }   
+        }
     }   // end if starts with i
-    else if (type[0] == 'd')   start = start_dangle;     // dangle        
+    else if (type[0] == 'd')   start = start_dangle;     // dangle
 
 
     //printf ("start = %d, num_params = %d, type = %s\n", start, num_params, type);
   // now traverse all params, to see which is the right index
-  // veeery slow!!! // it's faster now, since I added the above 
+  // veeery slow!!! // it's faster now, since I added the above
   // for the EXTENDED model I added some sort of cashing system
     for (i=start; i < num_params; i++)
     {
@@ -759,7 +759,7 @@ void set_starters ()
 
     if (parsi_int22 == T99)
         start_internal22 = structure_type_index("int22[0][3][0][0][3][0][0][0]");
-    else    
+    else
         start_internal22 = structure_type_index("misc.internal22mid_group1");
     if (parsi_int22 == LAVISH)
     {
@@ -794,7 +794,7 @@ void set_starters ()
         start_internal22_UGG = structure_type_index("int22[3][2][2][0][2][3][0][2]");
         start_internal22_UGU = structure_type_index("int22[3][2][3][0][2][3][0][3]");
     }
-        
+
     if (parsi_dangles == T99 | parsi_dangles == LAVISH)
         start_dangle = structure_type_index("dangle_top[0][3][0]");
     start_internal_size = structure_type_index("internal_penalty_by_size[4]");
@@ -805,7 +805,7 @@ void set_starters ()
     start_hairpin_size = structure_type_index("hairpin_penalty_by_size[3]");
     start_misc_last = structure_type_index("misc.terminal_AU_penalty");
     if (parsi_special == LAVISH || parsi_special == T99_LAVISH)
-        start_special_hl = structure_type_index("special_hl[0].energy"); 
+        start_special_hl = structure_type_index("special_hl[0].energy");
 }
 
 void count_AU_penalty (int base_i, int base_j, double *counter)
@@ -815,7 +815,7 @@ void count_AU_penalty (int base_i, int base_j, double *counter)
 {
     int index;
     if ((base_i != C || base_j != G) &&
-        (base_i != G || base_j != C))      
+        (base_i != G || base_j != C))
       {
         index = structure_type_index ("misc.terminal_AU_penalty");
         counter[index]++;
@@ -838,7 +838,7 @@ void count_dangling_energy (int *sequence, char *structure, int link, int i1, in
     int index_top, index_bot;
     int first_index;    // first index should be dangle_top[0][3][0]
     first_index = structure_type_index ("dangle_top[0][3][0]");
-    
+
     d_top = 0;
     d_bot = 0;
 
@@ -866,7 +866,7 @@ void count_dangling_energy (int *sequence, char *structure, int link, int i1, in
             energy = d_bot;
             counter[index_bot]++;
         }
-    }    
+    }
     else if (structure[i2] == ')' && structure[i3] == '<')   // pseudoknot, ignore dangling end dangling on it
     {
         if (i3 <= i2+2)     // ).< or )<   ignore completely
@@ -880,7 +880,7 @@ void count_dangling_energy (int *sequence, char *structure, int link, int i1, in
     else if (structure[i2] == '>' && structure[i3] == '<')  // case >..<  ignore completely
     {
         energy = 0;
-    }                                
+    }
     else if (i2+1 == i3-1 && i2 == link)
       {
         energy = d_bot;
@@ -895,7 +895,7 @@ void count_dangling_energy (int *sequence, char *structure, int link, int i1, in
     {
         //energy = d_top < d_bot ? d_top : d_bot;
         // NOTE: the comparison of d_top with d_bot is not right!
-        // NO! This is not right if we don't know which of d_top and d_bot is smaller        
+        // NO! This is not right if we don't know which of d_top and d_bot is smaller
 
         // if we restrict the 3' dangling ends to be less than the 5' ones, then it's ok to do what follows
 
@@ -982,7 +982,7 @@ void count_dangling_energy_left (int *sequence, char *structure, int link, int i
             energy = d_top;
             counter[index_top]++;
         }
-    }          
+    }
     else if (i1+1 == i3-1 && i1 == link)
       {
         energy = d_bot;
@@ -1047,7 +1047,7 @@ void count_dangling_energy_right (int *sequence, char *structure, int link, int 
     int index_top, index_bot;
     int first_index;    // first index should be dangle_top[0][3][0]
     first_index = structure_type_index ("dangle_top[0][3][0]");
-    
+
     d_top = 0;
     d_bot = 0;
 
@@ -1075,7 +1075,7 @@ void count_dangling_energy_right (int *sequence, char *structure, int link, int 
             energy = d_bot;
             counter[index_bot]++;
         }
-    }          
+    }
     else if (i4+1 == i2-1 && i4 == link)
       {
         energy = d_bot;
@@ -1093,7 +1093,7 @@ void count_dangling_energy_right (int *sequence, char *structure, int link, int 
         //if (d_top < d_bot) counter[index_top]++;
         //else counter[index_bot]++;
         //counter_min_dangle[index_top-first_index][index_bot-first_index]++;
-        
+
         if (simple_dangling_ends)
         {
             energy = d_top;
@@ -1141,7 +1141,7 @@ void count_penalty_by_size (int size, char type, double *counter)
     {
         if (type == 'H')    end = MAXLOOP_H_T99;
         if (type == 'B')    end = MAXLOOP_B_T99;
-        if (type == 'I')    end = MAXLOOP_I_T99;    
+        if (type == 'I')    end = MAXLOOP_I_T99;
     }
     else if (parsi_length == PARSI || parsi_length == ZL)
     {
@@ -1155,7 +1155,7 @@ void count_penalty_by_size (int size, char type, double *counter)
         if (type == 'B')    end = MAXLOOP_B_LAVISH;
         if (type == 'I')    end = MAXLOOP_I_LAVISH;
     }
-     
+
     if (type == 'H' && size <= end)
     {
         //return hairpin_penalty_by_size[size];
@@ -1173,18 +1173,18 @@ void count_penalty_by_size (int size, char type, double *counter)
         return;
     }
     if (type == 'B' && size <= end)
-    {          
+    {
         //return bulge_penalty_by_size[size];
         sprintf (t, "bulge_penalty_by_size[%d]", size);
         index = structure_type_index(t);
         counter[index]++;
-        return;        
+        return;
     }
 
     // Mirela: Nov 23, 2003
-    // We keep the formula 
-    // Extrapolation for large loops based on polymer theory 
-    // internal, bulge or hairpin loops > 30: dS(T)=dS(30)+param*ln(n/30) 
+    // We keep the formula
+    // Extrapolation for large loops based on polymer theory
+    // internal, bulge or hairpin loops > 30: dS(T)=dS(30)+param*ln(n/30)
     // and imcrement for x_penalty_by_size[MAXLOOP] and for misc.param_greater30
 
     // size > MAXLOOP _B, _H or _I
@@ -1195,8 +1195,8 @@ void count_penalty_by_size (int size, char type, double *counter)
         sprintf (t, "hairpin_penalty_by_size[%d]", end);
         index = structure_type_index (t);
         counter[index]++;
-        // added next line on Dec 23, 2006     
-        // TODO Mar 18, 2008: should that be round???   
+        // added next line on Dec 23, 2006
+        // TODO Mar 18, 2008: should that be round???
         //counter[num_params] += round(1.079*logval*100.0);
         counter[num_params] += misc.param_greater30 * logval * 100.0;
       }
@@ -1209,7 +1209,7 @@ void count_penalty_by_size (int size, char type, double *counter)
         counter[index]++;
         // added next line on Dec 23, 2006
         //printf ("Adding %d to total\n", (int)(1.079*logval*100.0));
-        //counter[num_params] += round(1.079*logval*100.0);        
+        //counter[num_params] += round(1.079*logval*100.0);
         counter[num_params] += misc.param_greater30 * logval * 100.0;
       }
     else
@@ -1223,7 +1223,7 @@ void count_penalty_by_size (int size, char type, double *counter)
         //counter[num_params] += round(1.079*logval*100.0);
         counter[num_params] += misc.param_greater30 * logval * 100.0;
       }
-    
+
     // Dec 4, 2005: let's keep misc.param_greater30 fixed, i.e. not consider it a parameter
     //penalty = (PARAMTYPE) (penaltyMAX + misc.param_greater30 * logval);
     //index = structure_type_index ("misc.param_greater30");
@@ -1246,17 +1246,17 @@ void count_asymmetry_penalty (int size1, int size2, double *counter)
         PARAMTYPE ass, pen;
         ass = misc.asymmetry_penalty_array [MIN (2, MIN (size1, size2))-1];
         pen = MIN (misc.asymmetry_penalty_max_correction, abs (size1-size2) * ass);
-    
+
         //printf ("Adding asym penalty %d to total\n", pen);
         counter[num_params] += pen;
-        
-        // don't count anything for now, considered them fixed. 
+
+        // don't count anything for now, considered them fixed.
         // TODO: to add new parameter t, for the min(a,b), and then add the restriction t <= a, t <= b and minimize (-t)
         /*
-        int ass, pen, index;    
+        int ass, pen, index;
         ass = misc.asymmetry_penalty_array [MIN (2, MIN (size1, size2))-1];
         pen = MIN (misc.asymmetry_penalty_max_correction, abs (size1-size2) * ass);
-        
+
         // store misc.asymmetry_penalty_array[0] and [1], and misc.asymmetry_penalty_max_correction
         index = structure_type_index("misc.asymmetry_penalty_max_correction"); counter[index]++;
         if (size1-size2 == 1)
@@ -1277,28 +1277,28 @@ void count_asymmetry_penalty (int size1, int size2, double *counter)
             case 3: index = structure_type_index("misc.asymmetry_penalty[3]"); counter[index]++; break;
             case 4: index = structure_type_index("misc.asymmetry_penalty[4]"); counter[index]++; break;
             case 5: index = structure_type_index("misc.asymmetry_penalty[5]"); counter[index]++; break;
-            default:index = structure_type_index("misc.asymmetry_penalty[6]"); counter[index]++; break;          
+            default:index = structure_type_index("misc.asymmetry_penalty[6]"); counter[index]++; break;
         }*/
-        
+
         //    return pen;
     }
     else if (parsi_asymmetry == PARSI || parsi_asymmetry == LAVISH)
-    {  
+    {
         int index;
         char type[50];
         // assume the size1 + size2 <= MAXLOOP_I. If it's greater, just use the value of the last parameter
         // first symmetric
-    
+
         if (size1 == size2)     return;
         if (parsi_asymmetry == PARSI)
         {
             sprintf (type, "internal_asymmetry_initiation");
             index = structure_type_index(type);
             counter[index]++;
-        
+
             sprintf (type, "internal_asymmetry_slope");
             index = structure_type_index(type);
-            counter[index] += log (abs (size1-size2));        
+            counter[index] += log (abs (size1-size2));
         }
         else if (parsi_asymmetry == LAVISH)
         {
@@ -1310,20 +1310,20 @@ void count_asymmetry_penalty (int size1, int size2, double *counter)
                     sprintf (type, "internal_asymmetry_initiation");
                     index = structure_type_index(type);
                     counter[index]++;
-        
+
                     sprintf (type, "internal_asymmetry_slope");
                     index = structure_type_index(type);
-                    counter[index] += log (abs (size1-size2));        
-                    
+                    counter[index] += log (abs (size1-size2));
+
                     sprintf (type, "internal_asymmetry[%d]", abs (size1-size2));
                     index = structure_type_index(type);
-                    counter[index]++;                    
+                    counter[index]++;
                 }
                 else
                 {
                     sprintf (type, "internal_asymmetry[%d]", abs (size1-size2));
                     index = structure_type_index(type);
-                    counter[index]++;        
+                    counter[index]++;
                 }
             }
             else
@@ -1331,10 +1331,10 @@ void count_asymmetry_penalty (int size1, int size2, double *counter)
                 sprintf (type, "internal_asymmetry_initiation");
                 index = structure_type_index(type);
                 counter[index]++;
-            
+
                 sprintf (type, "internal_asymmetry_slope");
                 index = structure_type_index(type);
-                counter[index] += log (abs (size1-size2));            
+                counter[index] += log (abs (size1-size2));
             }
         }
     }
@@ -1355,11 +1355,11 @@ double count_types (int link, int *sequence, char *csequence, char *structure, c
     PARAMTYPE energy, en, AUpen;
     PARAMTYPE dang;
     PARAMTYPE misc_energy;
-    int h,l;    
+    int h,l;
     static int cannot_add_dangling[MAXSLEN];
     char type[100];
     int index;
-    
+
     int nb_nucleotides = strlen(csequence);
     for (i=0; i < nb_nucleotides; i++) cannot_add_dangling[i] = 0;
 
@@ -1371,8 +1371,8 @@ double count_types (int link, int *sequence, char *csequence, char *structure, c
     }
 
     energy = 0;
-    AUpen = 0;       
-    
+    AUpen = 0;
+
     for (i=0; i < nb_nucleotides; i++)
     {
         if (debug)
@@ -1382,48 +1382,48 @@ double count_types (int link, int *sequence, char *csequence, char *structure, c
              && f[i].pair > i && structure[i] != '<')
         {
             if (!ignore_AU_penalty)
-            {            
+            {
                 AUpen = AU_penalty (sequence[i], sequence[f[i].pair]);
                 if (debug)
                     printf ("%d - AUpen1 \t- add energy %6g\n", i, AUpen);
-                energy += AUpen;            
+                energy += AUpen;
                 if (counter != NULL)    count_AU_penalty (sequence[i], sequence[f[i].pair], counter);
             }
         }
         else if ( i > 0 && f[i].pair > i  && structure[i] != '<' && f[i-1].pair < i-1 &&
              f[i-1].pair != -1 && !cannot_add_dangling[i])
-            //  )(  
-        {            
+            //  )(
+        {
             AUpen = AU_penalty (sequence[i], sequence[f[i].pair]);
             if (debug)
                 printf ("%d - AUpen2 \t- add energy %6g\n", i, AUpen);
-            energy += AUpen; 
+            energy += AUpen;
             if (counter != NULL)    count_AU_penalty (sequence[i], sequence[f[i].pair], counter);
-        }            
-    
+        }
+
         // add dangling energies and AU_penalties
         if (f[i].pair == -1 && !cannot_add_dangling[i])
         {
             if ((i == 0 || i-1 == link || (i > 0 && f[i-1].pair == -1 && i != link)) &&
                  i < nb_nucleotides-1 && f[i+1].pair > i+1 && structure[i+1] != '<')
                 // .( or ..(
-            {                
+            {
                 if (no_dangling_ends)
                     dang = 0;
                 else
-                {                                
+                {
                     //dang = MIN (0, IGINF(dangle_bot [sequence[f[i+1].pair]] [sequence[i+1]] [sequence[i]]));
                     dang = IGINF(dangle_bot [sequence[f[i+1].pair]] [sequence[i+1]] [sequence[i]]);
                     sprintf (type, "dangle_bot[%d][%d][%d]",sequence[f[i+1].pair], sequence[i+1], sequence[i]);
                     index = structure_type_index (type);
-                    if (counter != NULL)    counter[index]++;                    
+                    if (counter != NULL)    counter[index]++;
                 }
                 AUpen = AU_penalty (sequence[i+1], sequence[f[i+1].pair]);
                 if (debug)
                 {
                     printf ("%d - dangle1 \t- add energy %6g\n", i, dang);
                     printf ("%d - AUpen3 \t- add energy %6g\n", i, AUpen);
-                }                    
+                }
                 energy += dang + AUpen;
                 if (counter != NULL)    count_AU_penalty (sequence[i+1], sequence[f[i+1].pair], counter);
             }
@@ -1435,10 +1435,10 @@ double count_types (int link, int *sequence, char *csequence, char *structure, c
                 if (no_dangling_ends)
                     dang = 0;
                 else
-                {                                            
+                {
                     //dang = MIN (0, IGINF(dangle_top [sequence[i-1]] [sequence[f[i-1].pair]] [sequence[i]]));
                     dang = IGINF(dangle_top [sequence[i-1]] [sequence[f[i-1].pair]] [sequence[i]]);
-                    if (debug)                
+                    if (debug)
                         printf ("%d - dangle2 \t- add energy %6g\n", i, dang);
                     energy += dang;
                     sprintf (type, "dangle_top[%d][%d][%d]",sequence[i-1], sequence[f[i-1].pair], sequence[i]);
@@ -1448,23 +1448,23 @@ double count_types (int link, int *sequence, char *csequence, char *structure, c
             }
             else if (i < nb_nucleotides-1 && f[i+1].pair > i+1 && f[i-1].pair < i-1 && f[i-1].pair != -1
                     && structure[i+1] != '<' && structure[i-1] != '>')
-               // ).( 
+               // ).(
             {
                 if (no_dangling_ends)
                     dang = 0;
                 else
-                {                                            
+                {
                     //dang = MIN (0, IGINF(s_dangling_energy (sequence, f[i-1].pair, i-1, i+1, f[i+1].pair)));
                     dang = IGINF(s_dangling_energy (sequence, structure, f[i-1].pair, i-1, i+1, f[i+1].pair));
                     if (counter != NULL)    count_dangling_energy (sequence, structure, link, f[i-1].pair, i-1, i+1, f[i+1].pair, counter);
                 }
                 AUpen = AU_penalty (sequence[i+1], sequence[f[i+1].pair]);
                 if (debug)
-                {              
+                {
                     printf ("%d - dangle1 \t- add energy %6g\n", i, dang);
                     printf ("%d - AUpen4 \t- add energy %6g\n", i, AUpen);
-                }    
-                energy += dang + AUpen;                
+                }
+                energy += dang + AUpen;
                 if (counter != NULL)    count_AU_penalty (sequence[i+1], sequence[f[i+1].pair], counter);
             }
             else
@@ -1472,16 +1472,16 @@ double count_types (int link, int *sequence, char *csequence, char *structure, c
                 continue;
             }
         }
-        
+
         if (f[i].pair < i || f[i].type == NONE)
         {
             continue;
-        }       
+        }
 
         if (f[i].type == STACK)
         {
             en = s_stacked_pair::get_energy (i, f[i].pair, sequence);
-            if (debug)            
+            if (debug)
                 printf ("%d stack \t- add energy %6g\n", i, en);
             energy += en;
             if (counter != NULL)    s_stacked_pair::count_get_energy (i, f[i].pair, sequence, counter);
@@ -1489,7 +1489,7 @@ double count_types (int link, int *sequence, char *csequence, char *structure, c
         else if (f[i].type == HAIRP)    // means we don't have x's inside
         {
             if (link > -1 && i <= link && link < f[i].pair)
-            {    
+            {
                 // add intermolecular initiation
                 misc_energy = misc.intermolecular_initiation;
                 index = structure_type_index ("misc.intermolecular_initiation");
@@ -1506,46 +1506,46 @@ double count_types (int link, int *sequence, char *csequence, char *structure, c
                 {
                     if (no_dangling_ends)   dang = 0;
                     else
-                    {  
+                    {
                         //dang = MIN (0, IGINF(dangle_top [sequence[i]] [sequence[f[i].pair]] [sequence[i+1]]));
                         dang = IGINF(dangle_top [sequence[i]] [sequence[f[i].pair]] [sequence[i+1]]);
                         if (debug)
                         {
                             printf ("%d - dangle-spec-hairp \t- add energy %6g\n", i, dang);
-                        }                    
+                        }
                         energy += dang;
                         sprintf (type, "dangle_top[%d][%d][%d]", sequence[i], sequence[f[i].pair], sequence[i+1]);
                         index = structure_type_index (type);
                         if (counter != NULL)    counter[index]++;
                     }
-                }                 
+                }
                 if (link < f[i].pair-1)    // there is a dangle_bot    ( .)
                 {
                     if (no_dangling_ends)   dang = 0;
                     else
-                    {            
+                    {
                         //dang = MIN (0, IGINF(dangle_bot [sequence[i]] [sequence[f[i].pair]] [sequence[f[i].pair-1]]));
                         dang = IGINF(dangle_bot [sequence[i]] [sequence[f[i].pair]] [sequence[f[i].pair-1]]);
                         if (debug)
                         {
                             printf ("%d - dangle-spec-hairp \t- add energy %6g\n", i, dang);
-                        }                    
+                        }
                         energy += dang;
                         sprintf (type, "dangle_bot[%d][%d][%d]", sequence[i], sequence[f[i].pair], sequence[f[i].pair-1]);
                         index = structure_type_index (type);
                         if (counter != NULL)    counter[index]++;
                     }
-                }                 
-                
+                }
+
             }
             else
-            {                
+            {
                 en = s_hairpin_loop::get_energy (i, f[i].pair, sequence, csequence, p_table);
                 if (debug)
                     printf ("%d hairpin \t- add energy %6g\n", i, en);
                 energy += en;
                 if (counter != NULL)    s_hairpin_loop::count_get_energy (i, f[i].pair, sequence, csequence, counter);
-            }    
+            }
         }
         else if (f[i].type == INTER)
         {
@@ -1578,23 +1578,23 @@ double count_types (int link, int *sequence, char *csequence, char *structure, c
             }
             while (l < f[i].bri[0] && !special)
                 if (l++ == link) special = 1;
-            h = 0;                
+            h = 0;
             while (h < f[i].num_branches-1 && !special)
             {
                 l = f[f[i].bri[h]].pair;
                 while (l < f[i].bri[h+1] && !special)
                     if (l++ == link) special = 1;
-                h++;    
+                h++;
             }
             l = f[f[i].bri[f[i].num_branches-1]].pair;
             while (l < f[i].pair && !special)
                 if (l++ == link) special = 1;
-            // now we now if it a special multi-loop or not                                  
+            // now we now if it a special multi-loop or not
 
             if (!special)
             {
 //                printf ("Regular ML\n");
-              // consider the contribution of unpaired bases  
+              // consider the contribution of unpaired bases
               index = structure_type_index ("misc.multi_free_base_penalty");
                 for (l=i+1; l < f[i].bri[0]; l++)
                   {
@@ -1614,7 +1614,7 @@ double count_types (int link, int *sequence, char *csequence, char *structure, c
                     misc_energy += misc.multi_free_base_penalty;
                     if (counter != NULL)    counter[index]++;
                   }
-                // done considering the contribution of unpaired bases  
+                // done considering the contribution of unpaired bases
                 misc_energy += misc.multi_offset;
                 misc_energy += misc.multi_helix_penalty * (f[i].num_branches + 1);
                 index = structure_type_index ("misc.multi_offset");
@@ -1625,12 +1625,12 @@ double count_types (int link, int *sequence, char *csequence, char *structure, c
             /*
             else
             {
-//                printf ("Special ML\n");            
+//                printf ("Special ML\n");
                 misc_energy = misc.intermolecular_initiation;
                 index = structure_type_index ("misc.intermolecular_initiation");
                 if (counter != NULL)    counter[index]++;
-            } 
-            */               
+            }
+            */
             // add AU_penalties for multi-loop
             // the closing base pair can't be <>
             AUpen += AU_penalty (sequence[i], sequence[f[i].pair]);
@@ -1644,12 +1644,12 @@ double count_types (int link, int *sequence, char *csequence, char *structure, c
                     if (counter != NULL)    count_AU_penalty (sequence[f[i].bri[h]],sequence[f[f[i].bri[h]].pair], counter);
                 }
             }
-        
+
             // add dangling energies for multi-loop
             if (no_dangling_ends)
                 dang = 0;
             else
-            {                                            
+            {
                 dang += s_dangling_energy_left (sequence, structure, i, f[i].pair, f[i].bri[0], f[f[i].bri[0]].pair);
                 if (counter != NULL)    count_dangling_energy_left (sequence, structure, link, i, f[i].pair, f[i].bri[0], f[f[i].bri[0]].pair, counter);
                 for (l=0; l < f[i].num_branches - 1; l++)
@@ -1660,7 +1660,7 @@ double count_types (int link, int *sequence, char *csequence, char *structure, c
                 dang += s_dangling_energy_right (sequence, structure, i, f[i].pair, f[i].bri[f[i].num_branches-1], f[f[i].bri[f[i].num_branches-1]].pair);
                 if (counter != NULL)    count_dangling_energy_right (sequence, structure, link, i, f[i].pair, f[i].bri[f[i].num_branches-1], f[f[i].bri[f[i].num_branches-1]].pair, counter);
             }
-            // add "no-dangling" restriction                                    
+            // add "no-dangling" restriction
             for (l=0; l < f[i].num_branches; l++)
             {
                 cannot_add_dangling [f[i].bri[l] -1] = 1;
@@ -1671,8 +1671,8 @@ double count_types (int link, int *sequence, char *csequence, char *structure, c
                 printf ("%d - multi m\t- add energy %6g\n", i, misc_energy);
                 printf ("%d - multi d\t- add energy %6g\n", i, dang);
                 printf ("%d - multi AU\t- add energy %6g\n", i, AUpen);
-            }                
-            energy += misc_energy + dang + AUpen;                           
+            }
+            energy += misc_energy + dang + AUpen;
         }
     }
     if (restricted[0] != '\0')  delete [] p_table;
@@ -1736,7 +1736,7 @@ double get_feature_counts_restricted (char *sequence, char *structure, double *c
     char restricted[1] = "";
     double energy = count_each_structure_type (sequence, structure, restricted, c, f, reset_c);
     return energy;
-    
+
     // I tried to some check below, but if reset_c is 0, then it won't work.
     /*
     PARAMTYPE params_array[num_params];
@@ -1762,15 +1762,15 @@ int check_counts_linear (int numpars, double *params, double *c, double f, doubl
     int i;
     for (i=0; i < numpars; i++)
     {
-        energy_c +=  c[i] * params[i];  
+        energy_c +=  c[i] * params[i];
     }
     energy_c += f;
-    
+
     if (fabs(energy_c - energy) > 0.2)  // not really sure what's a good threshold. Maybe 0 is fine
     {
         printf ("ERROR! Something is wrong with the counts or the free energy: c'x+f = %.2lf, energy = %.2lf diff=%.2lf\n", energy_c, energy, fabs(energy_c-energy));
         return 0;
-    }        
+    }
     return 1;
 }
 
@@ -1784,7 +1784,7 @@ int check_counts_quadratic (int numpars, double *params, double **P, double *c, 
     int i, j;
     for (i=0; i < numpars; i++)
     {
-        energy_c +=  c[i] * params[i];  
+        energy_c +=  c[i] * params[i];
     }
     energy_c += f;
 
@@ -1794,12 +1794,12 @@ int check_counts_quadratic (int numpars, double *params, double **P, double *c, 
         {
             energy_c += P[i][j]*params[i]*params[j];
         }
-    }        
+    }
     if (fabs(energy_c - energy) > 0.2)  // not really sure what's a good threshold. Maybe 0 is fine
     {
         printf ("ERROR! Something is wrong with the counts or the free energy: x'Px + c'x + f = %g, energy = %g diff=%g\n", energy_c, energy, fabs(energy_c-energy));
         return 0;
-    }        
+    }
     return 1;
 }
 
@@ -1812,7 +1812,7 @@ void print_counter (double *counter, double free_value)
     //num_params = create_string_params();
     int i;
     PARAMTYPE params_array[MAXNUMPARAMS];
-    
+
     save_parameters_in_array (params_array);
     printf ("==================================================================\n");
     printf ("%4s\t%30s\t%10s\t%4s\n", "Par#", "Parameter name", "Value", "Counter");
@@ -1849,7 +1849,7 @@ double count_each_structure_type (char *sequence, char *structure, char *restric
     int len, nb_nucleotides;
     char *space;
     int link;
-    
+
     if (reset && counter != NULL)
     {
         //first reset counter
@@ -1860,7 +1860,7 @@ double count_each_structure_type (char *sequence, char *structure, char *restric
         }
         free_value = 0;
     }
-            
+
     //num_params = create_string_params ();
     len = strlen(sequence);
     // look for the space
@@ -1868,14 +1868,14 @@ double count_each_structure_type (char *sequence, char *structure, char *restric
     if (space == NULL)    // single sequence
     {
         // make sure the structure doesn't have space either
-        if (strstr (structure, " ") != NULL) 
-        { 
-            printf ("Structure has space, and sequence not!!\n%s\n%s\n", sequence, structure); 
+        if (strstr (structure, " ") != NULL)
+        {
+            printf ("Structure has space, and sequence not!!\n%s\n%s\n", sequence, structure);
             exit (1);
         }
         actual_seq = sequence;
         actual_str = structure;
-        link = -1;            
+        link = -1;
     }
     else
     {
@@ -1885,7 +1885,7 @@ double count_each_structure_type (char *sequence, char *structure, char *restric
         link = space_location - 1;
         if (structure[space_location] != ' ')
         {
-            printf ("Structure doesn't have space at the same place as sequence!!\n%s\n%s\n", sequence, structure); 
+            printf ("Structure doesn't have space at the same place as sequence!!\n%s\n%s\n", sequence, structure);
             exit (1);
         }
         actual_seq = new char[len+1];
@@ -1903,14 +1903,14 @@ double count_each_structure_type (char *sequence, char *structure, char *restric
         actual_seq[len-1] = '\0';
         actual_str[len-1] = '\0';
     }
-    
-    nb_nucleotides = strlen(actual_seq);    
-    if ((f = new str_features[nb_nucleotides]) == NULL) giveup ("Cannot allocate memory", "str_features");    
+
+    nb_nucleotides = strlen(actual_seq);
+    if ((f = new str_features[nb_nucleotides]) == NULL) giveup ("Cannot allocate memory", "str_features");
     // detect the structure features
     // this function call should be the same for single sequence of duplex
     //printf ("Structure:\n%s\n", structure);
     detect_structure_features (actual_str, f);
-    
+
     int_sequence = new int[nb_nucleotides];
     if (int_sequence == NULL) giveup ("Cannot allocate memory", "energy");
     for (i=0; i < nb_nucleotides; i++) int_sequence[i] = nuc_to_int(actual_seq[i]);
@@ -1930,38 +1930,38 @@ double count_each_structure_type (char *sequence, char *structure, char *restric
         free_value += counter_and_free_value[num_params]/100.0;
         delete [] counter_and_free_value;
     }
-    
+
     if (link > -1)
     {
         delete [] actual_seq;
         delete [] actual_str;
-    }    
+    }
     delete [] int_sequence;
-    delete [] f;    
+    delete [] f;
     return energy;
 }
 
 
 int is_int22_group_1 (int i, int j, int k, int l)
 // returns 1 if it is in group 1 according to Christiansen_Znosko_2008 and Shankar_Turner_2007
-{    
-    // a U · U pair adjacent to an R · R pair, 
-    if (i==U && j==U && (k==A || k==G) && (l==A || l==G))   return 1; 
-    if (k==U && l==U && (i==A || i==G) && (j==A || j==G))   return 1;    
-    //a G · A  or A · G pair adjacent to a Y · Y pair, 
+{
+    // a U · U pair adjacent to an R · R pair,
+    if (i==U && j==U && (k==A || k==G) && (l==A || l==G))   return 1;
+    if (k==U && l==U && (i==A || i==G) && (j==A || j==G))   return 1;
+    //a G · A  or A · G pair adjacent to a Y · Y pair,
     if (((i==A && j==G) || (i==G && j==A)) && (k==C || k==U) && (l==C || l==U))     return 1;
-    if (((k==A && l==G) || (k==G && l==A)) && (i==C || i==U) && (j==C || j==U))     return 1;        
+    if (((k==A && l==G) || (k==G && l==A)) && (i==C || i==U) && (j==C || j==U))     return 1;
     //or  any combination of A · C, U · C, C · U,  C · C, C · A, or A · A pairs
     if (((i==A && j==C) || (i==U && j==C) || (i==C && j==U) || (i==C && j==C) || (i==C && j==A) || (i==A && j==A)) &&
-        ((k==A && l==C) || (k==U && l==C) || (k==C && l==U) || (k==C && l==C) || (k==C && l==A) || (k==A && l==A)))     
+        ((k==A && l==C) || (k==U && l==C) || (k==C && l==U) || (k==C && l==C) || (k==C && l==A) || (k==A && l==A)))
         return 1;
     return 0;
 }
 
 int is_int22_group_2 (int i, int j, int k, int l)
 // returns 1 if it is in group 2 according to Christiansen_Znosko_2008 and Shankar_Turner_2007
-{    
-    //any combination of adjacent G · A and A · G pairs     
+{
+    //any combination of adjacent G · A and A · G pairs
     if (((i==A && j==G) || (i==G && j==A)) && ((k==A && l==G) || (k==G && l==A)))   return 1;
     //or two U · U pairs
     if (i==U && j==U && k==U && l==U)   return 1;
@@ -1972,9 +1972,9 @@ int is_int22_group_2 (int i, int j, int k, int l)
 int is_int22_group_3 (int i, int j, int k, int l)
 // According to Shankar_Turner_2007, group 3 is: (Christiansen_Znosko_2008 missed one case!!)
 //  GA or AG pair adjacent to a CA, AC, or AA pair, or a UU pair adjacent to a YY or CA or AC pair.
-{   
-    //GA or AG pair adjacent to a CA, AC, or AA pair 
-    //  - this is from Shankar_Turner_2007, Christiansen_Znosko_2008 missed it 
+{
+    //GA or AG pair adjacent to a CA, AC, or AA pair
+    //  - this is from Shankar_Turner_2007, Christiansen_Znosko_2008 missed it
     if (((i==G && j==A) || (i==A && j==G)) && ((k==A && l==C) || (k==C && l==A) || (k==A && l==A))) return 1;
     // now the mirrored
     if (((k==G && l==A) || (k==A && l==G)) && ((i==A && j==C) || (i==C && j==A) || (i==A && j==A))) return 1;
@@ -1990,7 +1990,7 @@ int is_int22_group_3 (int i, int j, int k, int l)
 
 int is_int22_group_4 (int i, int j, int k, int l)
 // returns 1 if it is in group 4 according to Christiansen_Znosko_2008 and Shankar_Turner_2007
-{    
+{
     //a G · G pair not adjacent to a U · U pair
     if (i==G && j==G)
     {
@@ -2007,38 +2007,38 @@ int is_int22_group_4 (int i, int j, int k, int l)
 
 
 int apply_rule_1 (int i, int j, int &i_rule1, int &j_rule1)
-// I Don't use this when I initialize the variable any more, I just used it for the feature similarity rules        
-// check if i-j form a base pair: A-U, C-G or G-U. 
+// I Don't use this when I initialize the variable any more, I just used it for the feature similarity rules
+// check if i-j form a base pair: A-U, C-G or G-U.
 // If they do, return 1, and write the replacement in i_rule1 and j_rule1
 // If they don't, return 0, and i_rule1=i, j_rule1=j.
         // There's a problem in the case of int21: If the free bases are UG/G, after applying this rule we get CG/A, but G/G "pairs" have some contribution in int21
 {
     i_rule1 = i;
-    j_rule1 = j;    
-    if (i==A && j==U) 
+    j_rule1 = j;
+    if (i==A && j==U)
     {
         j_rule1=C;  return 1;
     }
-    else if (i==U && j==A)  
+    else if (i==U && j==A)
     {
         i_rule1=C;  return 1;
-    }    
-    else if (i==G && j==C)  
+    }
+    else if (i==G && j==C)
     {
         i_rule1=A;  return 1;
-    }    
-    else if (i==C && j==G)  
+    }
+    else if (i==C && j==G)
     {
         j_rule1=A;  return 1;
-    }    
-    else if (i==G && j==U)  
+    }
+    else if (i==G && j==U)
     {
         i_rule1=A; j_rule1=C;  return 1;
-    }    
-    else if (i==U && j==G)  
+    }
+    else if (i==U && j==G)
     {
         i_rule1=C; j_rule1=A;  return 1;
-    }    
+    }
     return 0;
 }
 
@@ -2070,7 +2070,7 @@ void check_int11_parameters (int i, int j, int k, int l, int m, int n)
         // look for UU mismatch
         if (k==U && l==U)
             int11_shouldbe += misc.internal11_UU_mismatch;
-        // check if it is internal11_5YRR_5YRR    
+        // check if it is internal11_5YRR_5YRR
         if (isY(i) && isR(j) && isR(k) && isR(l) && isR(m) && isY(n))
             int11_shouldbe += misc.internal11_5YRR_5YRR;
         if ( isR(i) && isY(j) && isY(k) && isY(l) && isY(m) && isR(n) )
@@ -2078,10 +2078,10 @@ void check_int11_parameters (int i, int j, int k, int l, int m, int n)
         if ( isY(i) && isR(j) && isY(k) && isY(l) && isR(m) && isY(n) )
             int11_shouldbe += misc.internal11_5YYR_5YYR;
         if ( (isY(i) && isR(j) && isR(k) && isY(l) && isY(m) && isR(n)) ||
-              (isR(i) && isY(j) && isY(k) && isR(l) && isR(m) && isY(n)) )    
+              (isR(i) && isY(j) && isY(k) && isR(l) && isR(m) && isY(n)) )
             int11_shouldbe += misc.internal11_5YRY_5RYR;
         if ( (isR(i) && isY(j) && isR(k) && isY(l) && isY(m) && isR(n)) ||
-              (isR(i) && isY(j) && isY(k) && isR(l) && isY(m) && isR(n)) )    
+              (isR(i) && isY(j) && isY(k) && isR(l) && isY(m) && isR(n)) )
             int11_shouldbe += misc.internal11_5RRY_5RYY;
 
         if (fabs(int11_shouldbe - int11[i][j][k][l][m][n]) > 0.01)
@@ -2093,7 +2093,7 @@ void check_int11_parameters (int i, int j, int k, int l, int m, int n)
         }
     }
 }
-            
+
 void similarity_bulge_type (int bulged_base, char *similarity)
 //  computes the similarity tule
 // TODO
@@ -2110,7 +2110,7 @@ void similarity_bulge_type (int bulged_base, char *similarity)
             for (ip=0; ip < NUCL; ip++)
                 for (jp=0; jp < NUCL; jp++)
                 {
-                    if (! can_pair(ip, jp)) continue;                    
+                    if (! can_pair(ip, jp)) continue;
                     sprintf (type, "bulge1[%d][%d][%d][%d][%d]", i, j, bulged_base, ip, jp);
                     tindex = structure_type_index (type);
                     if (similarity_rule[tindex][0] != '\0')
@@ -2120,7 +2120,7 @@ void similarity_bulge_type (int bulged_base, char *similarity)
                 }
         }
     // now traverse again
-    // TODO: this is veeery slow 
+    // TODO: this is veeery slow
     for (i=0; i < NUCL; i++)
         for (j=0; j < NUCL; j++)
         {
@@ -2128,7 +2128,7 @@ void similarity_bulge_type (int bulged_base, char *similarity)
             for (ip=0; ip < NUCL; ip++)
                 for (jp=0; jp < NUCL; jp++)
                 {
-                    if (! can_pair(ip, jp)) continue;                    
+                    if (! can_pair(ip, jp)) continue;
                     sprintf (type, "bulge1[%d][%d][%d][%d][%d]", i, j, bulged_base, ip, jp);
                     tindex = structure_type_index (type);
                     if (similarity_rule[tindex][0] != '\0')
@@ -2140,7 +2140,7 @@ void similarity_bulge_type (int bulged_base, char *similarity)
                         if (num2 < num)     sprintf (similarity, "%s + ", similarity);
                     }
                 }
-        }            
+        }
 }
 
 
@@ -2161,9 +2161,9 @@ void extrapolate_parameters ()
     //#if (MODEL == SIMPLE)
     // set a fixed value to param_greater_30 for now
     misc.param_greater30 = 1.079;
-    // keep misc.gail_rule this fixed 
-    misc.gail_rule = 1;  
-    
+    // keep misc.gail_rule this fixed
+    misc.gail_rule = 1;
+
     if (parsi_int11 == T99)
     {
         // fill the int11 data structure
@@ -2187,7 +2187,7 @@ void extrapolate_parameters ()
                                                 //int11[n][m][l][k][j][i] = misc.internal11_basic_mismatch;
                                             }
                                         }
-                                        
+
                                         else
                                         {
                                             if (!(watson_crick(i,j) && watson_crick(m,n) && k==U && l==U))
@@ -2206,15 +2206,15 @@ void extrapolate_parameters ()
                                                     int11[i][j][k][l][m][n] += misc.internal_AU_closure;
                                             }
                                         }
-                                        
+
                                         // round it to match Turner parameters
                                         //if (int11[i][j][k][l][m][n] % 10 == 5) int11[i][j][k][l][m][n] += 5;
                                         //if (int11[i][j][k][l][m][n] % 10 == -5) int11[i][j][k][l][m][n] += 5;
                                     }
-                }                                
+                }
     }
     if (parsi_int21 == T99)
-    {   
+    {
         // fill the int21 data structure
         for (i=0; i < NUCL; i++)
             for (j=0; j < NUCL; j++)
@@ -2244,14 +2244,14 @@ void extrapolate_parameters ()
                                                     (PARAMTYPE)(int21[G][C][k][l][G][C][o]/2.0);
                                                 if (has_AU_penalty(i,j))
                                                     int21[i][j][k][l][m][n][o] += misc.internal21_AU_closure;
-                                                if (has_AU_penalty(m,n))    
+                                                if (has_AU_penalty(m,n))
                                                     int21[i][j][k][l][m][n][o] += misc.internal21_AU_closure;
                                             }
                                             // round it to match Turner parameters - seems to be inconsistent
                                             //if (int21[i][j][k][l][m][n][o] % 10 == 5) int21[i][j][k][l][m][n][o] += 5;
                                         }
                                     }
-                }                                
+                }
     }
     if (parsi_int22 == T99)
     {
@@ -2285,7 +2285,7 @@ void extrapolate_parameters ()
                                                 if (m==G && n==U)   mm = A;     else mm = m;
                                                 if (m==U && n==G)   nn = A;     else nn = n;
 
-                                                
+
                                                 if (watson_crick(k,l) || watson_crick(o,p))
                                                 {
                                                     int22[i][j][k][l][m][n][o][p] = misc.internal22_match;
@@ -2309,14 +2309,14 @@ void extrapolate_parameters ()
                                                         case 2: int22[i][j][k][l][m][n][o][p] += misc.internal22_delta_different_size; break;
                                                         case 3: int22[i][j][k][l][m][n][o][p] += misc.internal22_delta_1stable_1unstable; break;
                                                         case 4: int22[i][j][k][l][m][n][o][p] += misc.internal22_delta_AC; break;
-                                                        default: printf ("ERROR: result %d for k=%d, l=%d, o=%d, p=%d, ABORT!\n", result, k, l, o, p); exit(1);                                                
-                                                    }                                                
-                                                }                                        
+                                                        default: printf ("ERROR: result %d for k=%d, l=%d, o=%d, p=%d, ABORT!\n", result, k, l, o, p); exit(1);
+                                                    }
+                                                }
                                             }
                                     }
-                }                                
-    }                    
-       
+                }
+    }
+
     if (parsi_tstacki == T99)
     {
         // fill the tstacki data structure, now that we also have terminal_AU_penalty - actually I removed it from here
@@ -2327,7 +2327,7 @@ void extrapolate_parameters ()
                     {
                         if (!can_pair (i, j))
                             tstacki[i][j][k][l] = INF;
-                        else    
+                        else
                         {
                             tstacki[i][j][k][l] = 0;
                             if (((i == A || i == G) && j == U) ||
@@ -2391,7 +2391,7 @@ void extrapolate_parameters ()
                     for (l=0; l < NUCL; l++)
                     {
                         if (!can_pair (i, j))   tstacki[i][j][k][l] = INF;
-                        else    
+                        else
                         {
                             tstacki[i][j][k][l] = 0;
                             if (((i == A || i == G) && j == U) || ((j == A || j == G) && i == U))
@@ -2514,7 +2514,7 @@ void extrapolate_parameters ()
     //                                 int11[i][j][k][l][m][n] = int11[i][j][rep1][rep2][m][n];
     //                             }
     //                         }
-    }    
+    }
     ///////////////// int 21
     // it starts the same for parsi_int21 and !parsi_int21
     // I'm also applying rule 1 in this case!
@@ -2535,7 +2535,7 @@ void extrapolate_parameters ()
                                     {
                                         if (parsi_int21 == LAVISH && int21_experimental_addition[i][j][k][l][m][n][o] >= INF)   continue;
                                         int21[i][j][k][l][m][n][o] = misc.internal21_initiation;
-    
+
                                         // look for AU closure
                                         if ((i==A && j==U) || (i==U && j==A))
                                             int21[i][j][k][l][m][n][o] += misc.internal21_AU_closure;
@@ -2563,7 +2563,7 @@ void extrapolate_parameters ()
                                     }
                                 }
         // apply rule 1 -- not so sure I should, it wasn't done in the basic model
-    
+
     //     for (i=0; i < NUCL; i++)
     //         for (j=0; j < NUCL; j++)
     //             for (k=0; k < NUCL; k++)
@@ -2577,8 +2577,8 @@ void extrapolate_parameters ()
     //                                 apply_rule_1 (rep1, o, rep3, rep4);
     //                                 int21[i][j][k][l][m][n][o] = int21[i][j][rep3][rep2][m][n][rep4];
     //                             }
-    }                                
-                                
+    }
+
     ////////////// int 22
     // this is for both parsi_int22 and !parsi_int22
     if (parsi_int22 == PARSI || parsi_int22 == LAVISH)
@@ -2648,7 +2648,7 @@ void extrapolate_parameters ()
                                         }
                                     }
         // apply rule 1 -- not so sure I should, it wasn't done in the basic model
-    
+
     //     for (i=0; i < NUCL; i++)
     //         for (j=0; j < NUCL; j++)
     //             for (k=0; k < NUCL; k++)
@@ -2663,8 +2663,8 @@ void extrapolate_parameters ()
     //                                     if (apply_rule_1 (o, p, rep1, rep2))
     //                                         int22[i][j][k][l][m][n][o][p] = int22[i][j][k][l][m][n][rep1][rep2];
     //                                 }
-    }                                    
-                                    
+    }
+
     ////////////// bulge1
     if (parsi_bulge1 == PARSI)
     {
@@ -2672,20 +2672,20 @@ void extrapolate_parameters ()
             for (j=0; j < NUCL; j++)
                 for (k=0; k < NUCL; k++)
                     for (ip=0; ip < NUCL; ip++)
-                        for (jp=0; jp < NUCL; jp++)                    
+                        for (jp=0; jp < NUCL; jp++)
                         {
                             if (!can_pair (i,j))            bulge1[i][j][k][ip][jp] = INF;
                             else if (!can_pair (ip,jp))     bulge1[i][j][k][ip][jp] = INF;
-                            else 
+                            else
                             {
                                 PARAMTYPE bulged;
                                 if (k==A)        bulged = bulgeA;
                                 else if (k==C)   bulged = bulgeC;
                                 else if (k==G)   bulged = bulgeG;
                                 else             bulged = bulgeU;
-                                bulge1[i][j][k][ip][jp] = stack[i][j][ip][jp] + bulged;    
+                                bulge1[i][j][k][ip][jp] = stack[i][j][ip][jp] + bulged;
                             }
-                        }    
+                        }
     }
     ////////////// dangling ends
     if (parsi_dangles == PARSI)
@@ -2704,11 +2704,11 @@ void extrapolate_parameters ()
                         dangle_top[i][j][k] = 0;
                         dangle_bot[i][j][k] = 0;
                     }
-                }    
-    }    
+                }
+    }
     //if (parsi_others)   // I have nothing in here for now
-    
-    ///////////// length of internal, hairpin and bulge loops    
+
+    ///////////// length of internal, hairpin and bulge loops
     if (parsi_length == PARSI)
     {
         double logval;
@@ -2728,7 +2728,7 @@ void extrapolate_parameters ()
         {
             logval = log (1.0*i/MAXLOOP_B_PARSI);
             bulge_penalty_by_size[i] = bulge_penalty_by_size[MAXLOOP_B_PARSI] + (PARAMTYPE)(100.0*misc.param_greater30 * logval);
-        }                
+        }
     }
     else if (parsi_length == ZL)
     {
@@ -2740,7 +2740,7 @@ void extrapolate_parameters ()
         {
             multiplier = 1.75;
             logval = log (1.0*i/MAXLOOP_H_PARSI);
-            hairpin_penalty_by_size[i] = hairpin_penalty_by_size[MAXLOOP_H_PARSI] + 
+            hairpin_penalty_by_size[i] = hairpin_penalty_by_size[MAXLOOP_H_PARSI] +
                 (PARAMTYPE)(100.0 * R*Tem*multiplier * logval);
         }
         for (i=MAXLOOP_I_PARSI+1; i <= MAXLOOP_I_LAVISH; i++)
@@ -2751,12 +2751,12 @@ void extrapolate_parameters ()
                 (PARAMTYPE)(100.0* R*Tem*multiplier * logval);
         }
         for (i=MAXLOOP_B_PARSI+1; i <= MAXLOOP_B_LAVISH; i++)
-        {         
-            multiplier = 1.85;   
+        {
+            multiplier = 1.85;
             logval = log (1.0*i/MAXLOOP_B_PARSI);
-            bulge_penalty_by_size[i] = bulge_penalty_by_size[MAXLOOP_B_PARSI] + 
+            bulge_penalty_by_size[i] = bulge_penalty_by_size[MAXLOOP_B_PARSI] +
                 (PARAMTYPE)(100.0* R*Tem*multiplier * logval);
-        }                
+        }
     }
 
 
@@ -2768,8 +2768,8 @@ void extrapolate_parameters ()
         misc.hairpin_c2 = 0;
         misc.hairpin_c3 = 0;
         nb_special_hl = 0;
-    }        
-    
+    }
+
 }
 
 
@@ -2791,10 +2791,10 @@ void initialize_correct_int11_expadd (int ii, int jj, int kk, int ll, int mm, in
     if ((ii==G && jj==U) || (ii==U && jj==G))
         int11_experimental_addition[ii][jj][kk][ll][mm][nn] -= misc.internal11_GU_closure;
     if ((mm==G && nn==U) || (mm==U && nn==G))
-        int11_experimental_addition[ii][jj][kk][ll][mm][nn] -= misc.internal11_GU_closure;    
+        int11_experimental_addition[ii][jj][kk][ll][mm][nn] -= misc.internal11_GU_closure;
     // look for AG mismatch
     if ((kk==A && ll==G) || (kk==G && ll==A))
-        int11_experimental_addition[ii][jj][kk][ll][mm][nn] -= misc.internal11_AG_mismatch;        
+        int11_experimental_addition[ii][jj][kk][ll][mm][nn] -= misc.internal11_AG_mismatch;
     // look for GG mismatch
     if (kk==G && ll==G)
         int11_experimental_addition[ii][jj][kk][ll][mm][nn] -= misc.internal11_GG_mismatch;
@@ -2827,9 +2827,9 @@ void initialize_correct_int21_expadd (int ii, int jj, int kk, int ll, int mm, in
     //apply_rule_1 (kk, ll, kk, ll);
     //apply_rule_1 (kk, oo, kk, oo);
 
-    int21_experimental_addition[ii][jj][kk][ll][mm][nn][oo] = int21[ii][jj][kk][ll][mm][nn][oo];    
+    int21_experimental_addition[ii][jj][kk][ll][mm][nn][oo] = int21[ii][jj][kk][ll][mm][nn][oo];
     int21_experimental_addition[ii][jj][kk][ll][mm][nn][oo] -= misc.internal21_initiation;
-    
+
     // look for AU closure
     if ((ii==A && jj==U) || (ii==U && jj==A))
         int21_experimental_addition[ii][jj][kk][ll][mm][nn][oo] -= misc.internal21_AU_closure;
@@ -2862,12 +2862,12 @@ void initialize_correct_int22_expadd (int ii, int jj, int kk, int ll, int mm, in
 // this is similar to the function count_int22_MODEL_EXTENDED in s_internal_loop.cpp
 {
     if (parsi_int22 != LAVISH)  return;
-    
+
     // Apply rule 1 twice
     // DO NOT apply rule 1, otherwise it skrews up the string_params array
     //apply_rule_1 (kk, ll, kk, ll);
     //apply_rule_1 (oo, pp, oo, pp);
-    
+
     // Applying rule 1 might not get the order of ii, jj, kk, ll, mm, nn, oo, pp to be in the first symmetric part, which is part of the feature set
 
     int22_experimental_addition[ii][jj][kk][ll][mm][nn][oo][pp] = int22[ii][jj][kk][ll][mm][nn][oo][pp];
@@ -2913,13 +2913,13 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
     int line = 0;
     int inc;
     int sim_index = 0;
-    
-    
+
+
     // need for save_parameters
     FILE *file;
-    
+
     if (strcmp (calling_function, "create_string_params") == 0)
-        job = 0;  
+        job = 0;
     else if (strcmp (calling_function, "fill_similarity_rules") == 0)
         job = 1;
     else if (strcmp (calling_function, "save_parameters_in_array") == 0)
@@ -2931,20 +2931,20 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
     else if (strcmp (calling_function, "fill_data_structures_with_new_parameters_from_array") == 0)
         job = 5;    // array contains the array with the parameters
 
-  
+
     if (job == 3)
     {
         if ((file = fopen (filename, "w")) == NULL)
         {
             giveup ("Cannot open file", filename);
-        }    
+        }
     }
     else if (job == 4)
     {
         if ((file = fopen (filename, "r")) == NULL)
         {
             giveup ("Cannot open file", filename);
-        }    
+        }
     }
 
     for (i=0; i < NUCL; i++)
@@ -2958,11 +2958,11 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                         // stack[i][j][k][l] is the same as stack[l][k][j][i]
                         if (i*1000 + j*100 + k*10 + l <= l*1000 + k*100 + j*10 + i)
                         {
-                            switch (job) 
+                            switch (job)
                             {
                                 case 0:
                                     sprintf (string_params[index], "stack[%d][%d][%d][%d]", i, j, k, l);
-                                    sprintf (string_params_human_readable[index], "stack[5'-%c%c/%c%c-3']", 
+                                    sprintf (string_params_human_readable[index], "stack[5'-%c%c/%c%c-3']",
                                         int_to_nuc(i), int_to_nuc(k), int_to_nuc(l), int_to_nuc(j));
                                     break;
                                 case 2:
@@ -2983,7 +2983,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                     stack[i][j][k][l] = array[index];
                                     stack[l][k][j][i] = array[index];
                                     break;
-                            }                        
+                            }
                             index++;    sim_index++;
                         }
                     }
@@ -2999,7 +2999,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 2:
                 array[index] = misc.hairpin_AU_closure;
-                break;  
+                break;
             case 3:
                 fprintf (file, "%.2lf\n", (double)misc.hairpin_AU_closure/100.0);
                 break;
@@ -3014,7 +3014,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
         }
         index++;    sim_index++;
-        
+
         switch (job)
         {
             case 0:
@@ -3023,7 +3023,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 2:
                 array[index] = misc.hairpin_AG_mismatch;
-                break;                                                        
+                break;
             case 3:
                 fprintf (file, "%.2lf\n", (double)misc.hairpin_AG_mismatch/100.0);
                 break;
@@ -3046,7 +3046,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 2:
                 array[index] = misc.hairpin_GA_mismatch;
-                break;                                                        
+                break;
             case 3:
                 fprintf (file, "%.2lf\n", (double)misc.hairpin_GA_mismatch/100.0);
                 break;
@@ -3058,10 +3058,10 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 5:
                 misc.hairpin_GA_mismatch = array[index];
-                break;                                                                      
+                break;
         }
-        index++;    sim_index++;    
-        
+        index++;    sim_index++;
+
         switch (job)
         {
             case 0:
@@ -3070,7 +3070,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 2:
                 array[index] = misc.hairpin_UU_mismatch;
-                break;    
+                break;
             case 3:
                 fprintf (file, "%.2lf\n", (double)misc.hairpin_UU_mismatch/100.0);
                 break;
@@ -3082,12 +3082,12 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 5:
                 misc.hairpin_UU_mismatch = array[index];
-                break;                                       
+                break;
         }
         index++;    sim_index++;
     }
     else if (parsi_tstackh == LAVISH || parsi_tstackh == T99)   // lavish and turner99 model for tstackh
-    {            
+    {
         for (i=0; i < NUCL; i++)
             for (j=0; j < NUCL; j++)
                 for (k=0; k < NUCL; k++)
@@ -3100,24 +3100,24 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                             {
                                 case 0:
                                     sprintf (string_params[index], "tstackh[%d][%d][%d][%d]", i, j, k, l);
-                                    sprintf (string_params_human_readable[index], "tstackh[5'-%c%c/%c%c-3']", 
+                                    sprintf (string_params_human_readable[index], "tstackh[5'-%c%c/%c%c-3']",
                                             int_to_nuc(i), int_to_nuc(k), int_to_nuc(l), int_to_nuc(j));
                                     break;
                                 case 1:
                                     if (parsi_tstackh == LAVISH)
                                     {
                                         if (similarity_rule[sim_index][0] == '\0')
-                                        {   
+                                        {
                                             int k_rule1, l_rule1;
                                             if (apply_rule_1 (k, l, k_rule1, l_rule1))
-                                                sprintf (similarity_rule[sim_index], "1 * tstackh[5'-%c%c/%c%c-3']", 
+                                                sprintf (similarity_rule[sim_index], "1 * tstackh[5'-%c%c/%c%c-3']",
                                                     int_to_nuc(i), int_to_nuc(k_rule1), int_to_nuc(l_rule1), int_to_nuc(j));
                                         }
                                     }
                                     break;
                                 case 2:
                                     array[index] = tstackh[i][j][k][l];
-                                    break;  
+                                    break;
                                 case 3:
                                     fprintf (file, "%.2lf\n", (double)tstackh[i][j][k][l]/100.0);
                                     break;
@@ -3129,9 +3129,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                     break;
                                 case 5:
                                     tstackh[i][j][k][l] = array[index];
-                                    break;                                    
+                                    break;
                             }
-                            index++;    sim_index++;                                            
+                            index++;    sim_index++;
                         }
                     }
 
@@ -3141,7 +3141,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
     // for turner99, there's no bulge1
     if (parsi_bulge1 == PARSI || parsi_bulge1 == LAVISH)     // add 4 features or more
     {
-        // first take care of bulgeA, bulgeB, bulgeC, bulgeU    
+        // first take care of bulgeA, bulgeB, bulgeC, bulgeU
         switch (job)
         {
             case 0:
@@ -3154,7 +3154,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 2:
                 array[index] = bulgeA;
-                break;  
+                break;
             case 3:
                 fprintf (file, "%.2lf\n", (double)bulgeA/100.0);
                 break;
@@ -3166,7 +3166,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 5:
                 bulgeA = array[index];
-                break;                
+                break;
         }
         index++;    sim_index++;
         switch (job)
@@ -3178,10 +3178,10 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
             case 1:
                 if (parsi_bulge1 == LAVISH)
                     similarity_bulge_type (C, similarity_rule[sim_index]);
-                break;            
+                break;
             case 2:
                 array[index] = bulgeC;
-                break;  
+                break;
             case 3:
                 fprintf (file, "%.2lf\n", (double)bulgeC/100.0);
                 break;
@@ -3193,7 +3193,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 5:
                 bulgeC = array[index];
-                break;                         
+                break;
         }
         index++;    sim_index++;
         switch (job)
@@ -3205,10 +3205,10 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
             case 1:
                 if (parsi_bulge1 == LAVISH)
                     similarity_bulge_type (G, similarity_rule[sim_index]);
-                break;            
+                break;
             case 2:
                 array[index] = bulgeG;
-                break;  
+                break;
             case 3:
                 fprintf (file, "%.2lf\n", (double)bulgeG/100.0);
                 break;
@@ -3220,7 +3220,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 5:
                 bulgeG = array[index];
-                break;                                                                               
+                break;
         }
         index++;    sim_index++;
         switch (job)
@@ -3232,10 +3232,10 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
             case 1:
                 if (parsi_bulge1 == LAVISH)
                     similarity_bulge_type (U, similarity_rule[sim_index]);
-                break;            
+                break;
             case 2:
                 array[index] = bulgeU;
-                break;  
+                break;
             case 3:
                 fprintf (file, "%.2lf\n", (double)bulgeU/100.0);
                 break;
@@ -3247,18 +3247,18 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 5:
                 bulgeU = array[index];
-                break;                                                                               
+                break;
         }
         index++;    sim_index++;
     }
-    
+
     if (parsi_bulge1 == LAVISH)      // lavish for bulge1
     {
         for (i=0; i < NUCL; i++)
             for (j=0; j < NUCL; j++)
                 for (k=0; k < NUCL; k++)
                     for (ip=0; ip < NUCL; ip++)
-                        for (jp=0; jp < NUCL; jp++)                    
+                        for (jp=0; jp < NUCL; jp++)
                         {
                             if (bulge1[i][j][k][ip][jp] < INF)
                             {
@@ -3296,14 +3296,14 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                         break;
                                     case 5:
                                         bulge1[i][j][k][ip][jp] = array[index];
-                                        break;                                                                           
+                                        break;
                                 }
                                 index++;    sim_index++;
-    
+
                             }
                         }
     }
-                
+
     // this is included in all cases, at least for internal loops 1xn
     switch (job)
     {
@@ -3328,7 +3328,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
             break;
     }
     index++;    sim_index++;
-            
+
     if (parsi_tstacki == T99)
     {
         switch (job)
@@ -3339,7 +3339,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 2:
                 array[index] = misc.internal_GA_AG_mismatch;
-                break;                                                        
+                break;
             case 3:
                 fprintf (file, "%.2lf\n", (double)misc.internal_GA_AG_mismatch/100.0);
                 break;
@@ -3351,10 +3351,10 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 5:
                 misc.internal_GA_AG_mismatch = array[index];
-                break;                                                                                    
+                break;
         }
         index++;    sim_index++;
-    }    
+    }
     else if (parsi_tstacki == PARSI)
     {
         switch (job)
@@ -3365,7 +3365,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 2:
                 array[index] = misc.internal_AG_mismatch;
-                break;                                                        
+                break;
             case 3:
                 fprintf (file, "%.2lf\n", (double)misc.internal_AG_mismatch/100.0);
                 break;
@@ -3377,7 +3377,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 5:
                 misc.internal_AG_mismatch = array[index];
-                break;                                
+                break;
         }
         index++;    sim_index++;
 
@@ -3389,7 +3389,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 2:
                 array[index] = misc.internal_GA_mismatch;
-                break;                                                        
+                break;
             case 3:
                 fprintf (file, "%.2lf\n", (double)misc.internal_GA_mismatch/100.0);
                 break;
@@ -3401,10 +3401,10 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 5:
                 misc.internal_GA_mismatch = array[index];
-                break;                                                                                     
+                break;
         }
-        index++;     sim_index++;   
-        
+        index++;     sim_index++;
+
         switch (job)         // see Schroeder_Turner_2000
         {
             case 0:
@@ -3413,7 +3413,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 2:
                 array[index] = misc.internal_GG_mismatch;
-                break;    
+                break;
             case 3:
                 fprintf (file, "%.2lf\n", (double)misc.internal_GG_mismatch/100.0);
                 break;
@@ -3425,9 +3425,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 5:
                 misc.internal_GG_mismatch = array[index];
-                break;                
+                break;
         }
-        index++;     sim_index++; 
+        index++;     sim_index++;
     }
     if (parsi_tstacki == PARSI || parsi_tstacki == T99)
     {
@@ -3439,7 +3439,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 2:
                 array[index] = misc.internal_UU_mismatch;
-                break;    
+                break;
             case 3:
                 fprintf (file, "%.2lf\n", (double)misc.internal_UU_mismatch/100.0);
                 break;
@@ -3451,13 +3451,13 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 5:
                 misc.internal_UU_mismatch = array[index];
-                break;                               
+                break;
         }
         index++;    sim_index++;
     }
-    
+
     if (parsi_tstacki == LAVISH)
-    {              
+    {
         for (i=0; i < NUCL; i++)
         {
             // these depend on tstackh, so parsi_tstacki and parsi_tstackh should be the same
@@ -3473,7 +3473,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                             {
                                 case 0:
                                     sprintf (string_params[index], "tstacki[%d][%d][%d][%d]", i, j, k, l);
-                                    sprintf (string_params_human_readable[index], "tstacki[5'-%c%c/%c%c-3']", 
+                                    sprintf (string_params_human_readable[index], "tstacki[5'-%c%c/%c%c-3']",
                                             int_to_nuc(i), int_to_nuc(k), int_to_nuc(l), int_to_nuc(j));
                                     break;
                                 case 1:
@@ -3483,33 +3483,33 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                         // follow RULE 1
                                         int k_rule1, l_rule1;
                                         if (apply_rule_1 (k, l, k_rule1, l_rule1))
-                                            sprintf (similarity_rule[sim_index], "1 * tstacki[5'-%c%c/%c%c-3']", 
+                                            sprintf (similarity_rule[sim_index], "1 * tstacki[5'-%c%c/%c%c-3']",
                                                 int_to_nuc(i), int_to_nuc(k_rule1), int_to_nuc(l_rule1), int_to_nuc(j));
-                                        // make them the same as tstackh        
+                                        // make them the same as tstackh
                                         else
                                         {
                                             // I used to use tstackh but I changed my mind
-                                            //sprintf (similarity_rule[sim_index], "1 * tstackh[5'-%c%c/%c%c-3']", 
+                                            //sprintf (similarity_rule[sim_index], "1 * tstackh[5'-%c%c/%c%c-3']",
                                             //    int_to_nuc(i), int_to_nuc(k), int_to_nuc(l), int_to_nuc(j));
-                                            
-                                            // try to make the same as tstacki[j][i][k][l]                                        
-                                            char type[100];  
-                                            int tindex;                                      
+
+                                            // try to make the same as tstacki[j][i][k][l]
+                                            char type[100];
+                                            int tindex;
                                             sprintf (type, "tstacki[%d][%d][%d][%d]", j, i, k, l);
                                             tindex = structure_type_index(type);
                                             if (similarity_rule[tindex][0] != '\0')
-                                                sprintf (similarity_rule[sim_index], "1 * tstacki[5'-%c%c/%c%c-3']", 
+                                                sprintf (similarity_rule[sim_index], "1 * tstacki[5'-%c%c/%c%c-3']",
                                                     int_to_nuc(j), int_to_nuc(k), int_to_nuc(l), int_to_nuc(i));
-                                            
-                                            if (i==G && j==U)       // make it AU. 
+
+                                            if (i==G && j==U)       // make it AU.
                                                 // It doesn't matter if the one with AU has experimental support
                                             {
-                                                sprintf (similarity_rule[sim_index], "1 * tstacki[5'-%c%c/%c%c-3']", 
+                                                sprintf (similarity_rule[sim_index], "1 * tstacki[5'-%c%c/%c%c-3']",
                                                     int_to_nuc(A), int_to_nuc(k), int_to_nuc(l), int_to_nuc(j));
                                             }
                                             else if (i==U && j==G)       // make it UA
                                             {
-                                                sprintf (similarity_rule[sim_index], "1 * tstacki[5'-%c%c/%c%c-3']", 
+                                                sprintf (similarity_rule[sim_index], "1 * tstacki[5'-%c%c/%c%c-3']",
                                                     int_to_nuc(i), int_to_nuc(k), int_to_nuc(l), int_to_nuc(A));
                                             }
                                             if (i==A && j==U)   // replace with GC
@@ -3517,7 +3517,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                                 sprintf (type, "tstacki[%d][%d][%d][%d]", G, C, k, l);
                                                 tindex = structure_type_index(type);
                                                 if (similarity_rule[tindex][0] != '\0')
-                                                    sprintf (similarity_rule[sim_index], "1 * tstacki[5'-%c%c/%c%c-3'] + 1 * internal_AU_GU_closure_penalty", 
+                                                    sprintf (similarity_rule[sim_index], "1 * tstacki[5'-%c%c/%c%c-3'] + 1 * internal_AU_GU_closure_penalty",
                                                         int_to_nuc(G), int_to_nuc(k), int_to_nuc(l), int_to_nuc(C));
                                             }
                                             else if (i==U && j==A)   // replace with CG
@@ -3525,7 +3525,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                                 sprintf (type, "tstacki[%d][%d][%d][%d]", C, G, k, l);
                                                 tindex = structure_type_index(type);
                                                 if (similarity_rule[tindex][0] != '\0')
-                                                    sprintf (similarity_rule[sim_index], "1 * tstacki[5'-%c%c/%c%c-3'] + 1 * internal_AU_GU_closure_penalty", 
+                                                    sprintf (similarity_rule[sim_index], "1 * tstacki[5'-%c%c/%c%c-3'] + 1 * internal_AU_GU_closure_penalty",
                                                         int_to_nuc(C), int_to_nuc(k), int_to_nuc(l), int_to_nuc(G));
                                             }
                                         }
@@ -3533,7 +3533,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                     break;
                                 case 2:
                                     array[index] = tstacki[i][j][k][l];
-                                    break;  
+                                    break;
                                 case 3:
                                     fprintf (file, "%.2lf\n", (double)tstacki[i][j][k][l]/100.0);
                                     break;
@@ -3545,15 +3545,15 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                     break;
                                 case 5:
                                     tstacki[i][j][k][l] = array[index];
-                                    break;                                                                                                                                       
+                                    break;
                             }
-                            index++;    sim_index++;                                            
+                            index++;    sim_index++;
                         }
                     }
         }
     }
-    
-    if (!simple_internal_energy)          
+
+    if (!simple_internal_energy)
     {
 
         if (parsi_int11 == T99)
@@ -3585,7 +3585,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                                         break;
                                                     case 2:
                                                         array[index] = int11[i][j][k][l][m][n];
-                                                        break; 
+                                                        break;
                                                     case 3:
                                                         fprintf (file, "%.2lf\n", (double)int11[i][j][k][l][m][n]/100.0);
                                                         break;
@@ -3600,22 +3600,22 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                                     case 5:
                                                         int11[i][j][k][l][m][n] = array[index];
                                                         int11[n][m][l][k][j][i] = array[index];
-                                                        break;                                                                                                                                                                           
+                                                        break;
                                                 }
-                                                index++;      sim_index++;  
+                                                index++;      sim_index++;
                                             }
                                         }
                                     }
                                 }
             switch (job)
-            {                            
+            {
                 case 0:
                     sprintf (string_params[index], "misc.internal11_basic_mismatch");
                     sprintf (string_params_human_readable[index], "int11_basic_mismatch");
                     break;
                 case 2:
                     array[index] = misc.internal11_basic_mismatch;
-                    break;   
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)misc.internal11_basic_mismatch/100.0);
                     break;
@@ -3627,18 +3627,18 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     misc.internal11_basic_mismatch = array[index];
-                    break;                    
+                    break;
             }
-            index++;     sim_index++;   
+            index++;     sim_index++;
             switch (job)
-            {   
+            {
                 case 0:
                     sprintf (string_params[index], "misc.internal11_GG_mismatch");
                     sprintf (string_params_human_readable[index], "int11_GG_mismatch");
                     break;
                 case 2:
                     array[index] = misc.internal11_GG_mismatch;
-                    break;                
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)misc.internal11_GG_mismatch/100.0);
                     break;
@@ -3650,12 +3650,12 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     misc.internal11_GG_mismatch = array[index];
-                    break;                              
+                    break;
             }
             index++;    sim_index++;
         }
         else if (parsi_int11 == PARSI || parsi_int11 == LAVISH || parsi_int11 == HLI)
-        {       
+        {
             // first let's work with the 10 extra-parameters
             // Also, these are the only ones I use if parsi_int11
             switch (job)
@@ -3666,7 +3666,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 2:
                     array[index] = misc.internal11_AU_closure;
-                    break;       
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)misc.internal11_AU_closure/100.0);
                     break;
@@ -3678,7 +3678,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     misc.internal11_AU_closure = array[index];
-                    break;                    
+                    break;
             }
             index++;    sim_index++;
             switch (job)
@@ -3689,7 +3689,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 2:
                     array[index] = misc.internal11_GU_closure;
-                    break;       
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)misc.internal11_GU_closure/100.0);
                     break;
@@ -3701,7 +3701,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     misc.internal11_GU_closure = array[index];
-                    break;                    
+                    break;
             }
             index++;    sim_index++;
             switch (job)
@@ -3712,7 +3712,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 2:
                     array[index] = misc.internal11_AG_mismatch;
-                    break;       
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)misc.internal11_AG_mismatch/100.0);
                     break;
@@ -3735,7 +3735,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 2:
                     array[index] = misc.internal11_GG_mismatch;
-                    break;       
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)misc.internal11_GG_mismatch/100.0);
                     break;
@@ -3747,9 +3747,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     misc.internal11_GG_mismatch = array[index];
-                    break;                    
+                    break;
             }
-            index++;    sim_index++;    
+            index++;    sim_index++;
             switch (job)
             {
                 case 0:
@@ -3758,7 +3758,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 2:
                     array[index] = misc.internal11_UU_mismatch;
-                    break;       
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)misc.internal11_UU_mismatch/100.0);
                     break;
@@ -3770,7 +3770,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     misc.internal11_UU_mismatch = array[index];
-                    break;                                
+                    break;
             }
             index++;    sim_index++;
             switch (job)
@@ -3781,7 +3781,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 2:
                     array[index] = misc.internal11_5YRR_5YRR;
-                    break;       
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)misc.internal11_5YRR_5YRR/100.0);
                     break;
@@ -3793,9 +3793,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     misc.internal11_5YRR_5YRR = array[index];
-                    break;                    
+                    break;
             }
-            index++;    sim_index++;              
+            index++;    sim_index++;
             switch (job)
             {
                 case 0:
@@ -3804,7 +3804,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 2:
                     array[index] = misc.internal11_5RYY_5RYY;
-                    break;       
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)misc.internal11_5RYY_5RYY/100.0);
                     break;
@@ -3816,9 +3816,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     misc.internal11_5RYY_5RYY = array[index];
-                    break;                               
+                    break;
             }
-            index++;    sim_index++;              
+            index++;    sim_index++;
             switch (job)
             {
                 case 0:
@@ -3827,7 +3827,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 2:
                     array[index] = misc.internal11_5YYR_5YYR;
-                    break;       
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)misc.internal11_5YYR_5YYR/100.0);
                     break;
@@ -3839,9 +3839,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     misc.internal11_5YYR_5YYR = array[index];
-                    break;                    
+                    break;
             }
-            index++;    sim_index++;              
+            index++;    sim_index++;
             switch (job)
             {
                 case 0:
@@ -3850,7 +3850,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 2:
                     array[index] = misc.internal11_5YRY_5RYR;
-                    break;       
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)misc.internal11_5YRY_5RYR/100.0);
                     break;
@@ -3862,9 +3862,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     misc.internal11_5YRY_5RYR = array[index];
-                    break;                          
+                    break;
             }
-            index++;    sim_index++;              
+            index++;    sim_index++;
             switch (job)
             {
                 case 0:
@@ -3873,7 +3873,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 2:
                     array[index] = misc.internal11_5RRY_5RYY;
-                    break;       
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)misc.internal11_5RRY_5RYY/100.0);
                     break;
@@ -3885,10 +3885,10 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     misc.internal11_5RRY_5RYY = array[index];
-                    break;                                  
+                    break;
             }
-            index++;    sim_index++;                     
-    
+            index++;    sim_index++;
+
             if (parsi_int11 == LAVISH || parsi_int11 == HLI)
             {
                 for (i=0; i < NUCL; i++)
@@ -3914,7 +3914,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                                         // it might not get in here, but then it's ok, because we replace the right values in case 2
                                                         if (similarity_rule[sim_index][0] != '\0')
                                                         // this assumes I called the function fill_similarity_rule_with_optical_melting_reference
-                                                        {              
+                                                        {
                                                             sprintf (string_params[index], "int11_experimental_addition[%d][%d][%d][%d][%d][%d]", i, j, k, l, m, n);
                                                             sprintf (string_params_human_readable[index], "int11_expadd[5'-%c%c%c/%c%c%c-3']", int_to_nuc(i), int_to_nuc(k), int_to_nuc(m), int_to_nuc(n), int_to_nuc(l), int_to_nuc(j));
                                                             //printf ("IN create_string_params: %s; similarity_rule is %s\n", string_params_human_readable[index], similarity_rule[sim_index]);
@@ -3936,20 +3936,20 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                                             if (apply_rule_1 (k, l, k_rule1, l_rule1))
                                                             {
                                                                 // after the conversion, it might be that we have the wrong "mirror"
-                                                                if (i*100000 + j*10000 + k_rule1*1000 + l_rule1*100 + m*10 + n 
+                                                                if (i*100000 + j*10000 + k_rule1*1000 + l_rule1*100 + m*10 + n
                                                                     <= n*100000 + m*10000 + l_rule1*1000+ k_rule1*100 + j*10 + i)
                                                                 {
                                                                     if (int11_experimental_addition[i][j][k_rule1][l_rule1][m][n] < INF)
                                                                     {
-                                                                        sprintf (similarity_rule[sim_index], 
-                                                                            "1 * int11_expadd[5'-%c%c%c/%c%c%c-3']", 
-                                                                            int_to_nuc(i), int_to_nuc(k_rule1), int_to_nuc(m), 
+                                                                        sprintf (similarity_rule[sim_index],
+                                                                            "1 * int11_expadd[5'-%c%c%c/%c%c%c-3']",
+                                                                            int_to_nuc(i), int_to_nuc(k_rule1), int_to_nuc(m),
                                                                             int_to_nuc(n), int_to_nuc(l_rule1), int_to_nuc(j));
                                                                     }
                                                                     else
                                                                     {
-                                                                        sprintf (similarity_rule[sim_index], "1 * int11[5'-%c%c%c/%c%c%c-3']", 
-                                                                            int_to_nuc(i), int_to_nuc(k_rule1), int_to_nuc(m), 
+                                                                        sprintf (similarity_rule[sim_index], "1 * int11[5'-%c%c%c/%c%c%c-3']",
+                                                                            int_to_nuc(i), int_to_nuc(k_rule1), int_to_nuc(m),
                                                                             int_to_nuc(n), int_to_nuc(l_rule1), int_to_nuc(j));
                                                                         done = 1;
                                                                     }
@@ -3958,8 +3958,8 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                                                 {
                                                                     if (int11_experimental_addition[n][m][l_rule1][k_rule1][j][i] < INF)
                                                                     {
-                                                                        sprintf (similarity_rule[sim_index], 
-                                                                                "1 * int11_expadd[5'-%c%c%c/%c%c%c-3']", 
+                                                                        sprintf (similarity_rule[sim_index],
+                                                                                "1 * int11_expadd[5'-%c%c%c/%c%c%c-3']",
                                                                                     int_to_nuc(n), int_to_nuc(l_rule1), int_to_nuc(j),
                                                                                     int_to_nuc(i), int_to_nuc(k_rule1), int_to_nuc(m));
                                                                     }
@@ -3969,7 +3969,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                                                                     int_to_nuc(n), int_to_nuc(l_rule1), int_to_nuc(j),
                                                                                     int_to_nuc(i), int_to_nuc(k_rule1), int_to_nuc(m));
                                                                         done = 1;
-                                                                    }                                                                
+                                                                    }
                                                                 }
                                                             }
                                                             if (done) break;
@@ -3991,52 +3991,52 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                                                 sprintf (similarity_rule[sim_index], "%s%s1 * internal11_GU_closure", similarity_rule[sim_index], plus);
                                                             else if ((m==G && n==U) || (m==U && n==G))
                                                                 sprintf (similarity_rule[sim_index], "%s%s1 * internal11_GU_closure", similarity_rule[sim_index], plus);
-                                                            // look for AG mismatch                                                    
+                                                            // look for AG mismatch
                                                             if ((k==A && l==G) || (k==G && l==A))
                                                             {
                                                                 if (similarity_rule[sim_index][0] != '\0')  sprintf (similarity_rule[sim_index], "%s + ", similarity_rule[sim_index]);
                                                                 sprintf (similarity_rule[sim_index], "%s1 * internal11_AG_mismatch", similarity_rule[sim_index]);
                                                             }
-                                                            // look for GG mismatch                                                    
+                                                            // look for GG mismatch
                                                             if (k==G && l==G)
                                                             {
                                                                 if (similarity_rule[sim_index][0] != '\0')  sprintf (similarity_rule[sim_index], "%s + ", similarity_rule[sim_index]);
                                                                 sprintf (similarity_rule[sim_index], "%s1 * internal11_GG_mismatch", similarity_rule[sim_index]);
                                                             }
-                                                            // look for UU mismatch                                                    
+                                                            // look for UU mismatch
                                                             if (k==U && l==U)
                                                             {
                                                                 if (similarity_rule[sim_index][0] != '\0')  sprintf (similarity_rule[sim_index], "%s + ", similarity_rule[sim_index]);
                                                                 sprintf (similarity_rule[sim_index], "%s1 * internal11_UU_mismatch", similarity_rule[sim_index]);
                                                             }
-                                                            // check the nearest neighbours                                                    
+                                                            // check the nearest neighbours
                                                             if (isY(i) && isR(j) && isR(k) && isR(l) && isR(m) && isY(n))
                                                             {
                                                                 if (similarity_rule[sim_index][0] != '\0')  sprintf (similarity_rule[sim_index], "%s + ", similarity_rule[sim_index]);
                                                                 sprintf (similarity_rule[sim_index], "%s1 * internal11_5YRR_5YRR", similarity_rule[sim_index]);
-                                                            }                                                    
+                                                            }
                                                             if ( isR(i) && isY(j) && isY(k) && isY(l) && isY(m) && isR(n) )
                                                             {
                                                                 if (similarity_rule[sim_index][0] != '\0')  sprintf (similarity_rule[sim_index], "%s + ", similarity_rule[sim_index]);
                                                                 sprintf (similarity_rule[sim_index], "%s1 * internal11_5RYY_5RYY", similarity_rule[sim_index]);
-                                                            }                                                    
+                                                            }
                                                             if ( isY(i) && isR(j) && isY(k) && isY(l) && isR(m) && isY(n) )
                                                             {
                                                                 if (similarity_rule[sim_index][0] != '\0')  sprintf (similarity_rule[sim_index], "%s + ", similarity_rule[sim_index]);
                                                                 sprintf (similarity_rule[sim_index], "%s1 * internal11_5YYR_5YYR", similarity_rule[sim_index]);
-                                                            }                                                    
+                                                            }
                                                             if ( (isY(i) && isR(j) && isR(k) && isY(l) && isY(m) && isR(n)) ||
                                                                 (isR(i) && isY(j) && isY(k) && isR(l) && isR(m) && isY(n)) )
                                                             {
                                                                 if (similarity_rule[sim_index][0] != '\0')  sprintf (similarity_rule[sim_index], "%s + ", similarity_rule[sim_index]);
                                                                 sprintf (similarity_rule[sim_index], "%s1 * internal11_5YRY_5RYR", similarity_rule[sim_index]);
-                                                            }                                                    
+                                                            }
                                                             if ( (isR(i) && isY(j) && isR(k) && isY(l) && isY(m) && isR(n)) ||
-                                                                (isR(i) && isY(j) && isY(k) && isR(l) && isY(m) && isR(n)) )                                                        
+                                                                (isR(i) && isY(j) && isY(k) && isR(l) && isY(m) && isR(n)) )
                                                             {
                                                                 if (similarity_rule[sim_index][0] != '\0')  sprintf (similarity_rule[sim_index], "%s + ", similarity_rule[sim_index]);
                                                                 sprintf (similarity_rule[sim_index], "%s1 * internal11_5RRY_5RYY", similarity_rule[sim_index]);
-                                                            }                                                        
+                                                            }
                                                         }
                                                         //else    // appears in optical melting experiments
                                                         //{
@@ -4046,7 +4046,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                                     //     sprintf (string_params[index], "int11_experimental_addition[%d][%d][%d][%d][%d][%d]", i, j, k, l, m, n);
                                                     //     sprintf (string_params_human_readable[index], "int11_expadd[5'-%c%c%c/%c%c%c-3']", int_to_nuc(i), int_to_nuc(k), int_to_nuc(m), int_to_nuc(n), int_to_nuc(l), int_to_nuc(j));
                                                         //}
-                                                        break;                                                
+                                                        break;
                                                     case 2:
                                                         if (int11_experimental_addition[i][j][k][l][m][n] < INF)
                                                             array[index] = int11_experimental_addition[i][j][k][l][m][n];
@@ -4067,8 +4067,8 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                                         param *= 100;
                                                         if (similarity_rule[sim_index][0] != '\0')
                                                         // this assumes I called the function fill_similarity_rule_with_optical_melting_reference
-                                                        {                                               
-                                                            int11_experimental_addition[i][j][k][l][m][n] = (PARAMTYPE) param;                                                        
+                                                        {
+                                                            int11_experimental_addition[i][j][k][l][m][n] = (PARAMTYPE) param;
                                                             // also the symmetric one
                                                             int11_experimental_addition[n][m][l][k][j][i] = int11_experimental_addition[i][j][k][l][m][n];
                                                             //printf ("IN fill_data_structures_with_new_params: %s has value %lf\n", string_params_human_readable[index], param);
@@ -4083,7 +4083,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                                     case 5:
                                                         if (similarity_rule[sim_index][0] != '\0')
                                                         // this assumes I called the function fill_similarity_rule_with_optical_melting_reference
-                                                        {                                               
+                                                        {
                                                             int11_experimental_addition[i][j][k][l][m][n] = array[index];
                                                             // also the symmetric one
                                                             int11_experimental_addition[n][m][l][k][j][i] = int11_experimental_addition[i][j][k][l][m][n];
@@ -4095,12 +4095,12 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                                             int11[n][m][l][k][j][i] = int11[i][j][k][l][m][n];
                                                         }
                                                         else if (parsi_int11 == HLI)     inc = 0;
-                                                        break;                                                        
+                                                        break;
                                                 }
                                                 if (inc) index++;
                                                 //index++;
                                                 sim_index++;
-                                            }                                    
+                                            }
                                         }
                                     }
                             }
@@ -4108,7 +4108,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
         }
 
         if (parsi_int21 == T99)
-        {                   
+        {
             // NEXT, int21 parameters
             // go with few parameters, as in Mathews et al 1999
             // closed by CG
@@ -4128,7 +4128,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                         break;
                                     case 2:
                                         array[index] = int21[i][j][k][l][m][n][o];
-                                        break;        
+                                        break;
                                     case 3:
                                         fprintf (file, "%.2lf\n", (double)int21[i][j][k][l][m][n][o]/100.0);
                                         break;
@@ -4140,11 +4140,11 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                         break;
                                     case 5:
                                         int21[i][j][k][l][m][n][o] = array[index];
-                                        break;                                        
+                                        break;
                                 }
-                                index++;    sim_index++;    
+                                index++;    sim_index++;
                             }
-            // closed by GC                        
+            // closed by GC
             i=G; j=C; m=G; n=C;
             for (k=0; k < NUCL; k++)
                 for (l=0; l < NUCL; l++)
@@ -4161,7 +4161,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                         break;
                                     case 2:
                                         array[index] = int21[i][j][k][l][m][n][o];
-                                        break;     
+                                        break;
                                     case 3:
                                         fprintf (file, "%.2lf\n", (double)int21[i][j][k][l][m][n][o]/100.0);
                                         break;
@@ -4173,9 +4173,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                         break;
                                     case 5:
                                         int21[i][j][k][l][m][n][o] = array[index];
-                                        break;                                                                           
+                                        break;
                                 }
-                                index++;    sim_index++;    
+                                index++;    sim_index++;
                             }
             switch (job)
             {
@@ -4197,9 +4197,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     misc.internal21_match = array[index];
-                    break;                    
+                    break;
             }
-            index++;    sim_index++;    
+            index++;    sim_index++;
             switch (job)
             {
                 case 0:
@@ -4208,7 +4208,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 2:
                     array[index] = misc.internal21_AU_closure;
-                    break;       
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)misc.internal21_AU_closure/100.0);
                     break;
@@ -4220,9 +4220,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     misc.internal21_AU_closure = array[index];
-                    break;                               
+                    break;
             }
-            index++;    sim_index++;    
+            index++;    sim_index++;
         }
         else if (parsi_int21 == PARSI || parsi_int21 == LAVISH)
         {
@@ -4236,7 +4236,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 2:
                     array[index] = misc.internal21_initiation;
-                    break;       
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)misc.internal21_initiation/100.0);
                     break;
@@ -4248,9 +4248,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     misc.internal21_initiation = array[index];
-                    break;                    
+                    break;
             }
-            index++;    sim_index++;    
+            index++;    sim_index++;
             switch (job)
             {
                 case 0:
@@ -4259,7 +4259,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 2:
                     array[index] = misc.internal21_AU_closure;
-                    break;       
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)misc.internal21_AU_closure/100.0);
                     break;
@@ -4271,7 +4271,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     misc.internal21_AU_closure = array[index];
-                    break;           
+                    break;
             }
             index++;    sim_index++;
             switch (job)
@@ -4282,7 +4282,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 2:
                     array[index] = misc.internal21_GU_closure;
-                    break;       
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)misc.internal21_GU_closure/100.0);
                     break;
@@ -4294,7 +4294,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     misc.internal21_GU_closure = array[index];
-                    break;                    
+                    break;
             }
             index++;    sim_index++;
             switch (job)
@@ -4305,7 +4305,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 2:
                     array[index] = misc.internal21_AG_mismatch;
-                    break;       
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)misc.internal21_AG_mismatch/100.0);
                     break;
@@ -4317,9 +4317,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     misc.internal21_AG_mismatch = array[index];
-                    break;                    
+                    break;
             }
-            index++;    sim_index++;                
+            index++;    sim_index++;
             switch (job)
             {
                 case 0:
@@ -4328,7 +4328,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 2:
                     array[index] = misc.internal21_GG_mismatch;
-                    break;       
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)misc.internal21_GG_mismatch/100.0);
                     break;
@@ -4340,7 +4340,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     misc.internal21_GG_mismatch = array[index];
-                    break;                                  
+                    break;
             }
             index++;    sim_index++;
             switch (job)
@@ -4351,7 +4351,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 2:
                     array[index] = misc.internal21_UU_mismatch;
-                    break;       
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)misc.internal21_UU_mismatch/100.0);
                     break;
@@ -4363,12 +4363,12 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     misc.internal21_UU_mismatch = array[index];
-                    break;                    
+                    break;
             }
-            index++;    sim_index++;                                       
-    
+            index++;    sim_index++;
+
             if (parsi_int21 == LAVISH)
-            {                                            
+            {
                 for (i=0; i < NUCL; i++)
                     for (j=0; j < NUCL; j++)
                         for (k=0; k < NUCL; k++)
@@ -4409,15 +4409,15 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                                                 // no mirror here
                                                                 if (int21_experimental_addition[i][j][k_rule1][l_rule1][m][n][o_rule1] < INF)
                                                                 {
-                                                                    sprintf (similarity_rule[sim_index], 
-                                                                            "1 * int21_expadd[5'-%c%c%c/%c%c%c%c-3'] + ", 
-                                                                                int_to_nuc(i), int_to_nuc(k_rule1), int_to_nuc(m), 
+                                                                    sprintf (similarity_rule[sim_index],
+                                                                            "1 * int21_expadd[5'-%c%c%c/%c%c%c%c-3'] + ",
+                                                                                int_to_nuc(i), int_to_nuc(k_rule1), int_to_nuc(m),
                                                                                 int_to_nuc(n), int_to_nuc(o_rule1), int_to_nuc(l_rule1), int_to_nuc(j));
                                                                 }
                                                                 else
                                                                 {
-                                                                    sprintf (similarity_rule[sim_index], "1 * int21[5'-%c%c%c/%c%c%c%c-3']", 
-                                                                            int_to_nuc(i), int_to_nuc(k_rule1), int_to_nuc(m), 
+                                                                    sprintf (similarity_rule[sim_index], "1 * int21[5'-%c%c%c/%c%c%c%c-3']",
+                                                                            int_to_nuc(i), int_to_nuc(k_rule1), int_to_nuc(m),
                                                                                 int_to_nuc(n), int_to_nuc(o_rule1), int_to_nuc(l_rule1), int_to_nuc(j));
                                                                     done = 1;
                                                                 }
@@ -4464,7 +4464,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                                             array[index] = int21_experimental_addition[i][j][k][l][m][n][o];
                                                         else
                                                             array[index] = int21[i][j][k][l][m][n][o];
-                                                        break;     
+                                                        break;
                                                     case 3:
                                                         if (int21_experimental_addition[i][j][k][l][m][n][o] < INF)
                                                             fprintf (file, "%.2lf\n", (double)int21_experimental_addition[i][j][k][l][m][n][o]/100.0);
@@ -4486,19 +4486,19 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                                             int21_experimental_addition[i][j][k][l][m][n][o] = array[index];
                                                         else
                                                             int21[i][j][k][l][m][n][o] = array[index];
-                                                        
-                                                        break;                                                        
+
+                                                        break;
                                                 }
-                                                index++;    sim_index++;    
+                                                index++;    sim_index++;
                                             }
                                         }
             }       // end if (!parsi_int21)
         }
-         
-        // NEXT, INT2x2 
+
+        // NEXT, INT2x2
         if (parsi_int22 == T99)
         {
-            // 53 params instead of all, as in Mathews et al 1999      
+            // 53 params instead of all, as in Mathews et al 1999
             for (i=0; i < NUCL; i++)
                 for (j=0; j < NUCL; j++)
                     for (k=0; k < NUCL; k++)
@@ -4523,7 +4523,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                             break;
                                         case 2:
                                             array[index] = int22[i][j][k][l][m][n][o][p];
-                                            break;    
+                                            break;
                                         case 3:
                                             fprintf (file, "%.2lf\n", (double)int22[i][j][k][l][m][n][o][p]/100.0);
                                             break;
@@ -4538,9 +4538,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                         case 5:
                                             int22[i][j][k][l][m][n][o][p] = array[index];
                                             int22[n][m][p][o][j][i][l][k] = array[index];
-                                            break;                                            
+                                            break;
                                     }
-                                    index++;    sim_index++;    
+                                    index++;    sim_index++;
                                 }
                             }
                         }
@@ -4553,7 +4553,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 2:
                     array[index] = misc.internal22_delta_same_size;
-                    break;       
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)misc.internal22_delta_same_size/100.0);
                     break;
@@ -4565,9 +4565,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     misc.internal22_delta_same_size = array[index];
-                    break;                    
+                    break;
             }
-            index++;    sim_index++;    
+            index++;    sim_index++;
             switch (job)
             {
                 case 0:
@@ -4576,7 +4576,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 2:
                     array[index] = misc.internal22_delta_different_size;
-                    break;          
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)misc.internal22_delta_different_size/100.0);
                     break;
@@ -4588,9 +4588,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     misc.internal22_delta_different_size = array[index];
-                    break;                                  
+                    break;
             }
-            index++;    sim_index++;    
+            index++;    sim_index++;
             switch (job)
             {
                 case 0:
@@ -4599,7 +4599,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 2:
                     array[index] = misc.internal22_delta_1stable_1unstable;
-                    break;            
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)misc.internal22_delta_1stable_1unstable/100.0);
                     break;
@@ -4611,9 +4611,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     misc.internal22_delta_1stable_1unstable = array[index];
-                    break;                    
+                    break;
             }
-            index++;    sim_index++;    
+            index++;    sim_index++;
             switch (job)
             {
                 case 0:
@@ -4622,7 +4622,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 2:
                     array[index] = misc.internal22_delta_AC;
-                    break;                
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)misc.internal22_delta_AC/100.0);
                     break;
@@ -4634,9 +4634,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     misc.internal22_delta_AC = array[index];
-                    break;                               
+                    break;
             }
-            index++;    sim_index++;    
+            index++;    sim_index++;
             switch (job)
             {
                 case 0:
@@ -4645,7 +4645,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 2:
                     array[index] = misc.internal22_match;
-                    break;     
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)misc.internal22_match/100.0);
                     break;
@@ -4657,12 +4657,12 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     misc.internal22_match = array[index];
-                    break;                                 
+                    break;
             }
-            index++;    sim_index++;                        
+            index++;    sim_index++;
         }
         else if (parsi_int22 == PARSI || parsi_int22 == LAVISH)
-        {                            
+        {
             // I follow the model suggested in Christiansen_Znosko_2008
             // the basic 6 parameters
             switch (job)
@@ -4673,7 +4673,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 2:
                     array[index] = misc.internal22mid_group1;
-                    break;     
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)misc.internal22mid_group1/100.0);
                     break;
@@ -4685,9 +4685,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     misc.internal22mid_group1 = array[index];
-                    break;                    
+                    break;
             }
-            index++;    sim_index++;                        
+            index++;    sim_index++;
             switch (job)
             {
                 case 0:
@@ -4696,7 +4696,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 2:
                     array[index] = misc.internal22mid_group2;
-                    break;     
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)misc.internal22mid_group2/100.0);
                     break;
@@ -4708,9 +4708,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     misc.internal22mid_group2 = array[index];
-                    break;                                  
+                    break;
             }
-            index++;    sim_index++; 
+            index++;    sim_index++;
             switch (job)
             {
                 case 0:
@@ -4719,7 +4719,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 2:
                     array[index] = misc.internal22mid_group3;
-                    break;     
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)misc.internal22mid_group3/100.0);
                     break;
@@ -4731,9 +4731,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     misc.internal22mid_group3 = array[index];
-                    break;                                                                 
+                    break;
             }
-            index++;    sim_index++;         
+            index++;    sim_index++;
             switch (job)
             {
                 case 0:
@@ -4742,7 +4742,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 2:
                     array[index] = misc.internal22mid_group4;
-                    break;     
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)misc.internal22mid_group4/100.0);
                     break;
@@ -4754,10 +4754,10 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     misc.internal22mid_group4 = array[index];
-                    break;                    
+                    break;
             }
             index++;    sim_index++;
-                        
+
             // also add misc.internal22_AU_closure
             switch (job)
             {
@@ -4803,30 +4803,30 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     misc.internal22_GU_closure = array[index];
-                    break;                    
+                    break;
             }
             index++;    sim_index++;
-    
+
             if (parsi_int22 == LAVISH)
             {
                 // add the asymmetric int22
                 for (i=0; i < NUCL; i++)
                     for (j=0; j < NUCL; j++)
-                    {   
-                        if (!can_pair(i,j)) continue;               
+                    {
+                        if (!can_pair(i,j)) continue;
                         for (k=0; k < NUCL; k++)
                             for (l=0; l < NUCL; l++)
                             {
-                                // for now, let's only include ncbp in the internal loop                              
+                                // for now, let's only include ncbp in the internal loop
                                 //if (watson_crick(k,l)) continue;    // we need to include all
                                 for (m=0; m < NUCL; m++)
                                     for (n=0; n < NUCL; n++)
                                     {
-                                        if (!can_pair(m,n)) continue;                     
+                                        if (!can_pair(m,n)) continue;
                                         for(o=0; o < NUCL; o++)
                                             for (p=0; p < NUCL; p++)
                                             {
-                                                //if (watson_crick(o,p)) continue;    // we need to include all                       
+                                                //if (watson_crick(o,p)) continue;    // we need to include all
                                                 // exclude duplicates
                                                 // int22[i][j][k][l][m][n][o][p] is the same as int22[n][m][p][o][j][i][l][k]
                                                 if (i*10000000 + j*1000000 + k*100000 + l*10000 + m*1000 + n*100 + o*10 + p <=
@@ -4834,7 +4834,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                                 {
                                                     switch (job)
                                                     {
-                                                        case 0:                                                        
+                                                        case 0:
                                                             if (similarity_rule[sim_index][0] != '\0')
                                                             // this assumes I called the function fill_similarity_rule_with_optical_melting_reference
                                                             {
@@ -4862,15 +4862,15 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                                                     {
                                                                         if (int22_experimental_addition[i][j][k_rule1][l_rule1][m][n][o_rule1][p_rule1] < INF)
                                                                         {
-                                                                            sprintf (similarity_rule[sim_index], 
-                                                                                    "1 * int22_expadd[5'-%c%c%c%c/%c%c%c%c-3']", 
-                                                                                    int_to_nuc(i), int_to_nuc(k_rule1), int_to_nuc(o_rule1), int_to_nuc(m), 
+                                                                            sprintf (similarity_rule[sim_index],
+                                                                                    "1 * int22_expadd[5'-%c%c%c%c/%c%c%c%c-3']",
+                                                                                    int_to_nuc(i), int_to_nuc(k_rule1), int_to_nuc(o_rule1), int_to_nuc(m),
                                                                                     int_to_nuc(n), int_to_nuc(p_rule1), int_to_nuc(l_rule1), int_to_nuc(j));
                                                                         }
                                                                         else
                                                                         {
-                                                                            sprintf (similarity_rule[sim_index], "1 * int22[5'-%c%c%c%c/%c%c%c%c-3']", 
-                                                                                    int_to_nuc(i), int_to_nuc(k_rule1), int_to_nuc(o_rule1), int_to_nuc(m), 
+                                                                            sprintf (similarity_rule[sim_index], "1 * int22[5'-%c%c%c%c/%c%c%c%c-3']",
+                                                                                    int_to_nuc(i), int_to_nuc(k_rule1), int_to_nuc(o_rule1), int_to_nuc(m),
                                                                                     int_to_nuc(n), int_to_nuc(p_rule1), int_to_nuc(l_rule1), int_to_nuc(j));
                                                                             done = 1;
                                                                         }
@@ -4879,22 +4879,22 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                                                     {
                                                                         if (int22_experimental_addition[n][m][p_rule1][o_rule1][j][i][l_rule1][k_rule1] < INF)
                                                                         {
-                                                                            sprintf (similarity_rule[sim_index], 
-                                                                                    "1 * int22_expadd[5'-%c%c%c%c/%c%c%c%c-3']", 
-                                                                                    int_to_nuc(n), int_to_nuc(p_rule1), int_to_nuc(l_rule1), int_to_nuc(j), 
+                                                                            sprintf (similarity_rule[sim_index],
+                                                                                    "1 * int22_expadd[5'-%c%c%c%c/%c%c%c%c-3']",
+                                                                                    int_to_nuc(n), int_to_nuc(p_rule1), int_to_nuc(l_rule1), int_to_nuc(j),
                                                                                     int_to_nuc(i), int_to_nuc(k_rule1), int_to_nuc(o_rule1), int_to_nuc(m));
                                                                         }
                                                                         else
                                                                         {
                                                                             sprintf (similarity_rule[sim_index], "1 * int22[5'-%c%c%c%c/%c%c%c%c-3']",
-                                                                                    int_to_nuc(n), int_to_nuc(p_rule1), int_to_nuc(l_rule1), int_to_nuc(j), 
+                                                                                    int_to_nuc(n), int_to_nuc(p_rule1), int_to_nuc(l_rule1), int_to_nuc(j),
                                                                                     int_to_nuc(i), int_to_nuc(k_rule1), int_to_nuc(o_rule1), int_to_nuc(m));
                                                                             done = 1;
-                                                                        }                                                                
+                                                                        }
                                                                     }
                                                                 }
                                                                 if (done) break;
-                                                                
+
                                                                 char plus[5] = "";
                                                                 if (similarity_rule[sim_index][0] != '\0')  strcpy (plus, " + ");
                                                                 if (((i==A && j==U) || (i==U && j==A)) && ((m==A && n==U) || (m==U && n==A)))
@@ -4949,7 +4949,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                                                 array[index] = int22[i][j][k][l][m][n][o][p];
                                                             break;
                                                         case 3:
-                                                            if (int22_experimental_addition[i][j][k][l][m][n][o][p] < INF)                                                        
+                                                            if (int22_experimental_addition[i][j][k][l][m][n][o][p] < INF)
                                                                 fprintf (file, "%.2lf\n", (double)int22_experimental_addition[i][j][k][l][m][n][o][p]/100.0);
                                                             else
                                                                 fprintf (file, "%.2lf\n", (double)int22[i][j][k][l][m][n][o][p]/100.0);
@@ -4962,7 +4962,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                                             {
                                                                 int22_experimental_addition[i][j][k][l][m][n][o][p] = (PARAMTYPE) param;
                                                                 // now the duplicate
-                                                                int22_experimental_addition[n][m][p][o][j][i][l][k] = int22_experimental_addition[i][j][k][l][m][n][o][p]; 
+                                                                int22_experimental_addition[n][m][p][o][j][i][l][k] = int22_experimental_addition[i][j][k][l][m][n][o][p];
                                                             }
                                                             else
                                                             {
@@ -4971,33 +4971,33 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                                                 int22[n][m][p][o][j][i][l][k] = int22[i][j][k][l][m][n][o][p];
                                                             }
                                                             break;
-                                                        case 5:                                                            
+                                                        case 5:
                                                             if (similarity_rule[sim_index][0] != '\0')
                                                             {
                                                                 int22_experimental_addition[i][j][k][l][m][n][o][p] = array[index];
                                                                 // now the duplicate
-                                                                int22_experimental_addition[n][m][p][o][j][i][l][k] = int22_experimental_addition[i][j][k][l][m][n][o][p]; 
+                                                                int22_experimental_addition[n][m][p][o][j][i][l][k] = int22_experimental_addition[i][j][k][l][m][n][o][p];
                                                             }
                                                             else
                                                             {
                                                                 int22[i][j][k][l][m][n][o][p] = array[index];
                                                                 // now the duplicate
                                                                 int22[n][m][p][o][j][i][l][k] = int22[i][j][k][l][m][n][o][p];
-                                                            }                                                            
-                                                            break;                                                            
+                                                            }
+                                                            break;
                                                     }
                                                     //printf ("index=%d; int22_expadd[C][G][A][A][C][G][A][C] = %.2Lf\n", index, int22_experimental_addition[C][G][A][A][C][G][A][C]);
                                                     index++;    sim_index++;
                                                 }
                                             }
                                     }
-                            }                                                
-                    }                
+                            }
+                    }
             }   // end if (!parsi_int22)
         }
-        
+
     }    // end if (!simple_internal_energy)
-    
+
     if (parsi_dangles == T99 || parsi_dangles == LAVISH)
     {
         for (i=0; i < NUCL; i++)
@@ -5015,7 +5015,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                 break;
                             case 2:
                                 array[index] = dangle_top[i][j][k];
-                                break;      
+                                break;
                             case 3:
                                 fprintf (file, "%.2lf\n", (double)dangle_top[i][j][k]/100.0);
                                 break;
@@ -5027,9 +5027,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                 break;
                             case 5:
                                 dangle_top[i][j][k] = array[index];
-                                break;                                
+                                break;
                         }
-                        index++;    sim_index++;    
+                        index++;    sim_index++;
                     }
                 }
         for (i=0; i < NUCL; i++)
@@ -5047,7 +5047,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                 break;
                             case 2:
                                 array[index] = dangle_bot[i][j][k];
-                                break;    
+                                break;
                             case 3:
                                 fprintf (file, "%.2lf\n", (double)dangle_bot[i][j][k]/100.0);
                                 break;
@@ -5059,17 +5059,17 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                                 break;
                             case 5:
                                 dangle_bot[i][j][k] = array[index];
-                                break;                                                                
+                                break;
                         }
-                        index++;    sim_index++;    
+                        index++;    sim_index++;
                     }
                 }
     }
-                
-    /*                
+
+    /*
     #if (MODEL == EXTENDED)
     // use it as a parameter only if !parsi_length, otherwise consider it's fixed
-    // ACTUALLY consider it fixed always    
+    // ACTUALLY consider it fixed always
     if (!parsi_length)
     {
         switch (job)
@@ -5080,7 +5080,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 2:
                 array[index] = misc.param_greater30*100.0;      // multiply by 100 because all the other params are stored as value*100
-                break;       
+                break;
             case 3:
                 fprintf (file, "%.2lf\n", misc.param_greater30);
                 break;
@@ -5104,14 +5104,14 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
         end = MAXLOOP_I_T99;
     }
     else if (parsi_length == PARSI || parsi_length == LAVISH || parsi_length == ZL)
-    {    
+    {
         if (parsi_int11 == PARSI)       start = 2;
         else if (parsi_int21 == PARSI)  start = 3;
         else                            start = 4;
         if (parsi_length == PARSI || parsi_length == ZL)      end = MAXLOOP_I_PARSI;
         else                            end = MAXLOOP_I_LAVISH;
     }
-    
+
     for (i=start; i <= end; i++)
     {
         if (internal_penalty_by_size[i] < INF)
@@ -5128,10 +5128,10 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     {
                         sprintf (similarity_rule[sim_index], "1 * internal_size[%d] + %.4lf", i-1, misc.param_greater30*log(1.0*i/(i-1)));
                     }
-                    break;                    
+                    break;
                 case 2:
                     array[index] = internal_penalty_by_size[i];
-                    break;            
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)internal_penalty_by_size[i]/100.0);
                     break;
@@ -5143,14 +5143,14 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     internal_penalty_by_size[i] = array[index];
-                    break;                    
+                    break;
             }
-            index++;    sim_index++;    
+            index++;    sim_index++;
         }
     }
-    
+
     // I tried to do internal loop 2D, but I don't think it makes too much sense to do it. See the code at the very end of this file
-    
+
     // NOW internal asymmetries
     if (parsi_asymmetry == PARSI || parsi_asymmetry == LAVISH)
     {
@@ -5161,7 +5161,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 sprintf (string_params_human_readable[index], "internal_asymmetry_initiation");
                 break;
             case 2:
-                array[index] = internal_asymmetry_initiation; 
+                array[index] = internal_asymmetry_initiation;
                 break;
             case 3:
                 fprintf (file, "%.2lf\n", (double)internal_asymmetry_initiation/100.0);
@@ -5184,7 +5184,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 sprintf (string_params_human_readable[index], "internal_asymmetry_slope");
                 break;
             case 2:
-                array[index] = internal_asymmetry_slope;     
+                array[index] = internal_asymmetry_slope;
                 break;
             case 3:
                 fprintf (file, "%.2lf\n", (double)internal_asymmetry_slope/100.0);
@@ -5197,7 +5197,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 5:
                 internal_asymmetry_slope = array[index];
-                break;                          
+                break;
         }
         index++;    sim_index++;
         if (parsi_asymmetry == LAVISH)
@@ -5215,10 +5215,10 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                         if (similarity_rule[sim_index][0] == '\0')
                         {
                             sprintf (similarity_rule[sim_index], "1 * internal_asymmetry_initiation + %.4lf * internal_asymmetry_slope", log(i*1.0));
-                        }                    
+                        }
                         break;
                     case 2:
-                        array[index] = internal_asymmetry[i];      
+                        array[index] = internal_asymmetry[i];
                         break;
                     case 3:
                         fprintf (file, "%.2lf\n", (double)internal_asymmetry[i]/100.0);
@@ -5231,9 +5231,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                         break;
                     case 5:
                         internal_asymmetry[i] = array[index];
-                        break;                                           
+                        break;
                 }
-                index++;    sim_index++;            
+                index++;    sim_index++;
             }
         }
     }
@@ -5251,7 +5251,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
         if (parsi_length == PARSI || parsi_length == ZL)   end = MAXLOOP_B_PARSI;
         else                         end = MAXLOOP_B_LAVISH;
     }
-    
+
     for (i=start; i <= end; i++)
     {
         if (bulge_penalty_by_size[i] < INF)
@@ -5268,10 +5268,10 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     {
                         sprintf (similarity_rule[sim_index], "1 * bulge_size[%d] + %.4lf", i-1, misc.param_greater30*log(1.0*i/(i-1)));
                     }
-                    break;                    
+                    break;
                 case 2:
                     array[index] = bulge_penalty_by_size[i];
-                    break; 
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)bulge_penalty_by_size[i]/100.0);
                     break;
@@ -5283,9 +5283,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     bulge_penalty_by_size[i] = array[index];
-                    break;                    
+                    break;
             }
-            index++;    sim_index++;    
+            index++;    sim_index++;
         }
     }
 
@@ -5293,7 +5293,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
     if (parsi_length == T99)            end = MAXLOOP_H_T99;
     else if (parsi_length == PARSI || parsi_length == ZL)     end = MAXLOOP_H_PARSI;
     else if (parsi_length == LAVISH)    end = MAXLOOP_H_LAVISH;
-    
+
     for (i=1; i <= end; i++)
     {
         if (hairpin_penalty_by_size[i] < INF)
@@ -5313,7 +5313,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 2:
                     array[index] = hairpin_penalty_by_size[i];
-                    break;    
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)hairpin_penalty_by_size[i]/100.0);
                     break;
@@ -5325,9 +5325,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     hairpin_penalty_by_size[i] = array[index];
-                    break;                    
+                    break;
             }
-            index++;    sim_index++;    
+            index++;    sim_index++;
         }
     }
 
@@ -5339,7 +5339,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
             break;
         case 2:
             array[index] = misc.terminal_AU_penalty;
-            break;         
+            break;
         case 3:
             fprintf (file, "%.2lf\n", (double)misc.terminal_AU_penalty/100.0);
             break;
@@ -5351,7 +5351,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
             break;
         case 5:
             misc.terminal_AU_penalty = array[index];
-            break;            
+            break;
     }
     index++;    sim_index++;
 
@@ -5366,7 +5366,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 2:
                 array[index] = misc.hairpin_GGG;
-                break;    
+                break;
             case 3:
                 fprintf (file, "%.2lf\n", (double)misc.hairpin_GGG/100.0);
                 break;
@@ -5378,9 +5378,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 5:
                 misc.hairpin_GGG = array[index];
-                break;                
+                break;
         }
-        index++;    sim_index++;    
+        index++;    sim_index++;
         switch (job)
         {
             case 0:
@@ -5389,7 +5389,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 2:
                 array[index] = misc.hairpin_c1;
-                break;        
+                break;
             case 3:
                 fprintf (file, "%.2lf\n", (double)misc.hairpin_c1/100.0);
                 break;
@@ -5401,9 +5401,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 5:
                 misc.hairpin_c1 = array[index];
-                break;                             
+                break;
         }
-        index++;    sim_index++;    
+        index++;    sim_index++;
         switch (job)
         {
             case 0:
@@ -5424,9 +5424,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 5:
                 misc.hairpin_c2 = array[index];
-                break;                                                       
+                break;
         }
-        index++;    sim_index++;    
+        index++;    sim_index++;
         switch (job)
         {
             case 0:
@@ -5435,7 +5435,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 2:
                 array[index] = misc.hairpin_c3;
-                break;          
+                break;
             case 3:
                 fprintf (file, "%.2lf\n", (double)misc.hairpin_c3/100.0);
                 break;
@@ -5449,14 +5449,14 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 misc.hairpin_c3 = array[index];
                 break;
         }
-        index++;    sim_index++;    
+        index++;    sim_index++;
     }
-    
+
     // TODO
     //sprintf (string_params[index], "misc.asymmetry_penalty_max_correction");
     //sprintf (string_params[index], "misc.asymmetry_penalty_array[0]");
     //sprintf (string_params[index], "misc.asymmetry_penalty_array[1]");
-    
+
     // sprintf (string_params[index], "misc.asymmetry_penalty_array[2]");
     // sprintf (string_params[index], "misc.asymmetry_penalty_array[3]");
     // Instead of these, I will just store the asymmetry for 0.5, 1, 1.5, 2, 2.5 and 3.
@@ -5466,7 +5466,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
     //sprintf (string_params[index], "misc.asymmetry_penalty[4]");
     //sprintf (string_params[index], "misc.asymmetry_penalty[5]");
     //sprintf (string_params[index], "misc.asymmetry_penalty[6]");
-    
+
     //sprintf (string_params[index], "misc.gail_rule");
     switch (job)
     {
@@ -5476,7 +5476,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
             break;
         case 2:
             array[index] = misc.multi_offset;
-            break;            
+            break;
         case 3:
             fprintf (file, "%.2lf\n", (double)misc.multi_offset/100.0);
             break;
@@ -5488,9 +5488,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
             break;
         case 5:
             misc.multi_offset = array[index];
-            break;            
+            break;
     }
-    index++;    sim_index++;    
+    index++;    sim_index++;
     switch (job)
     {
         case 0:
@@ -5499,7 +5499,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
             break;
         case 2:
             array[index] = misc.multi_helix_penalty;
-            break;     
+            break;
         case 3:
             fprintf (file, "%.2lf\n", (double)misc.multi_helix_penalty/100.0);
             break;
@@ -5511,9 +5511,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
             break;
         case 5:
             misc.multi_helix_penalty = array[index];
-            break;                       
+            break;
     }
-    index++;    sim_index++;    
+    index++;    sim_index++;
     switch (job)
     {
         case 0:
@@ -5522,7 +5522,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
             break;
         case 2:
             array[index] = misc.multi_free_base_penalty;
-            break; 
+            break;
         case 3:
             fprintf (file, "%.2lf\n", (double)misc.multi_free_base_penalty/100.0);
             break;
@@ -5534,9 +5534,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
             break;
         case 5:
             misc.multi_free_base_penalty = array[index];
-            break;            
+            break;
     }
-    index++;    sim_index++;    
+    index++;    sim_index++;
     switch (job)
     {
         case 0:
@@ -5545,7 +5545,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
             break;
         case 2:
             array[index] = misc.intermolecular_initiation;
-            break;     
+            break;
         case 3:
             fprintf (file, "%.2lf\n", (double)misc.intermolecular_initiation/100.0);
             break;
@@ -5557,10 +5557,10 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
             break;
         case 5:
             misc.intermolecular_initiation = array[index];
-            break;                                                
+            break;
     }
-    index++;    sim_index++;    
-    
+    index++;    sim_index++;
+
     if (parsi_special == T99)
     {
         for(i=0; i < nb_triloops; i++)
@@ -5573,7 +5573,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 2:
                     array[index] = triloop[i].energy;
-                    break;  
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)triloop[i].energy/100.0);
                     break;
@@ -5587,8 +5587,8 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     triloop[i].energy = array[index];
                     break;
             }
-            index++;    sim_index++;    
-        }    
+            index++;    sim_index++;
+        }
         for(i=0; i < nb_tloops; i++)
         {
             switch (job)
@@ -5599,7 +5599,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 2:
                     array[index] = tloop[i].energy;
-                    break;            
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)tloop[i].energy/100.0);
                     break;
@@ -5611,9 +5611,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     tloop[i].energy = array[index];
-                    break;                                                                   
+                    break;
             }
-            index++;    sim_index++;    
+            index++;    sim_index++;
         }
     }
     else if (parsi_special == LAVISH || parsi_special == T99_LAVISH)
@@ -5628,7 +5628,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 2:
                     array[index] = special_hl[i].energy;
-                    break;  
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", (double)special_hl[i].energy/100.0);
                     break;
@@ -5640,9 +5640,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                     break;
                 case 5:
                     special_hl[i].energy = array[index];
-                    break;                    
+                    break;
             }
-            index++;    sim_index++;            
+            index++;    sim_index++;
         }
         // Now add the 6 internal special parameters
         switch (job)
@@ -5653,7 +5653,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 2:
                 array[index] = misc.internal_special_3GA;
-                break;  
+                break;
             case 3:
                 fprintf (file, "%.2lf\n", (double)misc.internal_special_3GA/100.0);
                 break;
@@ -5667,7 +5667,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 misc.internal_special_3GA = array[index];
                 break;
         }
-        index++;    sim_index++;                    
+        index++;    sim_index++;
         switch (job)
         {
             case 0:
@@ -5676,7 +5676,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 2:
                 array[index] = misc.internal_special_2GA;
-                break;  
+                break;
             case 3:
                 fprintf (file, "%.2lf\n", (double)misc.internal_special_2GA/100.0);
                 break;
@@ -5688,9 +5688,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 5:
                 misc.internal_special_2GA = array[index];
-                break;                
+                break;
         }
-        index++;    sim_index++;                  
+        index++;    sim_index++;
         switch (job)
         {
             case 0:
@@ -5699,7 +5699,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 2:
                 array[index] = misc.internal_special_2xGA_GC;
-                break;  
+                break;
             case 3:
                 fprintf (file, "%.2lf\n", (double)misc.internal_special_2xGA_GC/100.0);
                 break;
@@ -5711,9 +5711,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 5:
                 misc.internal_special_2xGA_GC = array[index];
-                break;                
+                break;
         }
-        index++;    sim_index++;  
+        index++;    sim_index++;
         switch (job)
         {
             case 0:
@@ -5722,7 +5722,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 2:
                 array[index] = misc.internal_special_midGA;
-                break;  
+                break;
             case 3:
                 fprintf (file, "%.2lf\n", (double)misc.internal_special_midGA/100.0);
                 break;
@@ -5734,9 +5734,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 5:
                 misc.internal_special_midGA = array[index];
-                break;                
+                break;
         }
-        index++;    sim_index++;  
+        index++;    sim_index++;
         switch (job)
         {
             case 0:
@@ -5745,7 +5745,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 2:
                 array[index] = misc.internal_special_UG_AG;
-                break;  
+                break;
             case 3:
                 fprintf (file, "%.2lf\n", (double)misc.internal_special_UG_AG/100.0);
                 break;
@@ -5757,9 +5757,9 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 5:
                 misc.internal_special_UG_AG = array[index];
-                break;                
+                break;
         }
-        index++;    sim_index++;  
+        index++;    sim_index++;
         switch (job)
         {
             case 0:
@@ -5768,7 +5768,7 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 2:
                 array[index] = misc.internal_special_GU_A;
-                break;  
+                break;
             case 3:
                 fprintf (file, "%.2lf\n", (double)misc.internal_special_GU_A/100.0);
                 break;
@@ -5780,11 +5780,11 @@ int traverse_features_and_do_work (const char *calling_function, PARAMTYPE *arra
                 break;
             case 5:
                 misc.internal_special_GU_A = array[index];
-                break;                
+                break;
         }
-        index++;    sim_index++;                                  
-    }    
-    
+        index++;    sim_index++;
+    }
+
     if (job == 3)        fclose (file);
     if (job == 4)
     {
@@ -5842,7 +5842,7 @@ int check_stability_and_size (int k, int l, int o, int p)
     // having at least one AC mismatch is the simplest, test first
     if ((k==A && l==C) || (k==C && l==A) || (o==A && p==C) || (o==C && p==A))
         return 4;
-    
+
     // combination of all mismatches of equal size (purine-purine, purine-pyrimidine, and pyrimidine-pyrimidine are different sizes)
     // purine =  A, G
     // pyrimidine = C, U
@@ -5861,38 +5861,38 @@ int check_stability_and_size (int k, int l, int o, int p)
     if ( ((k==A && l==A) || (k==C && l==C) || (k==C && l==U) || (k==U && l==C) || (k==G && l==G)) &&
          ((o==A && p==A) || (o==C && p==C) || (o==C && p==U) || (o==U && p==C) || (o==G && p==G)) )
         return 1;
-                 
+
     // two stabilizing mismatches (GU, GA, UU) of different sizes  (purine-purine, purine-pyrimidine, and pyrimidine-pyrimidine are different sizes)
     if ( (((k==G && l==U) || (k==U && l==G))   &&   ((o==G && p==A) || (o==A && p==G) || (o==U && p==U))) ||
          (((k==G && l==A) || (k==A && l==G))   &&   ((o==G && p==U) || (o==U && p==G) || (o==U && p==U))) ||
          ((k==U && l==U)                       &&   ((o==G && p==A) || (o==A && p==G) || (o==G && p==U) || (o==U && p==G))) )
         return 2;
-        
+
     // one stable (GU, GA, UU) and one unstable mismatch (excluding AC) (AA, CC, CU, GG) of different sizes
     // GU
-    if ( ((k==G && l==U) || (k==U && l==G)) && 
+    if ( ((k==G && l==U) || (k==U && l==G)) &&
               ((o==A && p==A) || (o==C && p==C) || (o==C && p==U) || (o==U && p==C) || (o==G && p==G)) )
-        return 3;    
+        return 3;
     if ( ((o==G && p==U) || (o==U && p==G)) &&
               ((k==A && l==A) || (k==C && l==C) || (k==C && l==U) || (k==U && l==C) || (k==G && l==G)) )
         return 3;
-    // GA        
+    // GA
     if ( ((k==G && l==A) || (k==A && l==G)) &&
               ((o==C && p==C) || (o==C && p==U) || (o==U && p==C)) )
-        return 3;    
+        return 3;
     if ( ((o==G && p==A) || (o==A && p==G)) &&
               ((k==C && l==C) || (k==C && l==U) || (k==U && l==C)) )
         return 3;
-    // UU        
+    // UU
     if ( (k==U && l==U) &&
               ((o==A && p==A) || (o==G && p==G)) )
-        return 3;    
+        return 3;
     if ( (o==U && p==U) &&
               ((k==A && l==A) || (k==G && l==G)) )
-        return 3;    
-        
-    return -1;            
-        
+        return 3;
+
+    return -1;
+
 }
 
 
@@ -5906,8 +5906,8 @@ void fill_data_structures_with_new_parameters (const char *filename)
   // TODO: this should be incorporated into traverse_and_do_work
 {
     #if (MODEL == EXTENDED)
-    
-    
+
+
     #elif (MODEL == SIMPLE)
     int index;
     int i, j, k, l, m, n, o, p;
@@ -5926,13 +5926,13 @@ void fill_data_structures_with_new_parameters (const char *filename)
                             int11[i][j][k][l][m][n] = INF;
                         }
 
-    
+
     //printf ("FILENAME: %s\n", filename);
     if ((file = fopen (filename, "r")) == NULL)
     {
         giveup ("Cannot open file", filename);
     }
-    
+
     index = 0;
     for (i=0; i < NUCL; i++)
         for (j=0; j < NUCL; j++)
@@ -5985,7 +5985,7 @@ void fill_data_structures_with_new_parameters (const char *filename)
     sscanf (buffer, "%lf", &param);
     param *= 100;
     misc.internal_AU_closure = (PARAMTYPE) param;
-    
+
     fgets (buffer, sizeof(buffer), file);
     line++;
     sscanf (buffer, "%lf", &param);
@@ -5997,7 +5997,7 @@ void fill_data_structures_with_new_parameters (const char *filename)
     sscanf (buffer, "%lf", &param);
     param *= 100;
     misc.internal_UU_mismatch = (PARAMTYPE) param;
-    
+
     // fill the tstacki data structure a bit later, after we read AU_penalty
 
 //     for (i=0; i < NUCL; i++)
@@ -6018,7 +6018,7 @@ void fill_data_structures_with_new_parameters (const char *filename)
 //                     //sprintf (string_params[index++], "tstacki[%d][%d][%d][%d]", i, j, k, l);
 //                 }
 //             }
-               
+
     if (!simple_internal_energy)
     {
         // do the few int 11 params: only those enclosed by CG and CG (any order), + 2 more params
@@ -6056,7 +6056,7 @@ void fill_data_structures_with_new_parameters (const char *filename)
         sscanf (buffer, "%lf", &param);
         param *= 100;
         misc.internal11_basic_mismatch = (PARAMTYPE) param;
-        
+
         fgets (buffer, sizeof(buffer), file);
         sscanf (buffer, "%lf", &param);
         param *= 100;
@@ -6084,7 +6084,7 @@ void fill_data_structures_with_new_parameters (const char *filename)
                                                 //int11[n][m][l][k][j][i] = misc.internal11_basic_mismatch;
                                             }
                                         }
-                                        
+
                                         else
                                         {
                                             if (!(watson_crick(i,j) && watson_crick(m,n) && k==U && l==U))
@@ -6103,14 +6103,14 @@ void fill_data_structures_with_new_parameters (const char *filename)
                                                     int11[i][j][k][l][m][n] += misc.internal_AU_closure;
                                             }
                                         }
-                                        
+
                                         // round it to match Turner parameters
                                         //if (int11[i][j][k][l][m][n] % 10 == 5) int11[i][j][k][l][m][n] += 5;
                                         //if (int11[i][j][k][l][m][n] % 10 == -5) int11[i][j][k][l][m][n] += 5;
                                     }
-                }                                
+                }
 
-            
+
 //         for (i=0; i < NUCL; i++)
 //             for (j=0; j < NUCL; j++)
 //             for (k=0; k < NUCL; k++)
@@ -6137,8 +6137,8 @@ void fill_data_structures_with_new_parameters (const char *filename)
 //                             }
 //                         }
 //                     }
-        
-                            
+
+
         // go with few int21 parameters, as in Mathews et al 1999
         // closed by CG
         i=C; j=G; m=C; n=G;
@@ -6154,7 +6154,7 @@ void fill_data_structures_with_new_parameters (const char *filename)
                             param *= 100;
                             int21[i][j][k][l][m][n][o] = (PARAMTYPE) param;
                         }
-        // closed by GC                        
+        // closed by GC
         i=G; j=C; m=G; n=C;
         for (k=0; k < NUCL; k++)
             for (l=0; l < NUCL; l++)
@@ -6176,7 +6176,7 @@ void fill_data_structures_with_new_parameters (const char *filename)
         sscanf (buffer, "%lf", &param);
         param *= 100;
         misc.internal21_AU_closure = (PARAMTYPE) param;
-       
+
         // fill the int21 data structure
         for (i=0; i < NUCL; i++)
             for (j=0; j < NUCL; j++)
@@ -6206,15 +6206,15 @@ void fill_data_structures_with_new_parameters (const char *filename)
                                                     (PARAMTYPE)(int21[G][C][k][l][G][C][o]/2.0);
                                                 if (has_AU_penalty(i,j))
                                                     int21[i][j][k][l][m][n][o] += misc.internal21_AU_closure;
-                                                if (has_AU_penalty(m,n))    
+                                                if (has_AU_penalty(m,n))
                                                     int21[i][j][k][l][m][n][o] += misc.internal21_AU_closure;
                                             }
                                             // round it to match Turner parameters - seems to be inconsistent
                                             //if (int21[i][j][k][l][m][n][o] % 10 == 5) int21[i][j][k][l][m][n][o] += 5;
                                         }
                                     }
-                }                                
-                                                        
+                }
+
 //         for (i=0; i < NUCL; i++)
 //             for (j=0; j < NUCL; j++)
 //             for (k=0; k < NUCL; k++)
@@ -6236,7 +6236,7 @@ void fill_data_structures_with_new_parameters (const char *filename)
 //                             //sprintf (string_params[index++], "int21[%d][%d][%d][%d][%d][%d][%d]", i, j, k, l, m, n, o);
 //                             }
 //                         }
-       
+
         // go with the 53 parameters, like in Mathews et al 1999
         for (i=0; i < NUCL; i++)
             for (j=0; j < NUCL; j++)
@@ -6267,7 +6267,7 @@ void fill_data_structures_with_new_parameters (const char *filename)
                             }
                         }
                     }
-        
+
 //         i=C; j=G; m=C; n=G;
 //         for (k=0; k < NUCL; k++)
 //             for (l=0; l < NUCL; l++)
@@ -6294,23 +6294,23 @@ void fill_data_structures_with_new_parameters (const char *filename)
 //                             }
 //                         }
 //                     }
-        
+
         // then add the 4 deltas
         fgets (buffer, sizeof(buffer), file);
         sscanf (buffer, "%lf", &param);
         param *= 100;
-        misc.internal22_delta_same_size = (PARAMTYPE) param;                
-        
+        misc.internal22_delta_same_size = (PARAMTYPE) param;
+
         fgets (buffer, sizeof(buffer), file);
         sscanf (buffer, "%lf", &param);
         param *= 100;
-        misc.internal22_delta_different_size = (PARAMTYPE) param;                
-        
+        misc.internal22_delta_different_size = (PARAMTYPE) param;
+
         fgets (buffer, sizeof(buffer), file);
         sscanf (buffer, "%lf", &param);
         param *= 100;
-        misc.internal22_delta_1stable_1unstable = (PARAMTYPE) param;                
-        
+        misc.internal22_delta_1stable_1unstable = (PARAMTYPE) param;
+
         fgets (buffer, sizeof(buffer), file);
         sscanf (buffer, "%lf", &param);
         param *= 100;
@@ -6336,7 +6336,7 @@ void fill_data_structures_with_new_parameters (const char *filename)
                                         for(o=0; o < NUCL; o++)
                                             for (p=0; p < NUCL; p++)
                                             {
-                                                
+
 //                                                 if (i==C && j==G && m==C && n==G)
 //                                                 {
 //                                                     if(watson_crick(k,l) || watson_crick(o,p))
@@ -6344,14 +6344,14 @@ void fill_data_structures_with_new_parameters (const char *filename)
 //                                                         int22[i][j][k][l][m][n][o][p] = misc.internal22_match;
 //                                                     }
 //                                                     // else do nothing, it's parameter
-//                                                 } 
+//                                                 }
                                                 // if a closing pair is wobble, it's the same as if G would be A
                                                 if (i==G && j==U)   ii = A;     else ii = i;
                                                 if (i==U && j==G)   jj = A;     else jj = j;
                                                 if (m==G && n==U)   mm = A;     else mm = m;
                                                 if (m==U && n==G)   nn = A;     else nn = n;
 
-                                                
+
                                                 if (watson_crick(k,l) || watson_crick(o,p))
                                                 {
                                                     int22[i][j][k][l][m][n][o][p] = misc.internal22_match;
@@ -6375,13 +6375,13 @@ void fill_data_structures_with_new_parameters (const char *filename)
                                                         case 2: int22[i][j][k][l][m][n][o][p] += misc.internal22_delta_different_size; break;
                                                         case 3: int22[i][j][k][l][m][n][o][p] += misc.internal22_delta_1stable_1unstable; break;
                                                         case 4: int22[i][j][k][l][m][n][o][p] += misc.internal22_delta_AC; break;
-                                                        default: printf ("ERROR: result %d for k=%d, l=%d, o=%d, p=%d, ABORT!\n", result, k, l, o, p); exit(1);                                                
-                                                    }                                                
-                                                }                                        
+                                                        default: printf ("ERROR: result %d for k=%d, l=%d, o=%d, p=%d, ABORT!\n", result, k, l, o, p); exit(1);
+                                                    }
+                                                }
                                             }
                                     }
-                }                                
-                        
+                }
+
 
 //         for (i=0; i < NUCL; i++)
 //             for (j=0; j < NUCL; j++)
@@ -6396,7 +6396,7 @@ void fill_data_structures_with_new_parameters (const char *filename)
 //                             {
 //                                 // exclude duplicates
 //                                 // int22[i][j][k][l][m][n][o][p] is the same as int22[n][m][p][o][j][i][l][k]
-//                                 if (i*10000000 + j*1000000 + k*100000 + l*10000 + m*1000 + n*100 + o*10 + p <= 
+//                                 if (i*10000000 + j*1000000 + k*100000 + l*10000 + m*1000 + n*100 + o*10 + p <=
 //                                     n*10000000 + m*1000000 + p*100000 + o*10000 + j*1000 + i*100 + l*10 + k)
 //                                 {
 //                                     fgets (buffer, sizeof(buffer), file);
@@ -6412,7 +6412,7 @@ void fill_data_structures_with_new_parameters (const char *filename)
 //                                 }
 //                             }
 //                         }
-                         
+
     }     // end if (!simple_internal_energy)
     for (i=0; i < NUCL; i++)
         for (j=0; j < NUCL; j++)
@@ -6448,11 +6448,11 @@ void fill_data_structures_with_new_parameters (const char *filename)
                 //sprintf (string_params[index++], "dangle_bot[%d][%d][%d]", i, j, k);
                 }
             }
-    int start;        
+    int start;
     if (!simple_internal_energy)
         start = 4;
     else
-        start = 1;                
+        start = 1;
     for (i=start; i <= MAXLOOP_I; i++)
         {
         if (internal_penalty_by_size[i] < INF)
@@ -6474,7 +6474,7 @@ void fill_data_structures_with_new_parameters (const char *filename)
             {
             // no duplicates here
             fgets (buffer, sizeof(buffer), file);
-            sscanf (buffer, "%lf", &param);    
+            sscanf (buffer, "%lf", &param);
             // if (param != 0)    // put Turner's parameters if it's 0, but I can do this in the learn.pl file
                 {
                 param *= 100;
@@ -6501,10 +6501,10 @@ void fill_data_structures_with_new_parameters (const char *filename)
     //fgets (buffer, sizeof(buffer), file); sscanf (buffer, "%lf", &param); param *= 100;
     // if (param != 0)      // put Turner's parameters if it's 0, but I can do this in the learn.pl file
     //    misc.param_greater30 = (PARAMTYPE) param;
-    
+
     // set a fixed value to param_greater_30 for now
     misc.param_greater30 = 1.079;
-    
+
     //sprintf (string_params[index++], "misc.param_greater30");
     fgets (buffer, sizeof(buffer), file); sscanf (buffer, "%lf", &param); param *= 100;
     // if (param != 0)      // put Turner's parameters if it's 0, but I can do this in the learn.pl file
@@ -6535,7 +6535,7 @@ void fill_data_structures_with_new_parameters (const char *filename)
                 {
                     if (!can_pair (i, j))
                         tstacki[i][j][k][l] = INF;
-                    else    
+                    else
                     {
                         tstacki[i][j][k][l] = 0;
                         if (((i == A || i == G) && j == U) ||
@@ -6555,18 +6555,18 @@ void fill_data_structures_with_new_parameters (const char *filename)
                     }
                 }
 
-    
+
     // TODO
-    // keep them fixed for now    
+    // keep them fixed for now
     //fgets (buffer, sizeof(buffer), file); fgets (buffer, sizeof(buffer), file);
-    //fgets (buffer, sizeof(buffer), file); 
+    //fgets (buffer, sizeof(buffer), file);
     // sprintf (string_params[index++], "misc.asymmetry_penalty_max_correction");
     // sprintf (string_params[index++], "misc.asymmetry_penalty_array[0]");
     // sprintf (string_params[index++], "misc.asymmetry_penalty_array[1]");
     // sprintf (string_params[index++], "misc.asymmetry_penalty_array[2]");
     // sprintf (string_params[index++], "misc.asymmetry_penalty_array[3]");
     // Instead of these, I will just store the asymmetry for 0.5, 1, 1.5, 2, 2.5 and 3.
-    
+
     // to come back!!!
     //fgets (buffer, sizeof(buffer), file); fgets (buffer, sizeof(buffer), file);
     //fgets (buffer, sizeof(buffer), file); fgets (buffer, sizeof(buffer), file);
@@ -6577,12 +6577,12 @@ void fill_data_structures_with_new_parameters (const char *filename)
     //sprintf (string_params[index++], "misc.asymmetry_penalty[4]");
     //sprintf (string_params[index++], "misc.asymmetry_penalty[5]");
     //sprintf (string_params[index++], "misc.asymmetry_penalty[6]");
-    
+
     //fgets (buffer, sizeof(buffer), file);
     //sprintf (string_params[index++], "misc.gail_rule");
-    // keep this fixed 
+    // keep this fixed
     misc.gail_rule = 1;
-    
+
     fgets (buffer, sizeof(buffer), file); sscanf (buffer, "%lf", &param); param *= 100;
     // if (param != 0)      // put Turner's parameters if it's 0, but I can do this in the learn.pl file
         misc.multi_offset = (PARAMTYPE) param;
@@ -6599,7 +6599,7 @@ void fill_data_structures_with_new_parameters (const char *filename)
     // if (param != 0)      // put Turner's parameters if it's 0, but I can do this in the learn.pl file
         misc.intermolecular_initiation = (PARAMTYPE) param;
     //sprintf (string_params[index++], "misc.intermolecular_initiation");
-    
+
     for(i=0; i < nb_triloops; i++)
         {
         fgets (buffer, sizeof(buffer), file); sscanf (buffer, "%lf", &param); param *= 100;
@@ -6607,7 +6607,7 @@ void fill_data_structures_with_new_parameters (const char *filename)
             triloop[i].energy = (PARAMTYPE) param;
         //sprintf (string_params[index++], "triloop[%d].energy", i);
         }
-    
+
     for(i=0; i < nb_tloops; i++)
         {
         fgets (buffer, sizeof(buffer), file); sscanf (buffer, "%lf", &param); param *= 100;
@@ -6615,7 +6615,7 @@ void fill_data_structures_with_new_parameters (const char *filename)
             tloop[i].energy = (PARAMTYPE) param;
         //sprintf (string_params[index++], "tloop[%d].energy", i);
         }
-    
+
     fclose (file);
     //printf ("****** stack[1][2][0][3] = %d\n", stack[1][2][0][3]);
     #endif
@@ -6642,9 +6642,9 @@ void save_paramtypes (const char *filename)
     {
         fprintf (file, "%s\n", string_params_human_readable[i]);
     }
-    
+
     fclose (file);
-            
+
 }
 
 
@@ -6664,9 +6664,9 @@ void save_paramtypes_machine_readable (const char *filename)
     {
         fprintf (file, "%s\n", string_params[i]);
     }
-    
+
     fclose (file);
-            
+
 }
 
 
@@ -6687,7 +6687,7 @@ void save_parameters_in_array (PARAMTYPE *array)
 
 
 double simfold_restricted_logZ (char *sequence, char *real_structure, char *restricted, double &min_energy, double &max_energy, int &actual_num_str)
-// if the real_structure is not one of the suboptimal structures, add it 
+// if the real_structure is not one of the suboptimal structures, add it
 {
     char structure[MAXSLEN];
     double enthalpy, energy;
@@ -6701,19 +6701,19 @@ double simfold_restricted_logZ (char *sequence, char *real_structure, char *rest
     temp = 310.15;
     beta = 1/(R*temp);
     real_str_found = 0;
-    
-    
+
+
     s_min_folding *min_fold = new s_min_folding (sequence, restricted);
     min_energy = min_fold->s_simfold_restricted ();
     min_fold->return_structure (structure);
-    delete min_fold;      
-    
+    delete min_fold;
+
     s_sub_folding* sub_fold = new s_sub_folding(sequence, restricted, -(int)(min_energy*100.0));
     sub_fold->set_limit (MAXSUBSTR);
     sub_fold->s_simfold_restricted (enthalpy);
     actual_num_str = sub_fold->return_structures(tmp_structures, tmp_energies);
     delete sub_fold;
-    
+
     max_energy = tmp_energies[actual_num_str-1];
     Z = 0;
     for (i=0; i < actual_num_str; i++)
@@ -6729,15 +6729,15 @@ double simfold_restricted_logZ (char *sequence, char *real_structure, char *rest
     {
         // if not found, add it
         energy = free_energy_simfold_restricted (sequence, real_structure, restricted);
-        Z += exp ((-1) * energy * beta);        
-    }        
-    return log(Z);    
+        Z += exp ((-1) * energy * beta);
+    }
+    return log(Z);
 }
 
 
 double simfold_restricted_logZ_gradient (char *sequence, char *real_structure, char *restricted, PFTYPE *logZ_gradient)
-// return 
-// if the real_structure is not one of the suboptimal structures, add it 
+// return
+// if the real_structure is not one of the suboptimal structures, add it
 {
     char structure[MAXSLEN];
     double enthalpy, energy;
@@ -6753,26 +6753,26 @@ double simfold_restricted_logZ_gradient (char *sequence, char *real_structure, c
     real_str_found = 0;
     double numerator [MAXNUMPARAMS];
     double counter [MAXNUMPARAMS];
-    double denominator;   
-    double f; 
-    
+    double denominator;
+    double f;
+
     s_min_folding *min_fold = new s_min_folding (sequence, restricted);
     min_energy = min_fold->s_simfold_restricted ();
     min_fold->return_structure (structure);
-    delete min_fold;      
-    
+    delete min_fold;
+
     s_sub_folding* sub_fold = new s_sub_folding(sequence, restricted, -(int)(min_energy*100.0));
     sub_fold->set_limit (MAXSUBSTR);
     sub_fold->s_simfold_restricted (enthalpy);
     actual_num_str = sub_fold->return_structures(tmp_structures, tmp_energies);
     max_energy = tmp_energies[actual_num_str-1];
     delete sub_fold;
-    
+
     for (i=0; i < num_params; i++)
     {
         numerator[i] = 0;
-    }    
-        
+    }
+
     // first compute the denominator, which is the same for all parameters
     denominator = 0;
     for (k=0; k < actual_num_str; k++)
@@ -6781,7 +6781,7 @@ double simfold_restricted_logZ_gradient (char *sequence, char *real_structure, c
         if (strcmp (tmp_structures[k], real_structure) == 0)
             real_str_found = 1;
         // recompute the free energy, i.e. with the correct dangling ends
-        energy = free_energy_simfold_restricted (sequence, tmp_structures[k], restricted);        
+        energy = free_energy_simfold_restricted (sequence, tmp_structures[k], restricted);
         denominator += exp ((-1) * energy * beta);
         count_each_structure_type (sequence, tmp_structures[k], restricted, counter, f, 1);
         for (i=0; i < num_params; i++)
@@ -6795,19 +6795,19 @@ double simfold_restricted_logZ_gradient (char *sequence, char *real_structure, c
         //printf ("Real str not found, add it\n");
         // if not found, add it
         energy = free_energy_simfold_restricted (sequence, real_structure, restricted);
-        denominator += exp ((-1) * energy * beta);        
+        denominator += exp ((-1) * energy * beta);
         count_each_structure_type (sequence, real_structure, restricted, counter, f, 1);
         for (i=0; i < num_params; i++)
         {
             numerator[i] += counter[i] * exp ((-1) * energy * beta);
-        }    
+        }
     }
     // now the denominator and nominator are computed
-    
+
     for (i=0; i < num_params; i++)
     {
         logZ_gradient[i] = numerator[i] / denominator;
-    }      
+    }
     //printf ("logZ_gradient[i] = %e\n", logZ_gradient[7646]);
 }
 
@@ -6838,9 +6838,9 @@ int get_info_from_file (FILE *file, char *sequence, char *real_structure, char *
         if (strstr (buffer, "Seq: ") != NULL)
         {
             for (i=5; i < strlen (buffer)-1; i++)
-                sequence[i-5] = buffer[i]; 
+                sequence[i-5] = buffer[i];
             sequence[i-5] = '\0';
-            // ignore sequences longer than MAXSLEN -1 
+            // ignore sequences longer than MAXSLEN -1
             if (strlen (sequence) > MAXSLEN-1) return 0;
         }
         else return 0;
@@ -6848,9 +6848,9 @@ int get_info_from_file (FILE *file, char *sequence, char *real_structure, char *
         if (strstr (buffer, "Str: ") != NULL)
         {
             for (i=5; i < strlen (buffer)-1; i++)
-                real_structure[i-5] = buffer[i]; 
+                real_structure[i-5] = buffer[i];
             real_structure[i-5] = '\0';
-        }        
+        }
         else
         {
             printf ("Str doesn't follow Seq, Seq is %s\n", sequence);
@@ -6860,14 +6860,14 @@ int get_info_from_file (FILE *file, char *sequence, char *real_structure, char *
         if (strstr (buffer, "Res: ") != NULL)
         {
             for (i=5; i < strlen (buffer)-1; i++)
-                restricted[i-5] = buffer[i]; 
+                restricted[i-5] = buffer[i];
             restricted[i-5] = '\0';
-        }        
+        }
         else
         {
             printf ("Res doesn't follow Str\n");
             exit(1);
-        }        
+        }
         fgets (buffer, sizeof(buffer), file);   //====
     }
     else
@@ -6881,7 +6881,7 @@ int get_info_from_file (FILE *file, char *sequence, char *real_structure, char *
             for (i=0; i < strlen (buffer)-1; i++)
                 sequence[i] = buffer[i];
             sequence[i] = '\0';
-            
+
             // next should be real structure
             fgets (buffer, sizeof(buffer), file);
             for (i=0; i < strlen (buffer)-1; i++)
@@ -6894,7 +6894,7 @@ int get_info_from_file (FILE *file, char *sequence, char *real_structure, char *
             {
                 restricted[0] = '\0';
                 return 1;   // that's it, we are done
-            }            
+            }
             for (i=0; i < strlen (buffer)-1; i++)
                 restricted[i] = buffer[i];
             restricted[i] = '\0';
@@ -6902,7 +6902,7 @@ int get_info_from_file (FILE *file, char *sequence, char *real_structure, char *
             if (strstr (restricted, "_") == NULL)   restricted[0] = '\0';
             fgets (buffer, sizeof(buffer), file);   // empty line
         }
-        else return 0;        
+        else return 0;
     }
     return 1;
 }
@@ -6921,35 +6921,35 @@ PFTYPE compute_f (char *input_file)
     double R, temp, beta;
     R = 0.00198717;
     temp = 310.15;
-    beta = 1/(R*temp); 
-    PFTYPE f; 
-    double min_energy, max_energy;      
+    beta = 1/(R*temp);
+    PFTYPE f;
+    double min_energy, max_energy;
     int i, actual_num_str;
-        
+
     f = 0;
     if ((file = fopen (input_file, "r")) == NULL)
     {
         printf ("Cannot open file %s\n", input_file);
-        exit (0);
+        exit (1);
     }
-      
+
     int k;
     k = 0;
     int seen = 0;
     while (!feof (file))
     {
         seen++;
-        if (!get_info_from_file (file, sequence, real_structure, restricted)) 
+        if (!get_info_from_file (file, sequence, real_structure, restricted))
             continue;
         //printf ("      ....,....1....,....2....,....3....,....4....,....5\n");
         //printf ("Seq: |%s|\nStr: |%s|\nRes: |%s|\n", sequence, real_structure, restricted);
-        energy = free_energy_simfold_restricted (sequence, real_structure, restricted);        
+        energy = free_energy_simfold_restricted (sequence, real_structure, restricted);
         logZ = simfold_restricted_logZ (sequence, real_structure, restricted, min_energy, max_energy, actual_num_str);
         //printf ("logZ(%d) = %e\n", seen, logZ);
         f += beta*energy + logZ;
-    }      
+    }
     fclose (file);
-    return f;                                                                                                                                
+    return f;
 }
 
 PFTYPE compute_likelihood_exactly (char *input_file)
@@ -6969,42 +6969,42 @@ PFTYPE compute_likelihood_exactly (char *input_file)
     double R, temp, beta;
     R = 0.00198717;
     temp = 310.15;
-    beta = 1/(R*temp); 
-    PFTYPE f; 
-                
+    beta = 1/(R*temp);
+    PFTYPE f;
+
     f = 1.0;
     if ((file = fopen (input_file, "r")) == NULL)
     {
         printf ("Cannot open file %s\n", input_file);
-        exit (0);
+        exit (1);
     }
-    
+
     //long double pf;
     //pf = simfold_partition_function_exactly ("CAAAAGUCUGGGCUAAGCCCACUGAUGAGCCGCUGAAAUGCGGCGAAACUUUUG");
-    //printf ("Exact part fun: %Le\n", pf);    
-         
+    //printf ("Exact part fun: %Le\n", pf);
+
     int k;
     k = 0;
     int seen = 0;
     while (!feof (file))
     {
         seen++;
-        if (!get_info_from_file (file, sequence, real_structure, restricted)) 
+        if (!get_info_from_file (file, sequence, real_structure, restricted))
             continue;
         //printf ("      ....,....1....,....2....,....3....,....4....,....5\n");
         //printf ("Seq: |%s|\nStr: |%s|\nRes: |%s|\n", sequence, real_structure, restricted);
-        
-        
+
+
         // for now ignore restricted if it exists
-        energy = free_energy_simfold (sequence, real_structure);  
-                
+        energy = free_energy_simfold (sequence, real_structure);
+
         Z = simfold_partition_function_smart (sequence);
         //printf ("Z = %Le\n", Z);
         //printf ("numerator = %e\n", exp (-1.0*beta*energy));
         f *= exp (-1.0*beta*energy) / Z;
-    }      
+    }
     fclose (file);
-    return f;                                                                                                                                
+    return f;
 }
 
 
@@ -7025,38 +7025,38 @@ PFTYPE compute_log_likelihood_smart (char *input_file)
     double R, temp, beta;
     R = 0.00198717;
     temp = 310.15;
-    beta = 1/(R*temp); 
+    beta = 1/(R*temp);
     double f;
-                
+
     f = 0.0;
     if ((file = fopen (input_file, "r")) == NULL)
     {
         printf ("Cannot open file %s\n", input_file);
-        exit (0);
+        exit (1);
     }
-    
+
     int k;
     k = 0;
     int seen = 0;
     while (!feof (file))
     {
         seen++;
-        if (!get_info_from_file (file, sequence, real_structure, restricted)) 
+        if (!get_info_from_file (file, sequence, real_structure, restricted))
             continue;
         //printf ("      ....,....1....,....2....,....3....,....4....,....5\n");
         //printf ("Seq: |%s|\nStr: |%s|\nRes: |%s|\n", sequence, real_structure, restricted);
-        
-        
+
+
         // for now ignore restricted if it exists
-        energy = free_energy_simfold (sequence, real_structure);  
-                
+        energy = free_energy_simfold (sequence, real_structure);
+
         Z = simfold_partition_function_smart (sequence);
         //printf ("Z = %g, en = %g, f = %g  %s\n", Z, energy, 1.0*beta*energy + log(Z), sequence);
         //printf ("numerator = %e\n", exp (-1.0*beta*energy));
         f += 1.0*beta*energy + log(Z);
-    }      
+    }
     fclose (file);
-    return f;                                                                                                                                
+    return f;
 }
 
 
@@ -7075,28 +7075,28 @@ void compute_gradient_f (char *input_file, PFTYPE *f_gradient)
     double R, temp, beta;
     R = 0.00198717;
     temp = 310.15;
-    beta = 1/(R*temp); 
-    double min_energy, max_energy;      
+    beta = 1/(R*temp);
+    double min_energy, max_energy;
     int i, actual_num_str;
-    double counter [MAXNUMPARAMS];    
+    double counter [MAXNUMPARAMS];
     PFTYPE logZ_gradient [MAXNUMPARAMS];
     double f;
-    
+
     for (i=0; i < num_params; i++)
     {
         f_gradient[i] = 0;
-    }    
+    }
     if ((file = fopen (input_file, "r")) == NULL)
     {
         printf ("Cannot open file %s\n", input_file);
-        exit (0);
-    }     
+        exit (1);
+    }
     int k;
     k = 0;
     while (!feof (file))
     {
-        if (!get_info_from_file (file, sequence, real_structure, restricted)) 
-            continue;    
+        if (!get_info_from_file (file, sequence, real_structure, restricted))
+            continue;
         //printf ("Seq: |%s|\nStr: |%s|\nRes: |%s|\n", sequence, real_structure, restricted);
         count_each_structure_type (sequence, real_structure, restricted, counter, f, 1);
         simfold_restricted_logZ_gradient (sequence, real_structure, restricted, logZ_gradient);
@@ -7105,12 +7105,12 @@ void compute_gradient_f (char *input_file, PFTYPE *f_gradient)
             f_gradient[i] += counter[i] - logZ_gradient[i];
         }
         //printf ("counter[i]=%d, logZ_gradient[i] = %e, f_gradient[i] = %e\n", counter[7621], logZ_gradient[7621], f_gradient[7621]);
-    }      
+    }
     fclose (file);
     for (i = 0; i < num_params; i++)
-    {    
+    {
         f_gradient[i] *= beta;
-    }    
+    }
 }
 
 
@@ -7129,44 +7129,44 @@ void compute_gradient_f_smart (char *input_file, PFTYPE *f_gradient)
     double R, temp, beta;
     R = 0.00198717;
     temp = 310.15;
-    beta = 1/(R*temp); 
-    double min_energy, max_energy;      
+    beta = 1/(R*temp);
+    double min_energy, max_energy;
     int i, actual_num_str;
-    double counter [MAXNUMPARAMS];    
+    double counter [MAXNUMPARAMS];
     PFTYPE logZ_gradient [MAXNUMPARAMS];
     double f;
-    
+
     for (i=0; i < num_params; i++)
     {
         f_gradient[i] = 0;
-    }    
+    }
     if ((file = fopen (input_file, "r")) == NULL)
     {
         printf ("Cannot open file %s\n", input_file);
-        exit (0);
-    }     
+        exit (1);
+    }
     int k;
     k = 0;
     while (!feof (file))
     {
-        if (!get_info_from_file (file, sequence, real_structure, restricted)) 
+        if (!get_info_from_file (file, sequence, real_structure, restricted))
             continue;
-        
+
         //printf ("Seq: |%s|\nStr: |%s|\nRes: |%s|\n", sequence, real_structure, restricted);
         char restricted[1] = "";
         count_each_structure_type (sequence, real_structure, restricted, counter, f, 1);
-        simfold_gradient_smart (sequence, logZ_gradient);        
+        simfold_gradient_smart (sequence, logZ_gradient);
         for (i = 0; i < num_params; i++)
         {
             f_gradient[i] += counter[i] - logZ_gradient[i];
         }
         //printf ("counter[i]=%d, logZ_gradient[i] = %e, f_gradient[i] = %e\n", counter[7621], logZ_gradient[7621], f_gradient[7621]);
-    }      
+    }
     fclose (file);
     for (i = 0; i < num_params; i++)
-    {    
+    {
         f_gradient[i] *= beta;
-    }    
+    }
 }
 
 
@@ -7188,36 +7188,36 @@ PFTYPE compute_f_and_gradient_f_smart (char *input_file, PFTYPE *f_gradient)
     double R, temp, beta;
     R = 0.00198717;
     temp = 310.15;
-    beta = 1/(R*temp); 
-    double min_energy, max_energy;      
+    beta = 1/(R*temp);
+    double min_energy, max_energy;
     int i, actual_num_str;
-    double counter [MAXNUMPARAMS];    
+    double counter [MAXNUMPARAMS];
     double free_value;
     PFTYPE logZ_gradient [MAXNUMPARAMS];
     PFTYPE Z;
     PFTYPE neglogli;
     neglogli = 0.0;
-    
+
     for (i=0; i < num_params; i++)
     {
         f_gradient[i] = 0;
-    }    
+    }
     if ((file = fopen (input_file, "r")) == NULL)
     {
         printf ("Cannot open file %s\n", input_file);
-        exit (0);
-    }     
+        exit (1);
+    }
     int k;
     k = 0;
     while (!feof (file))
     {
-        if (!get_info_from_file (file, sequence, real_structure, restricted)) 
+        if (!get_info_from_file (file, sequence, real_structure, restricted))
             continue;
-        
-        //printf ("Seq: |%s|\nStr: |%s|\nRes: |%s|\n", sequence, real_structure, restricted); 
+
+        //printf ("Seq: |%s|\nStr: |%s|\nRes: |%s|\n", sequence, real_structure, restricted);
         char restricted[1] = "";
         count_each_structure_type (sequence, real_structure, restricted, counter, free_value, 1);
-        energy = free_energy_simfold (sequence, real_structure); 
+        energy = free_energy_simfold (sequence, real_structure);
         Z = simfold_f_and_gradient_smart (sequence, NULL, logZ_gradient);
         neglogli += 1.0*beta*energy + log(Z);
         for (i = 0; i < num_params; i++)
@@ -7225,10 +7225,10 @@ PFTYPE compute_f_and_gradient_f_smart (char *input_file, PFTYPE *f_gradient)
             f_gradient[i] += counter[i] - logZ_gradient[i];
         }
         //printf ("counter[i]=%d, logZ_gradient[i] = %e, f_gradient[i] = %e\n", counter[7621], logZ_gradient[7621], f_gradient[7621]);
-    }      
+    }
     fclose (file);
     for (i = 0; i < num_params; i++)
-    {    
+    {
         f_gradient[i] *= beta;
     }
     return neglogli;
@@ -7250,43 +7250,43 @@ PFTYPE compute_f_and_gradient_f (char *input_file, PFTYPE *f_gradient)
     double R, temp, beta;
     R = 0.00198717;
     temp = 310.15;
-    beta = 1/(R*temp); 
-    double min_energy, max_energy;      
+    beta = 1/(R*temp);
+    double min_energy, max_energy;
     int i, actual_num_str;
-    double counter [MAXNUMPARAMS];    
+    double counter [MAXNUMPARAMS];
     double free_value;
     PFTYPE logZ_gradient;
     PFTYPE neglogli;
     neglogli = 0.0;
     int real_str_found;
     double numerator [MAXNUMPARAMS];
-    
-    double denominator;      
+
+    double denominator;
     char structure[MAXSLEN];
     double enthalpy;
     char tmp_structures[MAXSUBSTR][MAXSLEN];
-    double tmp_energies[MAXSUBSTR];    
-    
+    double tmp_energies[MAXSUBSTR];
+
     for (i=0; i < num_params; i++)
     {
         f_gradient[i] = 0;
-    }    
+    }
     if ((file = fopen (input_file, "r")) == NULL)
     {
         printf ("Cannot open file %s\n", input_file);
-        exit (0);
-    }     
+        exit (1);
+    }
     int k;
     k = 0;
-    
+
     int seen = 0;
     while (!feof (file))
     {
         seen++;
         // fixed bug: real_str_found was initialized with 0 outside of the while loop
         real_str_found = 0;
-        if (!get_info_from_file (file, sequence, real_structure, restricted)) 
-            continue;    
+        if (!get_info_from_file (file, sequence, real_structure, restricted))
+            continue;
         //printf ("Seq: |%s|\nStr: |%s|\nRes: |%s|\n", sequence, real_structure, restricted);
         count_each_structure_type (sequence, real_structure, restricted, counter, free_value, 1);
 
@@ -7294,20 +7294,20 @@ PFTYPE compute_f_and_gradient_f (char *input_file, PFTYPE *f_gradient)
         s_min_folding *min_fold = new s_min_folding (sequence, restricted);
         min_energy = min_fold->s_simfold_restricted ();
         min_fold->return_structure (structure);
-        delete min_fold;      
-        
+        delete min_fold;
+
         s_sub_folding* sub_fold = new s_sub_folding(sequence, restricted, -(int)(min_energy*100.0));
         sub_fold->set_limit (MAXSUBSTR);
         sub_fold->s_simfold_restricted (enthalpy);
         actual_num_str = sub_fold->return_structures(tmp_structures, tmp_energies);
         max_energy = tmp_energies[actual_num_str-1];
         delete sub_fold;
-        
+
         for (i=0; i < num_params; i++)
         {
             numerator[i] = 0;
-        }    
-            
+        }
+
         // first compute the denominator, which is the same for all parameters
         denominator = 0;
         for (k=0; k < actual_num_str; k++)
@@ -7316,7 +7316,7 @@ PFTYPE compute_f_and_gradient_f (char *input_file, PFTYPE *f_gradient)
             if (strcmp (tmp_structures[k], real_structure) == 0)
                 real_str_found = 1;
             // recompute the free energy, i.e. with the correct dangling ends
-            energy = free_energy_simfold_restricted (sequence, tmp_structures[k], restricted);        
+            energy = free_energy_simfold_restricted (sequence, tmp_structures[k], restricted);
             denominator += exp ((-1) * energy * beta);
             count_each_structure_type (sequence, tmp_structures[k], restricted, counter, free_value, 1);
             for (i=0; i < num_params; i++)
@@ -7325,18 +7325,18 @@ PFTYPE compute_f_and_gradient_f (char *input_file, PFTYPE *f_gradient)
             }
         }
         count_each_structure_type (sequence, real_structure, restricted, counter, free_value, 1);
-        energy = free_energy_simfold_restricted (sequence, real_structure, restricted);        
+        energy = free_energy_simfold_restricted (sequence, real_structure, restricted);
         if (!real_str_found)
         {
             // if not found, add it
-            denominator += exp ((-1) * energy * beta);                    
+            denominator += exp ((-1) * energy * beta);
             for (i=0; i < num_params; i++)
             {
                 numerator[i] += counter[i] * exp ((-1) * energy * beta);
-            }    
+            }
         }
         // now the denominator and nominator are computed
-        
+
         neglogli += beta*energy + log(denominator);
         //printf ("logZ(%d) = %e\n", seen, log(denominator));
         for (i=0; i < num_params; i++)
@@ -7346,12 +7346,12 @@ PFTYPE compute_f_and_gradient_f (char *input_file, PFTYPE *f_gradient)
         }
         //printf ("counter[i]=%d, logZ_gradient[i] = %e, f_gradient[i] = %e\n", counter[7621], numerator[7621]/denominator, f_gradient[7621]);
         //printf ("logZ_grad[i] = %e\n", numerator[7621]/denominator);
-    }      
+    }
     fclose (file);
     for (i = 0; i < num_params; i++)
-    {    
+    {
         f_gradient[i] *= beta;
-    }    
+    }
     return neglogli;
 }
 
@@ -7367,45 +7367,45 @@ void compute_counts_vector_LP (char *input_file, double *total_counter)
     char pred_structure[MAXSLEN];
     char restricted[MAXSLEN];
     char buffer [5000];
-    double counter [MAXNUMPARAMS];    
+    double counter [MAXNUMPARAMS];
     FILE *file;
     double logZ;
     double energy;
     double R, temp, beta;
     R = 0.00198717;
     temp = 310.15;
-    beta = 1/(R*temp); 
-    double min_energy, max_energy;      
+    beta = 1/(R*temp);
+    double min_energy, max_energy;
     int i, actual_num_str;
     double f;
-    
+
     if ((file = fopen (input_file, "r")) == NULL)
     {
         printf ("Cannot open file %s\n", input_file);
-        exit (0);
-    }     
+        exit (1);
+    }
     int k;
     k = 0;
-    
+
     for (i = 0; i < num_params; i++)
-    {    
+    {
         total_counter[i] = 0;
-    }    
-    
-    
+    }
+
+
     while (!feof (file))
     {
-        if (!get_info_from_file (file, sequence, real_structure, restricted)) 
-            continue;    
+        if (!get_info_from_file (file, sequence, real_structure, restricted))
+            continue;
         //printf ("===\nReal:\nSeq: |%s|\nStr: |%s|\nRes: |%s|\n", sequence, real_structure, restricted);
         count_each_structure_type (sequence, real_structure, restricted, counter, f, 1);
         for (i = 0; i < num_params; i++)  total_counter[i] += counter[i];
-        // now predict the structure        
+        // now predict the structure
         simfold_restricted (sequence, restricted, pred_structure);
         //printf ("===\nPred:\nSeq: |%s|\nStr: |%s|\nRes: |%s|\n", sequence, pred_structure, restricted);
         count_each_structure_type (sequence, pred_structure, restricted, counter, f, 1);
-        for (i = 0; i < num_params; i++)  total_counter[i] -= counter[i];        
-    }      
+        for (i = 0; i < num_params; i++)  total_counter[i] -= counter[i];
+    }
 }
 
 int compute_counts_matrix_LP_helper (FILE *file)
@@ -7414,15 +7414,15 @@ int compute_counts_matrix_LP_helper (FILE *file)
     char real_structure[MAXSLEN];
     char pred_structure[MAXSLEN];
     char restricted[MAXSLEN];
-    double counter_real [MAXNUMPARAMS];    
-    double counter_pred [MAXNUMPARAMS];    
+    double counter_real [MAXNUMPARAMS];
+    double counter_pred [MAXNUMPARAMS];
     double f;
-    
-    if (!get_info_from_file (file, sequence, real_structure, restricted)) 
-        return 0;    
+
+    if (!get_info_from_file (file, sequence, real_structure, restricted))
+        return 0;
     //printf ("===\nReal:\nSeq: |%s|\nStr: |%s|\nRes: |%s|\n", sequence, real_structure, restricted);
     count_each_structure_type (sequence, real_structure, restricted, counter_real, f, 1);
-    // now predict the structure        
+    // now predict the structure
     simfold_restricted (sequence, restricted, pred_structure);
     //printf ("===\nPred:\nSeq: |%s|\nStr: |%s|\nRes: |%s|\n", sequence, pred_structure, restricted);
     count_each_structure_type (sequence, pred_structure, restricted, counter_pred, f, 1);
@@ -7432,7 +7432,7 @@ int compute_counts_matrix_LP_helper (FILE *file)
     {
         printf ("%.2lf, ", counter_real[i] - counter_pred[i]);
     }
-    printf ("%.2lf]", counter_real[num_params-1] - counter_pred[num_params-1]);  
+    printf ("%.2lf]", counter_real[num_params-1] - counter_pred[num_params-1]);
     return 1;
 }
 
@@ -7448,29 +7448,29 @@ void compute_counts_matrix_LP (char *input_file, int train_samples)
     char pred_structure[MAXSLEN];
     char restricted[MAXSLEN];
     char buffer [5000];
-    double counter_real [MAXNUMPARAMS];    
-    double counter_pred [MAXNUMPARAMS];    
+    double counter_real [MAXNUMPARAMS];
+    double counter_pred [MAXNUMPARAMS];
     FILE *file;
     double logZ;
     double energy;
     double R, temp, beta;
     R = 0.00198717;
     temp = 310.15;
-    beta = 1/(R*temp); 
-    double min_energy, max_energy;      
+    beta = 1/(R*temp);
+    double min_energy, max_energy;
     int i, actual_num_str;
-    
+
     if ((file = fopen (input_file, "r")) == NULL)
     {
         printf ("Cannot open file %s\n", input_file);
-        exit (0);
-    }     
-    
+        exit (1);
+    }
+
     int k;
     k = 0;
 
     printf ("[");
-    compute_counts_matrix_LP_helper (file);    
+    compute_counts_matrix_LP_helper (file);
     if (train_samples > 0)
     {
         for (i = 1; i < train_samples; i++)
@@ -7482,8 +7482,8 @@ void compute_counts_matrix_LP (char *input_file, int train_samples)
                 exit(1);
             }
         }
-    }            
-    else 
+    }
+    else
     {
         while (!feof (file))
         {
@@ -7493,8 +7493,8 @@ void compute_counts_matrix_LP (char *input_file, int train_samples)
                 printf ("Error in file\n");
                 exit(1);
             }
-        }        
-    }      
+        }
+    }
     printf ("]\n");
     fclose (file);
 }
@@ -7525,7 +7525,7 @@ void find_indeces_of_bbtypes (int &first, int &last, const char *bbtype, int num
               break;
             }
         }
-    }        
+    }
   if (last == -1)
     last = num_params-1;
 }
@@ -7551,43 +7551,43 @@ int generate_structure_withbb (char *sequence, char *known_structure, char *give
 //   Return the number of structures found
 //   Look for at most threshold structures
 //   num_params = total number of parameters
-//   true_fe = the estimated free energy of the true structure. 
+//   true_fe = the estimated free energy of the true structure.
 //        We consider only those structures whose energies are <= true_fe
-//   Update old_counts every time I consider a structure 
+//   Update old_counts every time I consider a structure
 {
     char *position_left, *position_right;
     char *position_left2, *position_right2;  // for tstacki
     char restricted[MAXSLEN];
-    int seqlen, i, numstr;   
+    int seqlen, i, numstr;
     int bb_index;
     double counter_other[MAXNUMPARAMS];
     double energies[MAXSUBSTR];
     double known_fe;
     int considered;
     double f;
-    
+
     seqlen = strlen(sequence);
     numstr = 0;
     bb_index = 0;
-           
+
     if (given_restricted[0] == '\0')
         known_fe = free_energy_simfold (sequence, known_structure);
-    else    
+    else
         known_fe = free_energy_simfold_restricted (sequence, known_structure, given_restricted);
     //printf ("Known fe: %.2lf\n", known_fe);
-    
+
     // first find bb_index, which is < threshold
     while (bb_index < num_params)
     {
-        position_left = strstr (sequence, bbseq_left[bb_index]);            
+        position_left = strstr (sequence, bbseq_left[bb_index]);
         if ((old_counts[bb_index] >= threshold) ||
             (strcmp (bbseq_left[bb_index], "") == 0) ||     // building block not implemented
             (strstr (string_params[bb_index], "dangle_") != NULL))    // not implemented yet
         {
-            bb_index++;            
-            continue;  
-        }            
-        //printf ("Looking for parameter %s\n", string_params[bb_index]);        
+            bb_index++;
+            continue;
+        }
+        //printf ("Looking for parameter %s\n", string_params[bb_index]);
         considered = 0;
         while (position_left != NULL && !considered)    // include only one structure having some building block, no more
         //while (position_left != NULL && old_counts[bb_index] < threshold)
@@ -7600,7 +7600,7 @@ int generate_structure_withbb (char *sequence, char *known_structure, char *give
             while (position_right != NULL && old_counts[bb_index] < threshold)
             {
                 // found a new place for my building block
-                for (i=0; i < seqlen; i++)   restricted[i] = '_'; restricted [seqlen] = '\0'; 
+                for (i=0; i < seqlen; i++)   restricted[i] = '_'; restricted [seqlen] = '\0';
                 replace_str_piece (restricted, position_left-sequence, bbstr_left[bb_index]);
                 replace_str_piece (restricted, position_right-sequence, bbstr_right[bb_index]);
                 // if it if type tstackh, then everything in between bbstr_left and bbstr_right must be "...."
@@ -7631,7 +7631,7 @@ int generate_structure_withbb (char *sequence, char *known_structure, char *give
                     {
                         bb_index2 = choose_bbtype_randomly (first, last);
                         //printf ("first=%d, last=%d, chosen = %d\n", first, last, bb_index2);
-                        if (strstr (string_params[bb_index2], "tstacki") == NULL)              
+                        if (strstr (string_params[bb_index2], "tstacki") == NULL)
                         {
                             printf ("bbtype was not chosen correctly\n");
                             exit(1);
@@ -7651,7 +7651,7 @@ int generate_structure_withbb (char *sequence, char *known_structure, char *give
                                     break;
                                 // now we should have both 1 and 2 somewhere
                                 // now make sure the distance is right
-                                if ((position_left2 - position_left == 2 && position_right - position_right2 == 2) || 
+                                if ((position_left2 - position_left == 2 && position_right - position_right2 == 2) ||
                                     (position_left2 - position_left + position_right - position_right2 > MAXLOOP))
                                     // not good, they shouldn't be 2 and 2 or longer than MAXLOOP
                                     // keep trying
@@ -7668,7 +7668,7 @@ int generate_structure_withbb (char *sequence, char *known_structure, char *give
                                 for (i=position_left - sequence + strlen (bbseq_left[bb_index]); i < position_left2-sequence; i++)
                                     restricted[i] = '.';
                                 for (i=position_right2 - sequence + strlen (bbseq_right[bb_index2]); i < position_right-sequence; i++)
-                                    restricted[i] = '.';                      
+                                    restricted[i] = '.';
                                 found = 1;
                                 break;
                             }  // end while position_right2
@@ -7677,16 +7677,16 @@ int generate_structure_withbb (char *sequence, char *known_structure, char *give
                         }  // end while position_right1
                         if (found) break;
                     }  // end for bb_index2
-                    if (!found) 
+                    if (!found)
                     {
                         position_right = strstr (position_right+1, bbseq_right[bb_index]);
                         continue;
                     }
                     //printf ("\t%s\n", restricted);
-        
+
                 } // end if tstacki
                 //printf ("\t%s\n", restricted);
-                
+
                 // now make sure restricted is compatible with given_restricted
                 if (given_restricted[0] != '\0')
                 {
@@ -7699,12 +7699,12 @@ int generate_structure_withbb (char *sequence, char *known_structure, char *give
                     else
                     {
                         //printf ("INCOMPATIBLE!\n\n");
-                        position_right = strstr (position_right+1, bbseq_right[bb_index]);                        
+                        position_right = strstr (position_right+1, bbseq_right[bb_index]);
                         continue;
                     }
-                }                
+                }
                 energies[numstr] = simfold_restricted (sequence, restricted, structures[numstr]);
-                
+
                 // test that this structure is not the same as the known_structure, turner_structure, or any other structure generated so far
                 int to_consider = 1;
                 if (strcmp (known_structure, structures[numstr]) == 0)          to_consider = 0;
@@ -7715,22 +7715,22 @@ int generate_structure_withbb (char *sequence, char *known_structure, char *give
                         if (strcmp (structures[i], structures[numstr]) == 0)
                             to_consider = 0;
                 }
-                
+
                 if (to_consider && energies[numstr] <= known_fe)    // only then consider it
-                {                                        
+                {
                     // update old_counts, by adding the new counts
-                    count_each_structure_type (sequence, structures[numstr], restricted, old_counts, f, 0);                               
+                    count_each_structure_type (sequence, structures[numstr], restricted, old_counts, f, 0);
                     numstr++;
                     considered = 1;
                     if (numstr >= MAXSUBSTR)     // I have to make it stop somewhere, just in case, otherwise it can run out of bounds
                         return numstr;
-                }    
+                }
                 position_right = strstr (position_right+1, bbseq_right[bb_index]);
             } // end while position_right
             position_left = strstr (position_left+1, bbseq_left[bb_index]);
         }    // end while position_left
         bb_index++;
-    }    
+    }
     return numstr;
 
   // stack, int11, int21, int22 are good to go - done
@@ -7749,51 +7749,51 @@ int generate_structure_withoutbb (char *sequence, char *known_structure, char *g
     char *position_left, *position_right;
     char *position_left2, *position_right2;  // for tstacki
     char restricted[MAXSLEN];
-    int seqlen, i, numstr;   
+    int seqlen, i, numstr;
     int bb_index;
     int counter_known[MAXNUMPARAMS];
     int counter_other[MAXNUMPARAMS];
     double energies[MAXSUBSTR];
-    
+
     double known_fe;
     int considered;
-    
+
     // first see which of the critical building blocks are in the known structure
     count_each_structure_type (sequence, structure_pred, counter_known, 1);
     for (i=0; i < numparams; i++)
     {
         if (counter_known[i] > 0 && old_counts[i] < threshold)
         {
-            position_left = strstr (sequence, bbseq_left[bb_index]);         
+            position_left = strstr (sequence, bbseq_left[bb_index]);
         }
     }
-    
-    
-    
-      
-    
+
+
+
+
+
     seqlen = strlen(sequence);
     numstr = 0;
     bb_index = 0;
-           
+
     if (given_restricted[0] == '\0')
         known_fe = free_energy_simfold (sequence, known_structure);
-    else    
+    else
         known_fe = free_energy_simfold_restricted (sequence, known_structure, given_restricted);
     //printf ("Known fe: %.2lf\n", known_fe);
-    
+
     // first find bb_index, which is < threshold
     while (bb_index < num_params)
     {
-        position_left = strstr (sequence, bbseq_left[bb_index]);            
+        position_left = strstr (sequence, bbseq_left[bb_index]);
         if ((old_counts[bb_index] >= threshold) ||
             (strcmp (bbseq_left[bb_index], "") == 0) ||     // building block not implemented
             (strstr (string_params[bb_index], "dangle_") != NULL))    // not implemented yet
         {
-            bb_index++;            
-            continue;  
-        }            
-        //printf ("Looking for parameter %s\n", string_params[bb_index]);        
+            bb_index++;
+            continue;
+        }
+        //printf ("Looking for parameter %s\n", string_params[bb_index]);
         considered = 0;
         while (position_left != NULL && !considered)    // include only one structure having some building block, no more
         //while (position_left != NULL && old_counts[bb_index] < threshold)
@@ -7806,7 +7806,7 @@ int generate_structure_withoutbb (char *sequence, char *known_structure, char *g
             while (position_right != NULL && old_counts[bb_index] < threshold)
             {
                 // found a new place for my building block
-                for (i=0; i < seqlen; i++)   restricted[i] = '_'; restricted [seqlen] = '\0'; 
+                for (i=0; i < seqlen; i++)   restricted[i] = '_'; restricted [seqlen] = '\0';
                 replace_str_piece (restricted, position_left-sequence, bbstr_left[bb_index]);
                 replace_str_piece (restricted, position_right-sequence, bbstr_right[bb_index]);
                 // if it if type tstackh, then everything in between bbstr_left and bbstr_right must be "...."
@@ -7837,7 +7837,7 @@ int generate_structure_withoutbb (char *sequence, char *known_structure, char *g
                     {
                         bb_index2 = choose_bbtype_randomly (first, last);
                         //printf ("first=%d, last=%d, chosen = %d\n", first, last, bb_index2);
-                        if (strstr (string_params[bb_index2], "tstacki") == NULL)              
+                        if (strstr (string_params[bb_index2], "tstacki") == NULL)
                         {
                             printf ("bbtype was not chosen correctly\n");
                             exit(1);
@@ -7857,7 +7857,7 @@ int generate_structure_withoutbb (char *sequence, char *known_structure, char *g
                                     break;
                                 // now we should have both 1 and 2 somewhere
                                 // now make sure the distance is right
-                                if ((position_left2 - position_left == 2 && position_right - position_right2 == 2) || 
+                                if ((position_left2 - position_left == 2 && position_right - position_right2 == 2) ||
                                     (position_left2 - position_left + position_right - position_right2 > MAXLOOP))
                                     // not good, they shouldn't be 2 and 2 or longer than MAXLOOP
                                     // keep trying
@@ -7874,7 +7874,7 @@ int generate_structure_withoutbb (char *sequence, char *known_structure, char *g
                                 for (i=position_left - sequence + strlen (bbseq_left[bb_index]); i < position_left2-sequence; i++)
                                     restricted[i] = '.';
                                 for (i=position_right2 - sequence + strlen (bbseq_right[bb_index2]); i < position_right-sequence; i++)
-                                    restricted[i] = '.';                      
+                                    restricted[i] = '.';
                                 found = 1;
                                 break;
                             }  // end while position_right2
@@ -7883,16 +7883,16 @@ int generate_structure_withoutbb (char *sequence, char *known_structure, char *g
                         }  // end while position_right1
                         if (found) break;
                     }  // end for bb_index2
-                    if (!found) 
+                    if (!found)
                     {
                         position_right = strstr (position_right+1, bbseq_right[bb_index]);
                         continue;
                     }
                     //printf ("\t%s\n", restricted);
-        
+
                 } // end if tstacki
                 //printf ("\t%s\n", restricted);
-                
+
                 // now make sure restricted is compatible with given_restricted
                 if (given_restricted[0] != '\0')
                 {
@@ -7905,12 +7905,12 @@ int generate_structure_withoutbb (char *sequence, char *known_structure, char *g
                     else
                     {
                         //printf ("INCOMPATIBLE!\n\n");
-                        position_right = strstr (position_right+1, bbseq_right[bb_index]);                        
+                        position_right = strstr (position_right+1, bbseq_right[bb_index]);
                         continue;
                     }
-                }                
+                }
                 energies[numstr] = simfold_restricted (sequence, restricted, structures[numstr]);
-                
+
                 // test that this structure is not the same as the known_structure, turner_structure, or any other structure generated so far
                 int to_consider = 1;
                 if (strcmp (known_structure, structures[numstr]) == 0)          to_consider = 0;
@@ -7921,22 +7921,22 @@ int generate_structure_withoutbb (char *sequence, char *known_structure, char *g
                         if (strcmp (structures[i], structures[numstr]) == 0)
                             to_consider = 0;
                 }
-                
+
                 if (to_consider && energies[numstr] <= known_fe)    // only then consider it
-                {                                        
+                {
                     // update old_counts, by adding the new counts
-                    count_each_structure_type (sequence, structures[numstr], old_counts, 0);                               
+                    count_each_structure_type (sequence, structures[numstr], old_counts, 0);
                     numstr++;
                     considered = 1;
                     if (numstr >= MAXSUBSTR)     // I have to make it stop somewhere, just in case, otherwise it can run out of bounds
                         return numstr;
-                }    
+                }
                 position_right = strstr (position_right+1, bbseq_right[bb_index]);
             } // end while position_right
             position_left = strstr (position_left+1, bbseq_left[bb_index]);
         }    // end while position_left
         bb_index++;
-    }    
+    }
     return numstr;
 
   // stack, int11, int21, int22 are good to go - done
@@ -7968,15 +7968,15 @@ int restricted_compatible (char *given_restricted, char *restricted)
             {
                 compatible = 0;
                 break;
-            }    
-        }    
+            }
+        }
         else if (p_table[i] >= 0)
         {
             if (given_p_table[i] >= 0 && given_p_table[i] != p_table[i])
             {
                 compatible = 0;
                 break;
-            }            
+            }
         }
     }
     if (compatible)
@@ -7987,7 +7987,7 @@ int restricted_compatible (char *given_restricted, char *restricted)
                 restricted[i] = given_restricted[i];
         }
     }
-    
+
     return compatible;
 }
 
@@ -8001,36 +8001,36 @@ int generate_structure_withbb_many_thresholds (char *sequence, char structures[]
 //   Return the number of structures found
 //   Look for at most threshold structures
 //   num_params = total number of parameters
-//   true_fe = the estimated free energy of the true structure. 
+//   true_fe = the estimated free energy of the true structure.
 //        We consider only those structures whose energies are <= true_fe
-//   Update old_counts every time I consider a structure 
+//   Update old_counts every time I consider a structure
 
 // many_thresholds is a threshold per parameter (INF of no threshols wanted)
 {
     char *position_left, *position_right;
     char *position_left2, *position_right2;  // for tstacki
     char restricted[MAXSLEN];
-    int seqlen, i, numstr;   
+    int seqlen, i, numstr;
     int bb_index;
     double counter_other[MAXNUMPARAMS];
     double f;
-    
+
     seqlen = strlen(sequence);
     numstr = 0;
     bb_index = 0;
-    
+
     // first find bb_index, which is < threshold
     while (bb_index < num_params)
-    {        
-        position_left = strstr (sequence, bbseq_left[bb_index]);            
+    {
+        position_left = strstr (sequence, bbseq_left[bb_index]);
         if ((many_thresholds[bb_index] >= INF) ||
             (old_counts[bb_index] >= many_thresholds[bb_index]) ||
             (strcmp (bbseq_left[bb_index], "") == 0) ||     // building block not implemented
             (strstr (string_params[bb_index], "dangle_") != NULL))    // not implemented yet
         {
-            bb_index++;            
-            continue;  
-        }            
+            bb_index++;
+            continue;
+        }
         while (position_left != NULL && old_counts[bb_index] < many_thresholds[bb_index])
         {
             position_right = position_left + strlen (bbseq_left[bb_index])+TURN;  //?
@@ -8041,7 +8041,7 @@ int generate_structure_withbb_many_thresholds (char *sequence, char structures[]
             while (position_right != NULL && old_counts[bb_index] < many_thresholds[bb_index])
             {
                 // found a new place for my building block
-                for (i=0; i < seqlen; i++)   restricted[i] = '_'; restricted [seqlen] = '\0'; 
+                for (i=0; i < seqlen; i++)   restricted[i] = '_'; restricted [seqlen] = '\0';
                 replace_str_piece (restricted, position_left-sequence, bbstr_left[bb_index]);
                 replace_str_piece (restricted, position_right-sequence, bbstr_right[bb_index]);
                 // if it if type tstackh, then everything in between bbstr_left and bbstr_right must be "...."
@@ -8072,7 +8072,7 @@ int generate_structure_withbb_many_thresholds (char *sequence, char structures[]
                     {
                         bb_index2 = choose_bbtype_randomly (first, last);
                         //printf ("first=%d, last=%d, chosen = %d\n", first, last, bb_index2);
-                        if (strstr (string_params[bb_index2], "tstacki") == NULL)              
+                        if (strstr (string_params[bb_index2], "tstacki") == NULL)
                         {
                             printf ("bbtype was not chosen correctly\n");
                             exit(1);
@@ -8090,7 +8090,7 @@ int generate_structure_withbb_many_thresholds (char *sequence, char structures[]
                                     break;
                                 // now we should have both 1 and 2 somewhere
                                 // now make sure the distance is right
-                                if ((position_left2 - position_left == 2 && position_right - position_right2 == 2) || 
+                                if ((position_left2 - position_left == 2 && position_right - position_right2 == 2) ||
                                     (position_left2 - position_left + position_right - position_right2 > MAXLOOP))
                                     // not good, they shouldn't be 2 and 2 or longer than MAXLOOP
                                     // keep trying
@@ -8107,7 +8107,7 @@ int generate_structure_withbb_many_thresholds (char *sequence, char structures[]
                                 for (i=position_left - sequence + strlen (bbseq_left[bb_index]); i < position_left2-sequence; i++)
                                     restricted[i] = '.';
                                 for (i=position_right2 - sequence + strlen (bbseq_right[bb_index2]); i < position_right-sequence; i++)
-                                    restricted[i] = '.';                      
+                                    restricted[i] = '.';
                                 found = 1;
                                 break;
                             }  // end while position_right2
@@ -8116,30 +8116,30 @@ int generate_structure_withbb_many_thresholds (char *sequence, char structures[]
                         }  // end while position_right1
                         if (found) break;
                     }  // end for bb_index2
-                    if (!found) 
+                    if (!found)
                     {
                         position_right = strstr (position_right+1, bbseq_right[bb_index]);
                         continue;
                     }
                     //printf ("\t%s\n", restricted);
-        
+
                 } // end if tstacki
                 //printf ("\t%s\n", restricted);
                 energies[numstr] = simfold_restricted (sequence, restricted, structures[numstr]);
                 if (energies[numstr] <= true_fe)    // only then consider it
-                {                    
+                {
                     // update old_counts, by adding the new counts
                     count_each_structure_type (sequence, structures[numstr], restricted, old_counts, f, 0);
                     numstr++;
                     if (numstr >= MAXSUBSTR)     // I have to make it stop somewhere, just in case, otherwise it can run out of bounds
                         return numstr;
-                }    
+                }
                 position_right = strstr (position_right+1, bbseq_right[bb_index]);
             } // end while position_right
             position_left = strstr (position_left+1, bbseq_left[bb_index]);
         }    // end while position_left
         bb_index++;
-    }    
+    }
     return numstr;
 
   // stack, int11, int21, int22 are good to go - done
@@ -8160,31 +8160,31 @@ void search_bb (char *sequence, double *old_counts, int threshold, int num_param
 //   Return the number of structures found
 //   Look for at most threshold structures
 //   num_params = total number of parameters
-//   true_fe = the estimated free energy of the true structure. 
+//   true_fe = the estimated free energy of the true structure.
 //        We consider only those structures whose energies are <= true_fe
-//   Update old_counts every time I consider a structure 
+//   Update old_counts every time I consider a structure
 {
     char *position_left, *position_right;
     char *position_left2, *position_right2;  // for tstacki
     char restricted[MAXSLEN];
-    int seqlen, i, numstr;   
+    int seqlen, i, numstr;
     int bb_index;
     double counter_other[MAXNUMPARAMS];
-    
+
     seqlen = strlen(sequence);
     numstr = 0;
     bb_index = 0;
-    
-    // first find bb_index, which is < threshold    
+
+    // first find bb_index, which is < threshold
     while (bb_index < num_params)
     {
-        position_left = strstr (sequence, bbseq_left[bb_index]);        
+        position_left = strstr (sequence, bbseq_left[bb_index]);
         if ((strcmp (bbseq_left[bb_index], "") == 0) ||     // building block not implemented
             (strstr (string_params[bb_index], "dangle_") != NULL))    // not implemented yet
         {
             bb_index++;
-            continue;  
-        }            
+            continue;
+        }
         while (position_left != NULL)
         {
             position_right = position_left + strlen (bbseq_left[bb_index])+TURN;  //?
@@ -8195,7 +8195,7 @@ void search_bb (char *sequence, double *old_counts, int threshold, int num_param
             while (position_right != NULL)
             {
                 // found a new place for my building block
-                for (i=0; i < seqlen; i++)   restricted[i] = '_'; restricted [seqlen] = '\0'; 
+                for (i=0; i < seqlen; i++)   restricted[i] = '_'; restricted [seqlen] = '\0';
                 replace_str_piece (restricted, position_left-sequence, bbstr_left[bb_index]);
                 replace_str_piece (restricted, position_right-sequence, bbstr_right[bb_index]);
                 // if it if type tstackh, then everything in between bbstr_left and bbstr_right must be "...."
@@ -8226,7 +8226,7 @@ void search_bb (char *sequence, double *old_counts, int threshold, int num_param
                     {
                         bb_index2 = choose_bbtype_randomly (first, last);
                         //printf ("first=%d, last=%d, chosen = %d\n", first, last, bb_index2);
-                        if (strstr (string_params[bb_index2], "tstacki") == NULL)              
+                        if (strstr (string_params[bb_index2], "tstacki") == NULL)
                         {
                             printf ("bbtype was not chosen correctly\n");
                             exit(1);
@@ -8244,7 +8244,7 @@ void search_bb (char *sequence, double *old_counts, int threshold, int num_param
                                     break;
                                 // now we should have both 1 and 2 somewhere
                                 // now make sure the distance is right
-                                if ((position_left2 - position_left == 2 && position_right - position_right2 == 2) || 
+                                if ((position_left2 - position_left == 2 && position_right - position_right2 == 2) ||
                                     (position_left2 - position_left + position_right - position_right2 > MAXLOOP))
                                     // not good, they shouldn't be 2 and 2 or longer than MAXLOOP
                                     // keep trying
@@ -8261,7 +8261,7 @@ void search_bb (char *sequence, double *old_counts, int threshold, int num_param
                                 for (i=position_left - sequence + strlen (bbseq_left[bb_index]); i < position_left2-sequence; i++)
                                     restricted[i] = '.';
                                 for (i=position_right2 - sequence + strlen (bbseq_right[bb_index2]); i < position_right-sequence; i++)
-                                    restricted[i] = '.';                      
+                                    restricted[i] = '.';
                                 found = 1;
                                 break;
                             }  // end while position_right2
@@ -8270,13 +8270,13 @@ void search_bb (char *sequence, double *old_counts, int threshold, int num_param
                         }  // end while position_right1
                         if (found) break;
                     }  // end for bb_index2
-                    if (!found) 
+                    if (!found)
                     {
                         position_right = strstr (position_right+1, bbseq_right[bb_index]);
                         continue;
                     }
                     //printf ("\t%s\n", restricted);
-        
+
                 } // end if tstacki
                 old_counts[bb_index]++;
                 position_right = strstr (position_right+1, bbseq_right[bb_index]);
@@ -8284,7 +8284,7 @@ void search_bb (char *sequence, double *old_counts, int threshold, int num_param
             position_left = strstr (position_left+1, bbseq_left[bb_index]);
         }    // end while position_left
         bb_index++;
-    }    
+    }
 
   // stack, int11, int21, int22 are good to go - done
   // tstackh: everything in between bbstr_left and bbstr_right must be "...." - done
@@ -8297,7 +8297,7 @@ void search_bb (char *sequence, double *old_counts, int threshold, int num_param
 /*
 void fill_data_structures_with_new_parameters_fixed_dangles (const char *filename, char *dangfilename)
 // reads all params from filename, except the dangling parameters, which reads from a different file
-// assumes the fm363 model  
+// assumes the fm363 model
 
   // Mirela: Ian 11, 2007
   // reads parameters from a file, and writes them in the internal data structures
@@ -8321,13 +8321,13 @@ void fill_data_structures_with_new_parameters_fixed_dangles (const char *filenam
                             int11[i][j][k][l][m][n] = INF;
                         }
 
-    
+
     //printf ("FILENAME: %s\n", filename);
     if ((file = fopen (filename, "r")) == NULL)
     {
         giveup ("Cannot open file", filename);
     }
-    
+
     index = 0;
     for (i=0; i < NUCL; i++)
         for (j=0; j < NUCL; j++)
@@ -8380,7 +8380,7 @@ void fill_data_structures_with_new_parameters_fixed_dangles (const char *filenam
     sscanf (buffer, "%lf", &param);
     param *= 100;
     misc.internal_AU_closure = (int)(round(param));
-    
+
     fgets (buffer, sizeof(buffer), file);
     line++;
     sscanf (buffer, "%lf", &param);
@@ -8392,9 +8392,9 @@ void fill_data_structures_with_new_parameters_fixed_dangles (const char *filenam
     sscanf (buffer, "%lf", &param);
     param *= 100;
     misc.internal_UU_mismatch = (int)(round(param));
-    
+
     // fill the tstacki data structure a bit later, after we read AU_penalty
-    
+
     if (!simple_internal_energy)
     {
         // do the few int 11 params: only those enclosed by CG and CG (any order), + 2 more params
@@ -8432,7 +8432,7 @@ void fill_data_structures_with_new_parameters_fixed_dangles (const char *filenam
         sscanf (buffer, "%lf", &param);
         param *= 100;
         misc.internal11_basic_mismatch = (int)(round(param));
-        
+
         fgets (buffer, sizeof(buffer), file);
         sscanf (buffer, "%lf", &param);
         param *= 100;
@@ -8460,7 +8460,7 @@ void fill_data_structures_with_new_parameters_fixed_dangles (const char *filenam
                                                 //int11[n][m][l][k][j][i] = misc.internal11_basic_mismatch;
                                             }
                                         }
-                                        
+
                                         else
                                         {
                                             if (!(watson_crick(i,j) && watson_crick(m,n) && k==U && l==U))
@@ -8479,13 +8479,13 @@ void fill_data_structures_with_new_parameters_fixed_dangles (const char *filenam
                                                     int11[i][j][k][l][m][n] += misc.internal_AU_closure;
                                             }
                                         }
-                                        
+
                                         // round it to match Turner parameters
                                         //if (int11[i][j][k][l][m][n] % 10 == 5) int11[i][j][k][l][m][n] += 5;
                                         //if (int11[i][j][k][l][m][n] % 10 == -5) int11[i][j][k][l][m][n] += 5;
                                     }
-                }                                
-                           
+                }
+
         // go with few int21 parameters, as in Mathews et al 1999
         // closed by CG
         i=C; j=G; m=C; n=G;
@@ -8501,7 +8501,7 @@ void fill_data_structures_with_new_parameters_fixed_dangles (const char *filenam
                             param *= 100;
                             int21[i][j][k][l][m][n][o] = (int)(round(param));
                         }
-        // closed by GC                        
+        // closed by GC
         i=G; j=C; m=G; n=C;
         for (k=0; k < NUCL; k++)
             for (l=0; l < NUCL; l++)
@@ -8523,7 +8523,7 @@ void fill_data_structures_with_new_parameters_fixed_dangles (const char *filenam
         sscanf (buffer, "%lf", &param);
         param *= 100;
         misc.internal21_AU_closure = (int)(round(param));
-       
+
         // fill the int21 data structure
         for (i=0; i < NUCL; i++)
             for (j=0; j < NUCL; j++)
@@ -8553,14 +8553,14 @@ void fill_data_structures_with_new_parameters_fixed_dangles (const char *filenam
                                                                                  (int)(int21[G][C][k][l][G][C][o]/2);
                                                 if (has_AU_penalty(i,j))
                                                     int21[i][j][k][l][m][n][o] += misc.internal21_AU_closure;
-                                                if (has_AU_penalty(m,n))    
+                                                if (has_AU_penalty(m,n))
                                                     int21[i][j][k][l][m][n][o] += misc.internal21_AU_closure;
                                             }
                                             // round it to match Turner parameters - seems to be inconsistent
                                             //if (int21[i][j][k][l][m][n][o] % 10 == 5) int21[i][j][k][l][m][n][o] += 5;
                                         }
                                     }
-                }                                
+                }
         // go with the 53 parameters, like in Mathews et al 1999
         for (i=0; i < NUCL; i++)
             for (j=0; j < NUCL; j++)
@@ -8595,18 +8595,18 @@ void fill_data_structures_with_new_parameters_fixed_dangles (const char *filenam
         fgets (buffer, sizeof(buffer), file);
         sscanf (buffer, "%lf", &param);
         param *= 100;
-        misc.internal22_delta_same_size = (int)(round(param));                
-        
+        misc.internal22_delta_same_size = (int)(round(param));
+
         fgets (buffer, sizeof(buffer), file);
         sscanf (buffer, "%lf", &param);
         param *= 100;
-        misc.internal22_delta_different_size = (int)(round(param));                
-        
+        misc.internal22_delta_different_size = (int)(round(param));
+
         fgets (buffer, sizeof(buffer), file);
         sscanf (buffer, "%lf", &param);
         param *= 100;
-        misc.internal22_delta_1stable_1unstable = (int)(round(param));                
-        
+        misc.internal22_delta_1stable_1unstable = (int)(round(param));
+
         fgets (buffer, sizeof(buffer), file);
         sscanf (buffer, "%lf", &param);
         param *= 100;
@@ -8632,7 +8632,7 @@ void fill_data_structures_with_new_parameters_fixed_dangles (const char *filenam
                                         for(o=0; o < NUCL; o++)
                                             for (p=0; p < NUCL; p++)
                                             {
-                                                
+
 //                                                 if (i==C && j==G && m==C && n==G)
 //                                                 {
 //                                                     if(watson_crick(k,l) || watson_crick(o,p))
@@ -8640,14 +8640,14 @@ void fill_data_structures_with_new_parameters_fixed_dangles (const char *filenam
 //                                                         int22[i][j][k][l][m][n][o][p] = misc.internal22_match;
 //                                                     }
 //                                                     // else do nothing, it's parameter
-//                                                 } 
+//                                                 }
                                                 // if a closing pair is wobble, it's the same as if G would be A
                                                 if (i==G && j==U)   ii = A;     else ii = i;
                                                 if (i==U && j==G)   jj = A;     else jj = j;
                                                 if (m==G && n==U)   mm = A;     else mm = m;
                                                 if (m==U && n==G)   nn = A;     else nn = n;
 
-                                                
+
                                                 if (watson_crick(k,l) || watson_crick(o,p))
                                                 {
                                                     int22[i][j][k][l][m][n][o][p] = misc.internal22_match;
@@ -8671,13 +8671,13 @@ void fill_data_structures_with_new_parameters_fixed_dangles (const char *filenam
                                                         case 2: int22[i][j][k][l][m][n][o][p] += misc.internal22_delta_different_size; break;
                                                         case 3: int22[i][j][k][l][m][n][o][p] += misc.internal22_delta_1stable_1unstable; break;
                                                         case 4: int22[i][j][k][l][m][n][o][p] += misc.internal22_delta_AC; break;
-                                                        default: printf ("ERROR: result %d for k=%d, l=%d, o=%d, p=%d, ABORT!\n", result, k, l, o, p); exit(1);                                                
-                                                    }                                                
-                                                }                                        
+                                                        default: printf ("ERROR: result %d for k=%d, l=%d, o=%d, p=%d, ABORT!\n", result, k, l, o, p); exit(1);
+                                                    }
+                                                }
                                             }
                                     }
-                }                                
-                        
+                }
+
     }     // end if (!simple_internal_energy)
 
     // now get the dangling ends from a different file
@@ -8687,7 +8687,7 @@ void fill_data_structures_with_new_parameters_fixed_dangles (const char *filenam
     {
         giveup ("Cannot open file", dangfilename);
     }
-                                    
+
     for (i=0; i < NUCL; i++)
         for (j=0; j < NUCL; j++)
             for (k=0; k < NUCL; k++)
@@ -8723,14 +8723,14 @@ void fill_data_structures_with_new_parameters_fixed_dangles (const char *filenam
                 }
             }
     fclose(dangfile);
-    // **********************************************************************************************************            
+    // **********************************************************************************************************
 
-            
-    int start;        
+
+    int start;
     if (!simple_internal_energy)
         start = 4;
     else
-        start = 1;                
+        start = 1;
     for (i=start; i <= MAXLOOP_I; i++)
         {
         if (internal_penalty_by_size[i] < INF)
@@ -8752,7 +8752,7 @@ void fill_data_structures_with_new_parameters_fixed_dangles (const char *filenam
             {
             // no duplicates here
             fgets (buffer, sizeof(buffer), file);
-            sscanf (buffer, "%lf", &param);    
+            sscanf (buffer, "%lf", &param);
             // if (param != 0)    // put Turner's parameters if it's 0, but I can do this in the learn.pl file
                 {
                 param *= 100;
@@ -8779,10 +8779,10 @@ void fill_data_structures_with_new_parameters_fixed_dangles (const char *filenam
     //fgets (buffer, sizeof(buffer), file); sscanf (buffer, "%lf", &param); param *= 100;
     // if (param != 0)      // put Turner's parameters if it's 0, but I can do this in the learn.pl file
     //    misc.param_greater30 = (int)(round(param));
-    
+
     // set a fixed value to param_greater_30 for now
     misc.param_greater30 = 1.079;
-    
+
     //sprintf (string_params[index++], "misc.param_greater30");
     fgets (buffer, sizeof(buffer), file); sscanf (buffer, "%lf", &param); param *= 100;
     // if (param != 0)      // put Turner's parameters if it's 0, but I can do this in the learn.pl file
@@ -8813,7 +8813,7 @@ void fill_data_structures_with_new_parameters_fixed_dangles (const char *filenam
                 {
                     if (!can_pair (i, j))
                         tstacki[i][j][k][l] = INF;
-                    else    
+                    else
                     {
                         tstacki[i][j][k][l] = 0;
                         if (((i == A || i == G) && j == U) ||
@@ -8833,18 +8833,18 @@ void fill_data_structures_with_new_parameters_fixed_dangles (const char *filenam
                     }
                 }
 
-    
+
     // TODO
-    // keep them fixed for now    
+    // keep them fixed for now
     //fgets (buffer, sizeof(buffer), file); fgets (buffer, sizeof(buffer), file);
-    //fgets (buffer, sizeof(buffer), file); 
+    //fgets (buffer, sizeof(buffer), file);
     // sprintf (string_params[index++], "misc.asymmetry_penalty_max_correction");
     // sprintf (string_params[index++], "misc.asymmetry_penalty_array[0]");
     // sprintf (string_params[index++], "misc.asymmetry_penalty_array[1]");
     // sprintf (string_params[index++], "misc.asymmetry_penalty_array[2]");
     // sprintf (string_params[index++], "misc.asymmetry_penalty_array[3]");
     // Instead of these, I will just store the asymmetry for 0.5, 1, 1.5, 2, 2.5 and 3.
-    
+
     // to come back!!!
     //fgets (buffer, sizeof(buffer), file); fgets (buffer, sizeof(buffer), file);
     //fgets (buffer, sizeof(buffer), file); fgets (buffer, sizeof(buffer), file);
@@ -8855,12 +8855,12 @@ void fill_data_structures_with_new_parameters_fixed_dangles (const char *filenam
     //sprintf (string_params[index++], "misc.asymmetry_penalty[4]");
     //sprintf (string_params[index++], "misc.asymmetry_penalty[5]");
     //sprintf (string_params[index++], "misc.asymmetry_penalty[6]");
-    
+
     //fgets (buffer, sizeof(buffer), file);
     //sprintf (string_params[index++], "misc.gail_rule");
-    // keep this fixed 
+    // keep this fixed
     misc.gail_rule = 1;
-    
+
     fgets (buffer, sizeof(buffer), file); sscanf (buffer, "%lf", &param); param *= 100;
     // if (param != 0)      // put Turner's parameters if it's 0, but I can do this in the learn.pl file
         misc.multi_offset = (int)(round(param));
@@ -8877,7 +8877,7 @@ void fill_data_structures_with_new_parameters_fixed_dangles (const char *filenam
     // if (param != 0)      // put Turner's parameters if it's 0, but I can do this in the learn.pl file
         misc.intermolecular_initiation = (int)(round(param));
     //sprintf (string_params[index++], "misc.intermolecular_initiation");
-    
+
     for(i=0; i < nb_triloops; i++)
         {
         fgets (buffer, sizeof(buffer), file); sscanf (buffer, "%lf", &param); param *= 100;
@@ -8885,7 +8885,7 @@ void fill_data_structures_with_new_parameters_fixed_dangles (const char *filenam
             triloop[i].energy = (int)(round(param));
         //sprintf (string_params[index++], "triloop[%d].energy", i);
         }
-    
+
     for(i=0; i < nb_tloops; i++)
         {
         fgets (buffer, sizeof(buffer), file); sscanf (buffer, "%lf", &param); param *= 100;
@@ -8893,7 +8893,7 @@ void fill_data_structures_with_new_parameters_fixed_dangles (const char *filenam
             tloop[i].energy = (int)(round(param));
         //sprintf (string_params[index++], "tloop[%d].energy", i);
         }
-    
+
     fclose (file);
     //printf ("****** stack[1][2][0][3] = %d\n", stack[1][2][0][3]);
 }
@@ -8984,7 +8984,7 @@ void print_parameters_in_almost_mfold_format ()
                 else
                     printf ("   .   ");
 
-            }            
+            }
         }
         printf ("\n");
     }
@@ -9000,7 +9000,7 @@ void print_parameters_in_almost_mfold_format ()
                 else
                     printf ("   .   ");
 
-            }            
+            }
         }
         printf ("\n");
     }
@@ -9050,7 +9050,7 @@ void print_parameters_in_almost_mfold_format ()
     printf ("#-------------------------------\n");
     printf ("#Parameters for int22.dat\n");
     for (index=0; index < 6; index++)
-    {                
+    {
         for (indexp=0; indexp < 6; indexp++)
         {
             printf ("#3'-%c**%c-5'/5'-%c**%c-3'\n", int_to_nuc (oi[index]), int_to_nuc (oi[indexp]), int_to_nuc (oj[index]), int_to_nuc(oj[indexp]));
@@ -9094,7 +9094,7 @@ void print_parameters_in_almost_mfold_format ()
             printf ("%15.2lf", hairpin_penalty_by_size[i]/100.0);
         else
             printf ("            .  ");
-        printf ("\n");    
+        printf ("\n");
     }
 
     printf ("#-------------------------------\n");
@@ -9144,7 +9144,7 @@ void print_parameters_in_almost_mfold_format ()
     printf ("\n");
     printf ("c hairpin slope\n");
     printf ("--> \n");
-    printf ("%.2lf\n", misc.hairpin_c1/100.0); 
+    printf ("%.2lf\n", misc.hairpin_c1/100.0);
     printf ("\n");
     printf ("c hairpin intercept\n");
     printf ("--> \n");
@@ -9181,7 +9181,7 @@ void print_parameters_in_almost_mfold_format ()
 
 /*---------------------------------------------------------------*/
 
-void print_parameters_in_ViennaRNA_format () 
+void print_parameters_in_ViennaRNA_format ()
 // writes the parameters in Vienna RNA format, on the screen
 // this function is somewhat similar to the function write_parameter_file from the Vienna RNA library
 // see format documentation at http://www.tbi.univie.ac.at/~ivo/RNA/RNAlib/Param-Files.html
@@ -9200,38 +9200,38 @@ void print_parameters_in_ViennaRNA_format ()
     const char *pnames[] = {"CG", "GC", "GU", "UG", "AU", "UA", " @"};
     char bnames[] = "@ACGU";
 
-    
+
     printf ("## RNAfold parameter file\n");
-  
-    
+
+
     // FIRST BLOCK, stack energies
     printf ("\n# stack_energies\n");
-    printf ("/*  CG    GC    GU    UG    AU    UA    @  */\n");    
+    printf ("/*  CG    GC    GU    UG    AU    UA    @  */\n");
     for (i=0; i < num_base_pairs; i++)
     {
         printf (" ");
         for (j=0; j < num_base_pairs; j++)
         {
-            printf ("%6d", (int)round(stack[base1[j]][base2[j]][base2[i]][base1[i]]));    
+            printf ("%6d", (int)round(stack[base1[j]][base2[j]][base2[i]][base1[i]]));
             // each pair is from 5' to 3'
-        } 
+        }
         printf (" NST\n");
     }
     printf ("    NST   NST   NST   NST   NST   NST NST\n");
-    
-    
-    // NEXT BLOCK is tstackh  
+
+
+    // NEXT BLOCK is tstackh
     printf ("\n# mismatch_hairpin\n");
     for (i=0; i < num_base_pairs; i++)
     {
         printf ("     0     0     0     0     0\n");    //other base and other base as unpaired bases
         for (j=0; j < NUCL; j++)
-        {            
+        {
             // other base and A C G or U
             // for CG and GC, the Vienna RNA file give -90 and -70. Leave the same.
             if (i==0)        printf ("   -90");
             else if (i==1)   printf ("   -70");
-            else             printf ("     0");            
+            else             printf ("     0");
             for (k=0; k < NUCL; k++)
             {
                 printf ("%6d", (int)round(tstackh[base1[i]][base2[i]][j][k]));
@@ -9241,17 +9241,17 @@ void print_parameters_in_ViennaRNA_format ()
     }
     for (i=0; i < NUCL+1; i++)    // the last block of zeros for nonstandard base pair
         printf ("     0     0     0     0     0\n");
-        
-        
-    // NEXT BLOCK is tstacki    
+
+
+    // NEXT BLOCK is tstacki
     printf ("\n# mismatch_interior\n");
     for (i=0; i < num_base_pairs; i++)
     {
         printf ("     0     0     0     0     0\n");    //other base and other base as unpaired bases
         for (j=0; j < NUCL; j++)
-        {            
-            // other base and A C G or U            
-            printf ("     0");            
+        {
+            // other base and A C G or U
+            printf ("     0");
             for (k=0; k < NUCL; k++)
             {
                 printf ("%6d", (int)round(tstacki[base1[i]][base2[i]][j][k]));
@@ -9265,46 +9265,46 @@ void print_parameters_in_ViennaRNA_format ()
     printf ("    90    90    90    90    90\n");
     printf ("    90   -20    90    90    90\n");
     printf ("    90    90    90    90    20\n");
-    
-    
+
+
     // NEXT BLOCK is dangle5, i.e. dangle_bot
     printf ("\n# dangle5\n");
     printf ("/*  @     A     C     G     U   */\n");
     printf ("   INF   INF   INF   INF   INF\n");
     for (i=0; i < num_base_pairs; i++)
     {
-        // other base and A C G or U            
-        printf ("   INF");                
+        // other base and A C G or U
+        printf ("   INF");
         for (j=0; j < NUCL; j++)
-        {                        
+        {
             // this is read upside down - base2 first and then base1
             printf ("%6d", (int)round(dangle_bot[base2[i]][base1[i]][j]));
         }
         printf ("\n");
     }
     printf ("     0     0     0     0     0\n");
-    
-    
+
+
     // NEXT BLOCK is dangle3, i.e. dangle_top
     printf ("\n# dangle3\n");
     printf ("/*  @     A     C     G     U   */\n");
     printf ("   INF   INF   INF   INF   INF\n");
     for (i=0; i < num_base_pairs; i++)
     {
-        // other base and A C G or U            
-        printf ("   INF");                
+        // other base and A C G or U
+        printf ("   INF");
         for (j=0; j < NUCL; j++)
-        {   
-            // this is read upside down - base2 first and then base1                     
+        {
+            // this is read upside down - base2 first and then base1
             printf ("%6d", (int)round(dangle_top[base2[i]][base1[i]][j]));
         }
         printf ("\n");
     }
     printf ("     0     0     0     0     0\n");
-    
-    
+
+
     // NEXT BLOCK is int11
-    // don't print "no pair" entries for interior loop arrays 
+    // don't print "no pair" entries for interior loop arrays
     // But first get the maximum values, to be used for the non-standard values
     int ns_CG = -INF;
     int ns_AU = -INF;
@@ -9313,7 +9313,7 @@ void print_parameters_in_ViennaRNA_format ()
         for (j=0; j < num_base_pairs; j++)
         {
             for (k=1; k <= NUCL; k++)
-            {             
+            {
                 for (l=1; l <= NUCL; l++)
                 {
                     if (i==0 || i==1 || j==0 || j==1)
@@ -9327,45 +9327,45 @@ void print_parameters_in_ViennaRNA_format ()
                             ns_AU = (int)round(int11[base1[i]][base2[i]][k-1][l-1][base2[j]][base1[j]]);
                     }
                 }
-            }            
+            }
         }
-    }    
+    }
 
     //printf ("ns_AU = %d\n", ns_AU);
-    //printf ("ns_CG = %d\n", ns_CG);    
-        
+    //printf ("ns_CG = %d\n", ns_CG);
+
     printf ("\n# int11_energies\n");
     for (i=0; i <= num_base_pairs; i++)
     {
         for (j=0; j <= num_base_pairs; j++)
         {
-            printf ("/* %2s..%2s */\n", pnames[i], pnames[j]); 
+            printf ("/* %2s..%2s */\n", pnames[i], pnames[j]);
             // looks like in the original file these headers are switched, although the values seem to be correct
-            
-            // for the non-standard base pairs or bases, it looks like in the original file there's 110 
+
+            // for the non-standard base pairs or bases, it looks like in the original file there's 110
             //    if at least one of the base pairs is C-G, and 170 otherwise.
             // I think the rule is to put the maximum instead, computed above.
             for (k=0; k <= NUCL; k++)
-            {             
+            {
                 for (l=0; l <= NUCL; l++)
                 {
                     if (i==num_base_pairs || j==num_base_pairs || k==0 || l==0)
                     {
                         if (i==0 || i==1 || j==0 || j==1)
-                            printf ("%6d", ns_CG);   
-                        else             
-                            printf ("%6d", ns_AU);                          
+                            printf ("%6d", ns_CG);
+                        else
+                            printf ("%6d", ns_AU);
                     }
                     else
                         printf ("%6d", (int)round(int11[base1[i]][base2[i]][k-1][l-1][base2[j]][base1[j]]));
                 }
                 printf ("\n");
             }
-            
+
         }
-    }    
-    
-    // NEXT BLOCK is int21    
+    }
+
+    // NEXT BLOCK is int21
     // first get the maximum values, to be used for the non-standard values
     int ns = -INF;
     for (i=0; i < num_base_pairs; i++)
@@ -9373,7 +9373,7 @@ void print_parameters_in_ViennaRNA_format ()
         for (j=0; j < num_base_pairs; j++)
         {
             for (k=1; k <= NUCL; k++)
-            {             
+            {
                 for (l=1; l <= NUCL; l++)
                 {
                     for (m=1; m <= NUCL; m++)
@@ -9382,10 +9382,10 @@ void print_parameters_in_ViennaRNA_format ()
                             ns = (int)round(int21[base1[i]][base2[i]][k-1][m-1][base2[j]][base1[j]][l-1]);
                     }
                 }
-            }            
+            }
         }
-    }    
-    //printf ("ns=%d\n", ns);        
+    }
+    //printf ("ns=%d\n", ns);
     printf  ("\n# int21_energies\n");
     for (i=0; i <= num_base_pairs; i++)
     {
@@ -9393,7 +9393,7 @@ void print_parameters_in_ViennaRNA_format ()
         {
             for (k=0; k <= NUCL; k++)
             {
-                printf ("/* %2s.%c..%2s */\n", pnames[i], bnames[k], pnames[j]); 
+                printf ("/* %2s.%c..%2s */\n", pnames[i], bnames[k], pnames[j]);
                 for (l=0; l <= NUCL; l++)
                 {
                     for (m=0; m <= NUCL; m++)
@@ -9409,8 +9409,8 @@ void print_parameters_in_ViennaRNA_format ()
             }
         }
     }
-    
-    
+
+
     // NEXT BLOCK is int22
     // first get the maximum value
     ns = -INF;
@@ -9419,7 +9419,7 @@ void print_parameters_in_ViennaRNA_format ()
         for (j=0; j < num_base_pairs; j++)
         {
             for (k=0; k < NUCL; k++)
-            {             
+            {
                 for (l=0; l < NUCL; l++)
                 {
                     for (m=0; m < NUCL; m++)
@@ -9431,11 +9431,11 @@ void print_parameters_in_ViennaRNA_format ()
                         }
                     }
                 }
-            }            
+            }
         }
     }
-    //printf ("ns=%d\n", ns);    
-    printf ("\n# int22_energies\n");    
+    //printf ("ns=%d\n", ns);
+    printf ("\n# int22_energies\n");
     for (i=0; i <= num_base_pairs; i++)
     {
         for (j=0; j <= num_base_pairs; j++)
@@ -9445,7 +9445,7 @@ void print_parameters_in_ViennaRNA_format ()
             {
                 for (l=0; l < NUCL; l++)
                 {
-                    printf ("/* %2s.%c%c..%2s */\n", pnames[i], bnames[k+1], bnames[l+1], pnames[j]); 
+                    printf ("/* %2s.%c%c..%2s */\n", pnames[i], bnames[k+1], bnames[l+1], pnames[j]);
                     for (m=0; m < NUCL; m++)
                     {
                         for (n=0; n < NUCL; n++)
@@ -9459,11 +9459,11 @@ void print_parameters_in_ViennaRNA_format ()
                         printf ("\n");
                     }
                 }
-            }            
+            }
         }
     }
-  
-    
+
+
     // NEXT BLOCK is penalty by size for hairpin loops
     printf ("\n# hairpin\n");
     printf ("   INF");
@@ -9475,8 +9475,8 @@ void print_parameters_in_ViennaRNA_format ()
         if (i%10 == 9)  printf ("\n");
     }
     printf ("\n");
-  
-    
+
+
     // NEXT BLOCK is penalty by size for bulge loops
     printf ("\n# bulge\n");
     printf ("   INF");
@@ -9487,9 +9487,9 @@ void print_parameters_in_ViennaRNA_format ()
         else             printf ("%6d", x);
         if (i%10 == 9)  printf ("\n");
     }
-    printf ("\n");    
-  
-    
+    printf ("\n");
+
+
     // NEXT BLOCK is penalty by size for internal loops
     printf ("\n# internal_loop\n");
     printf ("   INF");
@@ -9500,16 +9500,16 @@ void print_parameters_in_ViennaRNA_format ()
         else             printf ("%6d", x);
         if (i%10 == 9)  printf ("\n");
     }
-    printf ("\n");        
-    
-  
+    printf ("\n");
+
+
     // NEXT BLOCK is other misc energies
     printf ("\n# ML_params\n");
     printf ("/* F = cu*n_unpaired + cc + ci*loop_degree (+TermAU) */\n");
     printf ("/*\t    cu\t    cc\t    ci\t TerminalAU */\n");
     printf ("\t%6d\t%6d\t%6d\t%6d\n", (int)round(misc.multi_free_base_penalty), (int)round(misc.multi_offset),
         (int)round(misc.multi_helix_penalty), (int)round(misc.terminal_AU_penalty));
-  
+
     printf ("\n# NINIO\n");
     printf ("/* Ninio = MIN(max, m*|n1-n2| */\n");
     printf ("/*       m   max              */\n");
@@ -9517,13 +9517,13 @@ void print_parameters_in_ViennaRNA_format ()
 
     printf ("\n# Tetraloops\n");
     for (i=0; i < nb_tloops; i++)
-        printf ("\t%.6s\t%4d\n", tloop[i].seq, (int)round(tloop[i].energy));        
+        printf ("\t%.6s\t%4d\n", tloop[i].seq, (int)round(tloop[i].energy));
 
     printf ("\n# Triloops\n");
     for (i=0; i < nb_triloops; i++)
         printf ("\t%.5s\t%4d\n", triloop[i].seq, (int)round(triloop[i].energy));
-        
-    printf ("\n#END\n"); 
+
+    printf ("\n#END\n");
 }
 
 // functions to read from the thermodynamic set XML file
@@ -9531,10 +9531,10 @@ int get_data_from_buffer (char *buffer, const char *header, char last_char, char
 // function to get the sequence, structure etc data from the XML lines
 {
     char *begin;
-    begin  = strstr (buffer, header);    
+    begin  = strstr (buffer, header);
         //printf ("%s\n", buffer);
     if (begin == NULL) { return 0; }     //printf ("Formatting error, %s not there\n", header); exit(1); }
-    begin += strlen(header);        
+    begin += strlen(header);
     int i = 0;
     while (1)
     {
@@ -9557,84 +9557,84 @@ void fill_similarity_rule_with_optical_melting_reference (char *xml_filename)
 // reads data from xml_filename, and fills up the array similarity_rule with the experiment id.
 // started on Mar 18, 2008.
 {
-    FILE *xml; 
+    FILE *xml;
     int i, j;
     char sequence[MAXSLEN];
-    char structure[MAXSLEN];    
+    char structure[MAXSLEN];
     double counter_min[MAXNUMPARAMS];
     // sometimes the initial state is not the completely unfolded sequence. In this case, sequence0 and structure0 are the initial state
     char sequence0[MAXSLEN];
-    char structure0[MAXSLEN];   
-    double counter0[MAXNUMPARAMS];    // just in case we have sequence0 and structure0     
+    char structure0[MAXSLEN];
+    double counter0[MAXNUMPARAMS];    // just in case we have sequence0 and structure0
     char buffer [10000];
-    char *begin;    
+    char *begin;
     char exp_id[100];
     double f;
-    
+
     // first reset the similarity_rule array and counter0
- 
-    for (i=0; i < num_params; i++)    
+
+    for (i=0; i < num_params; i++)
     {
         counter0[i] = 0;
         similarity_rule[i][0] = '\0';
     }
-    
+
     if ((xml = fopen (xml_filename, "r")) == NULL)
     {
         printf ("Cannot open file %s\n", xml_filename);
-        exit (0);
-    }           
-    
+        exit (1);
+    }
+
     int k;
     k = 0;
     int delta_index = 1;
     double margin;
-    int counter = 0;   
-     
+    int counter = 0;
+
     while (!feof (xml))
-    {    
+    {
         // the file is in XML format, among whose lines it has the following types:
         //    <EXPERIMENT sequence="CCGG CCGG" structure="(((( ))))" dG-37="-4.36" STD-dG-37="0.1"> </EXPERIMENT>
         //    <EXPERIMENT sequence="UGACCUCA UGAGGUCA" structure="(((((((( ))))))))" dG-37="-12.34" ERR-dG-37="3%"> </EXPERIMENT>
-        
+
         // try including only the first paper. With everything I can't save the solution because it says "No basic solution"
         //    Problem solved: In the cplex script, I have to write: "write file.vec"
         //if (counter >= 94) break;
-        
+
         fgets (buffer, sizeof(buffer), xml);
-        //printf ("%s", buffer);                         
-  
-        sequence[0] = '\0'; structure[0] = '\0'; 
-        begin = strstr (buffer, "<EXPERIMENT");        
+        //printf ("%s", buffer);
+
+        sequence[0] = '\0'; structure[0] = '\0';
+        begin = strstr (buffer, "<EXPERIMENT");
         if (begin == NULL) continue;
-        
+
         sequence0[0] = '\0';
         structure0[0] = '\0';
         get_data_from_buffer (buffer, "id=\"", '\"', exp_id);
-        get_data_from_buffer (buffer, "sequence0=\"", '\"', sequence0);        
-        get_data_from_buffer (buffer, "structure0=\"", '\"', structure0);        
+        get_data_from_buffer (buffer, "sequence0=\"", '\"', sequence0);
+        get_data_from_buffer (buffer, "structure0=\"", '\"', structure0);
         get_data_from_buffer (buffer, "sequence=\"", '\"', sequence);
-        get_data_from_buffer (buffer, "structure=\"", '\"', structure);    
-    
+        get_data_from_buffer (buffer, "structure=\"", '\"', structure);
+
         char restricted[1] = "";
         if (strcmp (sequence0, "") != 0)
-        {            
-            count_each_structure_type (sequence0, structure0, restricted, counter0, f, 1);            
-        }  
+        {
+            count_each_structure_type (sequence0, structure0, restricted, counter0, f, 1);
+        }
         //printf ("Sequence:  %s\n", sequence);
         //printf ("Structure: %s\n", structure);
         count_each_structure_type (sequence, structure, restricted, counter_min, f, 1);
         //printf ("DONE %s\n", exp_id);
 
         for (i=0; i < num_params; i++)
-        {                
+        {
             if (counter_min[i] - counter0[i] != 0)
             {
                 if (similarity_rule[i][0] == '\0')
                     strcpy (similarity_rule[i], exp_id);
-            }    
-        }                
-    }    
+            }
+        }
+    }
     fclose (xml);
 }
 
@@ -9648,53 +9648,53 @@ void fill_similarity_rules ()
 int is_special_internal_1 (int *sequence, int i, int j, int ip, int jp)
 {
     int branch1 = ip-i-1;
-    int branch2 = j-jp-1;           
-    if (branch1 < 3 || branch2 < 3)     return 0;  
+    int branch2 = j-jp-1;
+    if (branch1 < 3 || branch2 < 3)     return 0;
     // first misc.internal_special_3GA       5'-YGGA/GAAR-3' or 5'-GGAR/YGAA-3', in loops 3x3 and larger
     if ((isY (sequence[i]) && sequence[i+1] == G && sequence[i+2] == G && sequence[i+3] == A &&
-         isR (sequence[j]) && sequence[j-1] == A && sequence[j-2] == A && sequence[j-3] == G) || 
+         isR (sequence[j]) && sequence[j-1] == A && sequence[j-2] == A && sequence[j-3] == G) ||
          (isR (sequence[ip]) && sequence[ip-1] == A && sequence[ip-2] == G && sequence[ip-3] == G &&
          isY (sequence[jp]) && sequence[jp+1] == G && sequence[jp+2] == A && sequence[jp+3] == A))
         return 1;
-    return 0; 
+    return 0;
 }
 
 int is_special_internal_2 (int *sequence, int i, int j, int ip, int jp)
 {
-    // next internal_special_2GA     
-    // 5'-GA/GA-3' next to a closing base pair, or 5'-GG/AA-3' next to a closing base pair, for 3x3, 3x4, 4x4, and 4x5 loops; 
+    // next internal_special_2GA
+    // 5'-GA/GA-3' next to a closing base pair, or 5'-GG/AA-3' next to a closing base pair, for 3x3, 3x4, 4x4, and 4x5 loops;
     //  ALSO 5'-RGGA/GAAY-3' or 5'-GGAY/YGAA-3' for 3x5, 3x6 and 4x6 loops.
-    // internal_2GA is USED only if internal_3GA was not used    
+    // internal_2GA is USED only if internal_3GA was not used
 
     int branch1 = ip-i-1;
-    int branch2 = j-jp-1;       
-    if (branch1 < 3 || branch2 < 3)     return 0;  
-    
+    int branch2 = j-jp-1;
+    if (branch1 < 3 || branch2 < 3)     return 0;
+
     if (is_special_internal_1 (sequence, i, j, ip, jp))     return 0;
-    
-    if ((branch1 == 3 && (branch2==3 || branch2==4)) || 
-         (branch1 == 4 && (branch2==3 || branch2==4 || branch2==5)) || 
+
+    if ((branch1 == 3 && (branch2==3 || branch2==4)) ||
+         (branch1 == 4 && (branch2==3 || branch2==4 || branch2==5)) ||
          (branch1 == 5 && branch2 == 4))
     {
         if ((sequence[i+1]==G && sequence[i+2]==A && sequence[j-1]==A && sequence[j-2]==G) ||
              (sequence[ip-2]==G && sequence[ip-1]==A && sequence[jp+2]==A && sequence[jp+1]==G) ||
-             (sequence[i+1]==G && sequence[i+2]==G && sequence[j-1]==A && sequence[j-2]==A) || 
+             (sequence[i+1]==G && sequence[i+2]==G && sequence[j-1]==A && sequence[j-2]==A) ||
              (sequence[ip-2]==A && sequence[ip-1]==A && sequence[jp+2]==G && sequence[jp+1]==G))
         {
             return 1;
         }
-    } 
+    }
     if ((branch1==3 && (branch2==5 || branch2==6)) ||
-         (branch2==3 && (branch1==5 || branch1==6)) ||  
+         (branch2==3 && (branch1==5 || branch1==6)) ||
          (branch1 == 4 && branch2 == 6) || (branch2 == 4 && branch1 == 6))
     {
         if ((isR (sequence[i]) && sequence[i+1] == G && sequence[i+2] == G && sequence[i+3] == A &&
-             isY (sequence[j]) && sequence[j-1] == A && sequence[j-2] == A && sequence[j-3] == G) || 
+             isY (sequence[j]) && sequence[j-1] == A && sequence[j-2] == A && sequence[j-3] == G) ||
              (isY (sequence[ip]) && sequence[ip-1] == A && sequence[ip-2] == G && sequence[ip-3] == G &&
-             isR (sequence[jp]) && sequence[jp+1] == G && sequence[jp+2] == A && sequence[jp+3] == A)) 
+             isR (sequence[jp]) && sequence[jp+1] == G && sequence[jp+2] == A && sequence[jp+3] == A))
         {
             return 1;
-        }               
+        }
     }
     return 0;
 }
@@ -9703,13 +9703,13 @@ int is_special_internal_2 (int *sequence, int i, int j, int ip, int jp)
 int is_special_internal_3 (int *sequence, int i, int j, int ip, int jp)
 {
     int branch1 = ip-i-1;
-    int branch2 = j-jp-1;       
-    //next internal_special_2xGA_GC;         5'-GANGC/GANGC-3' in 3x3 loops    
+    int branch2 = j-jp-1;
+    //next internal_special_2xGA_GC;         5'-GANGC/GANGC-3' in 3x3 loops
     if (branch1==3 && branch2==3)
     {
         if (sequence[i]==G && sequence[i+1]==A && sequence[ip-1]==G && sequence[ip]==C &&
             sequence[jp]==G && sequence[jp+1]==A && sequence[j-1]==G && sequence[j]==C)
-            return 1;            
+            return 1;
     }
     return 0;
 }
@@ -9717,19 +9717,19 @@ int is_special_internal_3 (int *sequence, int i, int j, int ip, int jp)
 int is_special_internal_4 (int *sequence, int i, int j, int ip, int jp)
 {
     int branch1 = ip-i-1;
-    int branch2 = j-jp-1;       
+    int branch2 = j-jp-1;
 
     // next internal_special_midGA       // middle GA adjacent to RY in 3x3 loops
                                     // internal_midGA is USED only if none of internal_3GA and internal_2GA is used.
     if (is_special_internal_1 (sequence, i, j, ip, jp))     return 0;
     if (is_special_internal_2 (sequence, i, j, ip, jp))     return 0;
-    
+
     if (branch1==3 && branch2==3)
     {
-        if (sequence[i+2]==G && sequence[j-2]==A && 
+        if (sequence[i+2]==G && sequence[j-2]==A &&
             ((isR(sequence[i+1]) && isY(sequence[j-1])) || (isR(sequence[ip-1]) && isY(sequence[jp+1]))))
             return 1;
-        if (sequence[i+2]==A && sequence[j-2]==G && 
+        if (sequence[i+2]==A && sequence[j-2]==G &&
             ((isY(sequence[i+1]) && isR(sequence[j-1])) || (isY(sequence[ip-1]) && isR(sequence[jp+1]))))
             return 1;
     }
@@ -9740,7 +9740,7 @@ int is_special_internal_5 (int *sequence, int i, int j, int ip, int jp)
 // this returns how many times this motif appears. Can be 0, once or twice.
 {
     int branch1 = ip-i-1;
-    int branch2 = j-jp-1;       
+    int branch2 = j-jp-1;
     int result = 0;
     // next internal_special_UG_AG;       // once or twice, for each 5'-UG/AG-3' at the terminus of loops 3x3 or larger
     if (branch1==3 && branch2==3)
@@ -9756,7 +9756,7 @@ int is_special_internal_5 (int *sequence, int i, int j, int ip, int jp)
 int is_special_internal_6 (int *sequence, int i, int j, int ip, int jp)
 {
     int branch1 = ip-i-1;
-    int branch2 = j-jp-1;       
+    int branch2 = j-jp-1;
 
     // next internal_special_GU_A;        // first mismatch is GA, and U is 3' of G, for loops 3x3
     if (branch1==3 && branch2==3)
@@ -9770,70 +9770,70 @@ int is_special_internal_6 (int *sequence, int i, int j, int ip, int jp)
 
 
 PARAMTYPE special_energy_internal (int *sequence, int i, int j, int ip, int jp)
-// Return the energy obtained when we consider 6 additional parameters for internal loop 3x3 and larger, 
+// Return the energy obtained when we consider 6 additional parameters for internal loop 3x3 and larger,
 //  as described in Chen_Turner_2006b.
-// the arguments are positions in sequence                
+// the arguments are positions in sequence
 {
     PARAMTYPE energy = 0;
-    if (parsi_special != LAVISH && parsi_special != T99_LAVISH)  return 0;    
-      
-    if (is_special_internal_1 (sequence, i, j, ip, jp)) 
+    if (parsi_special != LAVISH && parsi_special != T99_LAVISH)  return 0;
+
+    if (is_special_internal_1 (sequence, i, j, ip, jp))
         energy += misc.internal_special_3GA;
-    
-    if (is_special_internal_2 (sequence, i, j, ip, jp)) 
+
+    if (is_special_internal_2 (sequence, i, j, ip, jp))
         energy += misc.internal_special_2GA;
-    
-    if (is_special_internal_3 (sequence, i, j, ip, jp)) 
+
+    if (is_special_internal_3 (sequence, i, j, ip, jp))
         energy += misc.internal_special_2xGA_GC;
-     
-    if (is_special_internal_4 (sequence, i, j, ip, jp)) 
+
+    if (is_special_internal_4 (sequence, i, j, ip, jp))
         energy += misc.internal_special_midGA;
-    
+
     energy += misc.internal_special_UG_AG * is_special_internal_5 (sequence, i, j, ip, jp);
 
-    if (is_special_internal_6 (sequence, i, j, ip, jp)) 
+    if (is_special_internal_6 (sequence, i, j, ip, jp))
         energy += misc.internal_special_GU_A;
     return energy;
 }
 
 
 PARAMTYPE count_special_internal (double *counter, int *sequence, int i, int j, int ip, int jp)
-// Return the energy and counts obtained when we consider 6 additional parameters for internal loop 3x3 and larger, 
+// Return the energy and counts obtained when we consider 6 additional parameters for internal loop 3x3 and larger,
 //  as described in Chen_Turner_2006b.
-// the arguments are positions in sequence                
+// the arguments are positions in sequence
 {
     PARAMTYPE energy = 0;
-    if (parsi_special != LAVISH && parsi_special != T99_LAVISH)  return 0;    
-      
+    if (parsi_special != LAVISH && parsi_special != T99_LAVISH)  return 0;
+
     int index;
-    if (is_special_internal_1 (sequence, i, j, ip, jp)) 
+    if (is_special_internal_1 (sequence, i, j, ip, jp))
     {
         energy += misc.internal_special_3GA;
         index = structure_type_index ("misc.internal_special_3GA");
         counter[index]++;
     }
-    
-    if (is_special_internal_2 (sequence, i, j, ip, jp)) 
+
+    if (is_special_internal_2 (sequence, i, j, ip, jp))
     {
         energy += misc.internal_special_2GA;
         index = structure_type_index ("misc.internal_special_2GA");
-        counter[index]++;        
+        counter[index]++;
     }
-    
-    if (is_special_internal_3 (sequence, i, j, ip, jp)) 
+
+    if (is_special_internal_3 (sequence, i, j, ip, jp))
     {
         energy += misc.internal_special_2xGA_GC;
         index = structure_type_index ("misc.internal_special_2xGA_GC");
-        counter[index]++;        
+        counter[index]++;
     }
-     
-    if (is_special_internal_4 (sequence, i, j, ip, jp)) 
+
+    if (is_special_internal_4 (sequence, i, j, ip, jp))
     {
         energy += misc.internal_special_midGA;
         index = structure_type_index ("misc.internal_special_midGA");
-        counter[index]++;        
+        counter[index]++;
     }
-    
+
     int sp5 = is_special_internal_5 (sequence, i, j, ip, jp);
     if (sp5 > 0)
     {
@@ -9842,11 +9842,11 @@ PARAMTYPE count_special_internal (double *counter, int *sequence, int i, int j, 
         counter[index] += sp5;
     }
 
-    if (is_special_internal_6 (sequence, i, j, ip, jp)) 
+    if (is_special_internal_6 (sequence, i, j, ip, jp))
     {
         energy += misc.internal_special_GU_A;
         index = structure_type_index ("misc.internal_special_GU_A");
-        counter[index]++;        
+        counter[index]++;
     }
     return energy;
 }
@@ -9886,11 +9886,11 @@ PARAMTYPE count_special_internal (double *counter, int *sequence, int i, int j, 
 //                                 // apply Jackobson_Stockmeyer on i-1, j-1
 //                                 sprintf (similarity_rule[sim_index], "1 * internal_size_2D[%d,%d] + %.4lf * extrapolation_large_loops",
 //                                     i, j-1, log(1.0*(i+j)/(i+j-1)));
-//                             }                            
-//                             
+//                             }
+//
 //                             // THIS I TRIED TO DO BEFORE, but I CHANGED MY MIND
 //                             //sprintf (similarity_rule[sim_index], "1 * internal_symmetry[%d]", i-1);
-//                             //internal_penalty_by_size_2D[i][j] = internal_penalty_by_size[i+j] + asymmetry_penalty(i,j);                            
+//                             //internal_penalty_by_size_2D[i][j] = internal_penalty_by_size[i+j] + asymmetry_penalty(i,j);
 //                         }
 //                         break;
 //                     case 2:
@@ -9901,11 +9901,11 @@ PARAMTYPE count_special_internal (double *counter, int *sequence, int i, int j, 
 //                         break;
 //                 }
 //                 index++;
-//             
-//             }            
+//
+//             }
 //         }
 //     }
-    
+
 //     for (i=3; i <= MAXLOOP_I/2; i++)
 //     {
 //         if (internal_symmetry[i] < INF)
@@ -9922,15 +9922,15 @@ PARAMTYPE count_special_internal (double *counter, int *sequence, int i, int j, 
 //                     {
 //                         sprintf (similarity_rule[sim_index], "1 * internal_symmetry[%d]", i-1);
 //                     }
-//                     break;                    
+//                     break;
 //                 case 2:
 //                     array[index] = internal_symmetry[i];
-//                     break;            
+//                     break;
 //                 case 3:
 //                     fprintf (file, "%.2lf\n", internal_symmetry[i]/100.0);
-//                     break;                                
+//                     break;
 //             }
-//             index++;    
+//             index++;
 //         }
 //     }
 //     for (i=1; i <= MAXLOOP_I-2; i++)
@@ -9949,17 +9949,17 @@ PARAMTYPE count_special_internal (double *counter, int *sequence, int i, int j, 
 //                     {
 //                         //sprintf (similarity_rule[sim_index], "1 * internal_penalty_by_size[%d] + %.4lf * extrapolation_large_loops", i-1, log(1.0*i/(i-1)));
 //                     }
-//                     break;                    
+//                     break;
 //                 case 2:
 //                     array[index] = internal_asymmetry[i];
-//                     break;            
+//                     break;
 //                 case 3:
 //                     fprintf (file, "%.2lf\n", internal_asymmetry[i]/100.0);
-//                     break;                                
+//                     break;
 //             }
-//             index++;    
+//             index++;
 //         }
-//     }    
+//     }
 
 
 
@@ -9998,8 +9998,8 @@ int create_building_block_strings ()
                     index++;
                   }
               }
-          }          
-          
+          }
+
   for (i=0; i < NUCL; i++)
     for (j=0; j < NUCL; j++)
       for (k=0; k < NUCL; k++)
@@ -10023,14 +10023,14 @@ int create_building_block_strings ()
 
     // replace all tstacki parameters by 3 parameters, as described in Mathews 1999
     sprintf (string_params[index], "misc.internal_AU_closure");
-    bbseq_left [index][0] = '\0'; bbseq_right[index][0] = '\0'; bbstr_left [index][0] = '\0'; bbstr_right[index][0] = '\0'; index++;          
+    bbseq_left [index][0] = '\0'; bbseq_right[index][0] = '\0'; bbstr_left [index][0] = '\0'; bbstr_right[index][0] = '\0'; index++;
     sprintf (string_params[index], "misc.internal_AG_mismatch");
     bbseq_left [index][0] = '\0'; bbseq_right[index][0] = '\0'; bbstr_left [index][0] = '\0'; bbstr_right[index][0] = '\0'; index++;
     sprintf (string_params[index], "misc.internal_UU_mismatch");
-    bbseq_left [index][0] = '\0'; bbseq_right[index][0] = '\0'; bbstr_left [index][0] = '\0'; bbstr_right[index][0] = '\0'; index++;          
-    
+    bbseq_left [index][0] = '\0'; bbseq_right[index][0] = '\0'; bbstr_left [index][0] = '\0'; bbstr_right[index][0] = '\0'; index++;
 
-          
+
+
 //   for (i=0; i < NUCL; i++)
 //     for (j=0; j < NUCL; j++)
 //       for (k=0; k < NUCL; k++)
@@ -10049,11 +10049,11 @@ int create_building_block_strings ()
 //                 bbseq_right[index][1] = int_to_nuc (j);
 //                 bbseq_right[index][2] = '\0';
 //                 strcpy (bbstr_right[index], ".)"); bbstr_right[index][2] = '\0';
-//                 index++;                
+//                 index++;
 //               }
 //           }
-         
-    if (!simple_internal_energy)          
+
+    if (!simple_internal_energy)
     {
 
         // do the few int 11 params: only those enclosed by CG and CG (any order), + 2 more params
@@ -10092,12 +10092,12 @@ int create_building_block_strings ()
                                 }
                             }
         sprintf (string_params[index], "misc.internal11_basic_mismatch");
-        bbseq_left [index][0] = '\0'; bbseq_right[index][0] = '\0'; bbstr_left [index][0] = '\0'; bbstr_right[index][0] = '\0'; index++;          
+        bbseq_left [index][0] = '\0'; bbseq_right[index][0] = '\0'; bbstr_left [index][0] = '\0'; bbstr_right[index][0] = '\0'; index++;
         sprintf (string_params[index], "misc.internal11_GG_mismatch");
-        bbseq_left [index][0] = '\0'; bbseq_right[index][0] = '\0'; bbstr_left [index][0] = '\0'; bbstr_right[index][0] = '\0'; index++;                                      
-                            
+        bbseq_left [index][0] = '\0'; bbseq_right[index][0] = '\0'; bbstr_left [index][0] = '\0'; bbstr_right[index][0] = '\0'; index++;
 
-        
+
+
 //         for (i=0; i < NUCL; i++)
 //             for (j=0; j < NUCL; j++)
 //             for (k=0; k < NUCL; k++)
@@ -10126,8 +10126,8 @@ int create_building_block_strings ()
 //                             }
 //                         }
 //                     }
-            
-        
+
+
         // go with few parameters, as in Mathews et al 1999
         i=C; j=G; m=C; n=G;
         for (k=0; k < NUCL; k++)
@@ -10182,12 +10182,12 @@ int create_building_block_strings ()
                     }
                 }
         sprintf (string_params[index], "misc.internal21_match");
-        bbseq_left [index][0] = '\0'; bbseq_right[index][0] = '\0'; bbstr_left [index][0] = '\0'; bbstr_right[index][0] = '\0'; index++;          
+        bbseq_left [index][0] = '\0'; bbseq_right[index][0] = '\0'; bbstr_left [index][0] = '\0'; bbstr_right[index][0] = '\0'; index++;
         sprintf (string_params[index], "misc.internal21_AU_closure");
-        bbseq_left [index][0] = '\0'; bbseq_right[index][0] = '\0'; bbstr_left [index][0] = '\0'; bbstr_right[index][0] = '\0'; index++;          
-                                    
-                            
-        
+        bbseq_left [index][0] = '\0'; bbseq_right[index][0] = '\0'; bbstr_left [index][0] = '\0'; bbstr_right[index][0] = '\0'; index++;
+
+
+
 //         for (i=0; i < NUCL; i++)
 //             for (j=0; j < NUCL; j++)
 //             for (k=0; k < NUCL; k++)
@@ -10214,7 +10214,7 @@ int create_building_block_strings ()
 //                             index++;
 //                             }
 //                         }
-                                
+
 
         // go with 53 parameters, like in Mathews et al 1999
         for (i=0; i < NUCL; i++)
@@ -10250,7 +10250,7 @@ int create_building_block_strings ()
                             }
                         }
                     }
-        
+
 //         i=C; j=G; m=C; n=G;
 //         for (k=0; k < NUCL; k++)
 //             for (l=0; l < NUCL; l++)
@@ -10278,23 +10278,23 @@ int create_building_block_strings ()
 //                                 bbseq_right[index][4] = '\0';
 //                                 strcpy (bbstr_right[index], ")..)"); bbstr_right[index][4] = '\0';
 //                                 index++;
-//                             }                        
+//                             }
 //                         }
 //                     }
-        
+
         // then add the 4 deltas
         sprintf (string_params[index], "misc.internal22_delta_same_size");
-        bbseq_left [index][0] = '\0'; bbseq_right[index][0] = '\0'; bbstr_left [index][0] = '\0'; bbstr_right[index][0] = '\0'; index++;          
+        bbseq_left [index][0] = '\0'; bbseq_right[index][0] = '\0'; bbstr_left [index][0] = '\0'; bbstr_right[index][0] = '\0'; index++;
         sprintf (string_params[index], "misc.internal22_delta_different_size");
-        bbseq_left [index][0] = '\0'; bbseq_right[index][0] = '\0'; bbstr_left [index][0] = '\0'; bbstr_right[index][0] = '\0'; index++;          
+        bbseq_left [index][0] = '\0'; bbseq_right[index][0] = '\0'; bbstr_left [index][0] = '\0'; bbstr_right[index][0] = '\0'; index++;
         sprintf (string_params[index], "misc.internal22_delta_1stable_1unstable");
-        bbseq_left [index][0] = '\0'; bbseq_right[index][0] = '\0'; bbstr_left [index][0] = '\0'; bbstr_right[index][0] = '\0'; index++;          
+        bbseq_left [index][0] = '\0'; bbseq_right[index][0] = '\0'; bbstr_left [index][0] = '\0'; bbstr_right[index][0] = '\0'; index++;
         sprintf (string_params[index], "misc.internal22_delta_AC");
-        bbseq_left [index][0] = '\0'; bbseq_right[index][0] = '\0'; bbstr_left [index][0] = '\0'; bbstr_right[index][0] = '\0'; index++;          
+        bbseq_left [index][0] = '\0'; bbseq_right[index][0] = '\0'; bbstr_left [index][0] = '\0'; bbstr_right[index][0] = '\0'; index++;
         sprintf (string_params[index], "misc.internal22_match");
-        bbseq_left [index][0] = '\0'; bbseq_right[index][0] = '\0'; bbstr_left [index][0] = '\0'; bbstr_right[index][0] = '\0'; index++;          
+        bbseq_left [index][0] = '\0'; bbseq_right[index][0] = '\0'; bbstr_left [index][0] = '\0'; bbstr_right[index][0] = '\0'; index++;
 
-                               
+
 //         for (i=0; i < NUCL; i++)
 //             for (j=0; j < NUCL; j++)
 //             for (k=0; k < NUCL; k++)
@@ -10308,7 +10308,7 @@ int create_building_block_strings ()
 //                             {
 //                                 // exclude duplicates
 //                                 // int22[i][j][k][l][m][n][o][p] is the same as int22[n][m][p][o][j][i][l][k]
-//                                 if (i*10000000 + j*1000000 + k*100000 + l*10000 + m*1000 + n*100 + o*10 + p <= 
+//                                 if (i*10000000 + j*1000000 + k*100000 + l*10000 + m*1000 + n*100 + o*10 + p <=
 //                                     n*10000000 + m*1000000 + p*100000 + o*10000 + j*1000 + i*100 + l*10 + k)
 //                                 {
 //                                     sprintf (string_params[index], "int22[%d][%d][%d][%d][%d][%d][%d][%d]", i, j, k, l, m, n, o, p);
@@ -10328,8 +10328,8 @@ int create_building_block_strings ()
 //                                 }
 //                             }
 //                         }
-      
-    }    // end if (!simple_internal_energy)                        
+
+    }    // end if (!simple_internal_energy)
   for (i=0; i < NUCL; i++)
     for (j=0; j < NUCL; j++)
       for (k=0; k < NUCL; k++)
@@ -10366,14 +10366,14 @@ int create_building_block_strings ()
               index++;
             }
         }
-    int start;        
+    int start;
     if (!simple_internal_energy)
         start = 4;
     else
-        start = 1;                
+        start = 1;
     for (i=start; i <= MAXLOOP_I; i++)
     {
-        
+
       if (internal_penalty_by_size[i] < INF)
         {
           // no duplicates here
@@ -10395,7 +10395,7 @@ int create_building_block_strings ()
           bbseq_right[index][0] = '\0';
           bbstr_left [index][0] = '\0';
           bbstr_right[index][0] = '\0';
-          index++;          
+          index++;
         }
     }
   for (i=1; i <= MAXLOOP_H; i++)
@@ -10433,11 +10433,11 @@ int create_building_block_strings ()
  //bbseq_left [index][0] = '\0'; bbseq_right[index][0] = '\0'; bbstr_left [index][0] = '\0'; bbstr_right[index][0] = '\0'; index++;
  //sprintf (string_params[index], "misc.asymmetry_penalty_array[1]");
  //bbseq_left [index][0] = '\0'; bbseq_right[index][0] = '\0'; bbstr_left [index][0] = '\0'; bbstr_right[index][0] = '\0'; index++;
- 
+
  // the next ones are never used
  // sprintf (string_params[index++], "misc.asymmetry_penalty_array[2]");
  // sprintf (string_params[index++], "misc.asymmetry_penalty_array[3]");
- 
+
  // Instead of these, I will just store the asymmetry for 0.5, 1, 1.5, 2, 2.5 and 3.
 
  //sprintf (string_params[index], "misc.asymmetry_penalty[1]");
@@ -10516,9 +10516,9 @@ int create_building_block_strings ()
             // first consider all the symmetric 2x2 internal loops
             for (i=0; i < NUCL; i++)
                 for (j=0; j < NUCL; j++)
-                {    
+                {
                     // i and j must pair
-                    if (!can_pair(i,j)) continue;                          
+                    if (!can_pair(i,j)) continue;
                     for (k=0; k < NUCL; k++)
                         for (l=0; l < NUCL; l++)
                         {
@@ -10526,7 +10526,7 @@ int create_building_block_strings ()
                             n = i;
                             m = j;
                             p = k;
-                            o = l;      
+                            o = l;
                             //if (!watson_crick(k,l))   // I should include all of them
                             {
                                 // exclude duplicates
@@ -10551,7 +10551,7 @@ int create_building_block_strings ()
                                             break;
                                         case 2:
                                             array[index] = int22[i][j][k][l][m][n][o][p];
-                                            break;    
+                                            break;
                                         case 3:
                                             fprintf (file, "%.2lf\n", int22[i][j][k][l][m][n][o][p]/100.0);
                                             break;
@@ -10562,16 +10562,16 @@ int create_building_block_strings ()
                                             int22[i][j][k][l][m][n][o][p] = (PARAMTYPE) param;
                                             // now the duplicate
                                             int22[n][m][p][o][j][i][l][k] = (PARAMTYPE) param;
-                                            break;                                            
+                                            break;
                                     }
-                                    index++;    
+                                    index++;
                                 }
                             }
-                        }  
-                }                     
-    
+                        }
+                }
+
             for (i=0; i < NUCL; i++)
-                for (j=0; j < NUCL; j++)      
+                for (j=0; j < NUCL; j++)
                     for (k=0;  k < NUCL; k++)
                         for (l=0; l < NUCL; l++)
                         {
@@ -10583,8 +10583,8 @@ int create_building_block_strings ()
                             // I guess I can include them directly in the int22 features
                             if (can_pair(i,j))  continue;
                             if (can_pair(k,l))  continue;
-                            // they are symmetric, so store only half               
-                            if (i*1000 + j*100 + k*10 + l <= l*1000+ k*100 + j*10 + i)              
+                            // they are symmetric, so store only half
+                            if (i*1000 + j*100 + k*10 + l <= l*1000+ k*100 + j*10 + i)
                             {
                                 switch (job)
                                 {
@@ -10594,7 +10594,7 @@ int create_building_block_strings ()
                                         break;
                                     case 1:
                                         if (similarity_rule[sim_index][0] == '\0')
-                                        {     
+                                        {
                                             // check which asymmetric 2x2 internal loops have this int22mid, and average
                                             int i_bp, j_bp, ip_bp, jp_bp;
                                             int num_covered_asymmetric = 0;
@@ -10604,35 +10604,35 @@ int create_building_block_strings ()
                                             // first traverse to get the counts for correct averaging of the remaining int22mid
                                             // ALSO: count # occurences in each group.
                                             for (i_bp=0; i_bp < NUCL; i_bp++)
-                                                for (j_bp=0; j_bp < NUCL; j_bp++)  
+                                                for (j_bp=0; j_bp < NUCL; j_bp++)
                                                 {
-                                                    if (!can_pair(i_bp,j_bp)) continue;    
+                                                    if (!can_pair(i_bp,j_bp)) continue;
                                                     for (ip_bp=0;  ip_bp < NUCL; ip_bp++)
-                                                        for (jp_bp=0; jp_bp < NUCL; jp_bp++) 
+                                                        for (jp_bp=0; jp_bp < NUCL; jp_bp++)
                                                         {
-                                                            if (!can_pair(ip_bp,jp_bp)) continue;  
+                                                            if (!can_pair(ip_bp,jp_bp)) continue;
                                                             // exclude the int22 sequence symmetric ones
                                                             if (i_bp==jp_bp && j_bp==ip_bp && i==l && j==k) continue;
                                                             // these are symmetric, so I'm only looking at half of them
                                                             if (i_bp*10000000 + j_bp*1000000 + i*100000 + j*10000 + ip_bp*1000 + jp_bp*100 + k*10 + l <=
                                                                 jp_bp*10000000 + ip_bp*1000000 + l*100000 + k*10000 + j_bp*1000 + i_bp*100 + j*10 + i)
                                                             {
-                                                                sprintf (s, "int22[%d][%d][%d][%d][%d][%d][%d][%d]", i_bp, j_bp, i, j, ip_bp, jp_bp, k, l);             
+                                                                sprintf (s, "int22[%d][%d][%d][%d][%d][%d][%d][%d]", i_bp, j_bp, i, j, ip_bp, jp_bp, k, l);
                                                             }
                                                             else        // switch for the other half
                                                             {
-                                                                sprintf (s, "int22[%d][%d][%d][%d][%d][%d][%d][%d]", jp_bp, ip_bp, l, k, j_bp, i_bp, j, i);             
+                                                                sprintf (s, "int22[%d][%d][%d][%d][%d][%d][%d][%d]", jp_bp, ip_bp, l, k, j_bp, i_bp, j, i);
                                                             }
                                                             //printf ("%s\t%s\n", string_params[index], s);
                                                             int index_s = structure_type_index (s);
                                                             if (similarity_rule[index_s][0] != '\0')
                                                             {
-                                                                num_covered_asymmetric++;                                                                
+                                                                num_covered_asymmetric++;
                                                                 there_is_exp = 1;
                                                             }
-    
-                                                        }      
-                                                }  
+
+                                                        }
+                                                }
                                             if (there_is_exp)
                                             {
                                                 if (is_int22_group_1 (i,j,k,l))
@@ -10640,17 +10640,17 @@ int create_building_block_strings ()
                                                     strcpy (sgroup1[num_group1], string_params_human_readable[index]);
                                                     num_group1++;
                                                 }
-                                                else if (is_int22_group_2 (i,j,k,l))  
+                                                else if (is_int22_group_2 (i,j,k,l))
                                                 {
                                                     strcpy (sgroup2[num_group2], string_params_human_readable[index]);
                                                     num_group2++;
                                                 }
-                                                else if (is_int22_group_3 (i,j,k,l))  
+                                                else if (is_int22_group_3 (i,j,k,l))
                                                 {
                                                     strcpy (sgroup3[num_group3], string_params_human_readable[index]);
                                                     num_group3++;
                                                 }
-                                                else if (is_int22_group_4 (i,j,k,l))  
+                                                else if (is_int22_group_4 (i,j,k,l))
                                                 {
                                                     strcpy (sgroup4[num_group4], string_params_human_readable[index]);
                                                     num_group4++;
@@ -10659,25 +10659,25 @@ int create_building_block_strings ()
                                             // next, traverse again to fill up similarity rule
                                             // IT MUST BE THE SAME TRAVERSAL AS ABOVE
                                             for (i_bp=0; i_bp < NUCL; i_bp++)
-                                                for (j_bp=0; j_bp < NUCL; j_bp++)  
+                                                for (j_bp=0; j_bp < NUCL; j_bp++)
                                                 {
-                                                    if (!can_pair(i_bp,j_bp)) continue;    
+                                                    if (!can_pair(i_bp,j_bp)) continue;
                                                     for (ip_bp=0;  ip_bp < NUCL; ip_bp++)
-                                                        for (jp_bp=0; jp_bp < NUCL; jp_bp++) 
+                                                        for (jp_bp=0; jp_bp < NUCL; jp_bp++)
                                                         {
-                                                            if (!can_pair(ip_bp,jp_bp)) continue;  
+                                                            if (!can_pair(ip_bp,jp_bp)) continue;
                                                             // exclude the int22 sequence symmetric ones
                                                             if (i_bp==jp_bp && j_bp==ip_bp && i==l && j==k) continue;
                                                             // these are symmetric, so I'm only looking at half of them
                                                             if (i_bp*10000000 + j_bp*1000000 + i*100000 + j*10000 + ip_bp*1000 + jp_bp*100 + k*10 + l <=
                                                                 jp_bp*10000000 + ip_bp*1000000 + l*100000 + k*10000 + j_bp*1000 + i_bp*100 + j*10 + i)
                                                             {
-                                                                sprintf (s, "int22[%d][%d][%d][%d][%d][%d][%d][%d]", i_bp, j_bp, i, j, ip_bp, jp_bp, k, l);  
+                                                                sprintf (s, "int22[%d][%d][%d][%d][%d][%d][%d][%d]", i_bp, j_bp, i, j, ip_bp, jp_bp, k, l);
                                                             }
                                                             else        // switch for the other half
                                                             {
-                                                                sprintf (s, "int22[%d][%d][%d][%d][%d][%d][%d][%d]", jp_bp, ip_bp, l, k, j_bp, i_bp, j, i);             
-                                                            }                                                                       
+                                                                sprintf (s, "int22[%d][%d][%d][%d][%d][%d][%d][%d]", jp_bp, ip_bp, l, k, j_bp, i_bp, j, i);
+                                                            }
                                                             //printf ("%s\t%s\n", string_params[index], s);
                                                             int index_s = structure_type_index (s);
                                                             if (similarity_rule[index_s][0] != '\0')
@@ -10692,19 +10692,19 @@ int create_building_block_strings ()
                                                                 index_sym2 = structure_type_index (s_sym2);
                                                                 // just add plus and a space if sth was added before
                                                                 if (similarity_rule[sim_index][0] != '\0')
-                                                                    sprintf (similarity_rule[sim_index], "%s + ", 
+                                                                    sprintf (similarity_rule[sim_index], "%s + ",
                                                                         similarity_rule[sim_index]);
-                                                                sprintf (similarity_rule[sim_index], "%s%g * %s + -%g * %s + -%g * %s", 
-                                                                    similarity_rule[sim_index], 
-                                                                    1.0/num_covered_asymmetric, 
+                                                                sprintf (similarity_rule[sim_index], "%s%g * %s + -%g * %s + -%g * %s",
+                                                                    similarity_rule[sim_index],
+                                                                    1.0/num_covered_asymmetric,
                                                                     string_params_human_readable[index_s],
-                                                                    1.0/num_covered_asymmetric/2.0, 
+                                                                    1.0/num_covered_asymmetric/2.0,
                                                                     string_params_human_readable[index_sym1],
-                                                                    1.0/num_covered_asymmetric/2.0, 
+                                                                    1.0/num_covered_asymmetric/2.0,
                                                                     string_params_human_readable[index_sym2]);
                                                             }
-                                                        }      
-                                                }                
+                                                        }
+                                                }
                                         }
                                         if (similarity_rule[sim_index][0] == '\0')  // it wasn't filled above
                                         {
@@ -10723,17 +10723,17 @@ int create_building_block_strings ()
                                             {
                                                 // int22mid is symmetric, so make sure I use the good one
                                                 if (i_rule1*1000 + j_rule1*100 + k_rule1*10 + l_rule1 <= l_rule1*1000+ k_rule1*100 + j_rule1*10 + i_rule1)
-                                                    sprintf (similarity_rule[sim_index], "1 * int22mid[5'-%c%c/%c%c-3']", 
+                                                    sprintf (similarity_rule[sim_index], "1 * int22mid[5'-%c%c/%c%c-3']",
                                                         int_to_nuc(i_rule1), int_to_nuc(k_rule1), int_to_nuc(l_rule1), int_to_nuc(j_rule1));
                                                 else
-                                                    sprintf (similarity_rule[sim_index], "1 * int22mid[5'-%c%c/%c%c-3']", 
+                                                    sprintf (similarity_rule[sim_index], "1 * int22mid[5'-%c%c/%c%c-3']",
                                                         int_to_nuc(l_rule1), int_to_nuc(j_rule1), int_to_nuc(i_rule1), int_to_nuc(k_rule1));
                                             }
                                         }
                                         break;
                                     case 2:
                                         array[index] = int22mid[i][j][k][l];
-                                        break;     
+                                        break;
                                     case 3:
                                         fprintf (file, "%.2lf\n", int22mid[i][j][k][l]/100.0);
                                         break;
@@ -10745,13 +10745,13 @@ int create_building_block_strings ()
                                         // now the duplicate
                                         int22mid[l][k][j][i] = (PARAMTYPE) param;
                                         break;
-                                }   
+                                }
                                 index++;
-                            }                                    
+                            }
                         }
-        }   // end if (! parsi_int22)                
+        }   // end if (! parsi_int22)
         // add the four groups
-        
+
         // add these no matter what
         switch (job)
         {
@@ -10760,14 +10760,14 @@ int create_building_block_strings ()
                 sprintf (string_params_human_readable[index], "int22mid_group1");
                 break;
             case 1:
-                if (num_group1 > 0)                                            
+                if (num_group1 > 0)
                     sprintf (similarity_rule[sim_index], "%g * %s", 1.0/num_group1, sgroup1[0]);
                 for (i=1; i < num_group1; i++)
                     sprintf (similarity_rule[sim_index], "%s + %g * %s", similarity_rule[sim_index], 1.0/num_group1, sgroup1[i]);
                 break;
             case 2:
                 array[index] = misc.internal22mid_group1;
-                break;     
+                break;
             case 3:
                 fprintf (file, "%.2lf\n", misc.internal22mid_group1/100.0);
                 break;
@@ -10778,7 +10778,7 @@ int create_building_block_strings ()
                 misc.internal22mid_group1 = (PARAMTYPE) param;
                 break;
         }
-        index++;                        
+        index++;
         switch (job)
         {
             case 0:
@@ -10786,14 +10786,14 @@ int create_building_block_strings ()
                 sprintf (string_params_human_readable[index], "int22mid_group2");
                 break;
             case 1:
-                if (num_group2 > 0)                                            
+                if (num_group2 > 0)
                     sprintf (similarity_rule[sim_index], "%g * %s", 1.0/num_group2, sgroup2[0]);
                 for (i=1; i < num_group2; i++)
                     sprintf (similarity_rule[sim_index], "%s + %g * %s", similarity_rule[sim_index], 1.0/num_group2, sgroup2[i]);
-                break;                                    
+                break;
             case 2:
                 array[index] = misc.internal22mid_group2;
-                break;     
+                break;
             case 3:
                 fprintf (file, "%.2lf\n", misc.internal22mid_group2/100.0);
                 break;
@@ -10802,9 +10802,9 @@ int create_building_block_strings ()
                 sscanf (buffer, "%lf\n", &param);
                 param *= 100;
                 misc.internal22mid_group2 = (PARAMTYPE) param;
-                break;                
+                break;
         }
-        index++; 
+        index++;
         switch (job)
         {
             case 0:
@@ -10812,14 +10812,14 @@ int create_building_block_strings ()
                 sprintf (string_params_human_readable[index], "int22mid_group3");
                 break;
             case 1:
-                if (num_group3 > 0)                                            
+                if (num_group3 > 0)
                     sprintf (similarity_rule[sim_index], "%g * %s", 1.0/num_group3, sgroup3[0]);
                 for (i=1; i < num_group3; i++)
-                    sprintf (similarity_rule[sim_index], "%s + %g * %s", similarity_rule[sim_index], 1.0/num_group3, sgroup3[i]); 
-                break;                                                        
+                    sprintf (similarity_rule[sim_index], "%s + %g * %s", similarity_rule[sim_index], 1.0/num_group3, sgroup3[i]);
+                break;
             case 2:
                 array[index] = misc.internal22mid_group3;
-                break;     
+                break;
             case 3:
                 fprintf (file, "%.2lf\n", misc.internal22mid_group3/100.0);
                 break;
@@ -10828,9 +10828,9 @@ int create_building_block_strings ()
                 sscanf (buffer, "%lf\n", &param);
                 param *= 100;
                 misc.internal22mid_group3 = (PARAMTYPE) param;
-                break;                                                  
+                break;
         }
-        index++;         
+        index++;
         switch (job)
         {
             case 0:
@@ -10838,14 +10838,14 @@ int create_building_block_strings ()
                 sprintf (string_params_human_readable[index], "int22mid_group4");
                 break;
             case 1:
-                if (num_group4 > 0)                                            
+                if (num_group4 > 0)
                     sprintf (similarity_rule[sim_index], "%g * %s", 1.0/num_group4, sgroup4[0]);
                 for (i=1; i < num_group4; i++)
                     sprintf (similarity_rule[sim_index], "%s + %g * %s", similarity_rule[sim_index], 1.0/num_group4, sgroup4[i]);
-                break;                                            
+                break;
             case 2:
                 array[index] = misc.internal22mid_group4;
-                break;     
+                break;
             case 3:
                 fprintf (file, "%.2lf\n", misc.internal22mid_group4/100.0);
                 break;
@@ -10854,10 +10854,10 @@ int create_building_block_strings ()
                 sscanf (buffer, "%lf\n", &param);
                 param *= 100;
                 misc.internal22mid_group4 = (PARAMTYPE) param;
-                break;                                                  
+                break;
         }
         index++;
-                       
+
         if (parsi_int22)
         {
             // also add misc.internal22_AU_closure
@@ -10869,7 +10869,7 @@ int create_building_block_strings ()
                     break;
                 case 2:
                     array[index] = misc.internal22_AU_closure;
-                    break;     
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", misc.internal22_AU_closure/100.0);
                     break;
@@ -10880,7 +10880,7 @@ int create_building_block_strings ()
                     misc.internal22_AU_closure = (PARAMTYPE) param;
                     break;
             }
-            index++;            
+            index++;
             // also add misc.internal22_GU_closure
             switch (job)
             {
@@ -10890,7 +10890,7 @@ int create_building_block_strings ()
                     break;
                 case 2:
                     array[index] = misc.internal22_GU_closure;
-                    break;     
+                    break;
                 case 3:
                     fprintf (file, "%.2lf\n", misc.internal22_GU_closure/100.0);
                     break;
@@ -10899,31 +10899,31 @@ int create_building_block_strings ()
                     sscanf (buffer, "%lf\n", &param);
                     param *= 100;
                     misc.internal22_GU_closure = (PARAMTYPE) param;
-                    break;                                                               
+                    break;
             }
-            index++;            
+            index++;
         }
-                                                                       
+
         if (!parsi_int22)
         {
             // add the asymmetric int22
             for (i=0; i < NUCL; i++)
                 for (j=0; j < NUCL; j++)
-                {   
-                    if (!can_pair(i,j)) continue;               
+                {
+                    if (!can_pair(i,j)) continue;
                     for (k=0; k < NUCL; k++)
                         for (l=0; l < NUCL; l++)
                         {
-                            // for now, let's only include ncbp in the internal loop                              
+                            // for now, let's only include ncbp in the internal loop
                             //if (watson_crick(k,l)) continue;    // we need to include all
                             for (m=0; m < NUCL; m++)
                                 for (n=0; n < NUCL; n++)
                                 {
-                                    if (!can_pair(m,n)) continue;                     
+                                    if (!can_pair(m,n)) continue;
                                     for(o=0; o < NUCL; o++)
                                         for (p=0; p < NUCL; p++)
                                         {
-                                            //if (watson_crick(o,p)) continue;    // we need to include all                       
+                                            //if (watson_crick(o,p)) continue;    // we need to include all
                                             if (!(n==i && m==j && p==k && o==l))       // i.e. asymmetric
                                             {
                                                 // exclude duplicates
@@ -10948,7 +10948,7 @@ int create_building_block_strings ()
                                                                     sprintf (smid, "%c%c/%c%c", int_to_nuc(k_rule1), int_to_nuc(o_rule1), int_to_nuc(p_rule1), int_to_nuc(l_rule1));
                                                                 else
                                                                     sprintf (smid, "%c%c/%c%c", int_to_nuc(p_rule1), int_to_nuc(l_rule1), int_to_nuc(k_rule1), int_to_nuc(o_rule1));
-                                                                sprintf (similarity_rule[sim_index], "0.5 * int22[5'-%c%c%c%c/%c%c%c%c-3'] + 0.5 * int22[5'-%c%c%c%c/%c%c%c%c-3'] + 1 * int22mid[5'-%s-3']", 
+                                                                sprintf (similarity_rule[sim_index], "0.5 * int22[5'-%c%c%c%c/%c%c%c%c-3'] + 0.5 * int22[5'-%c%c%c%c/%c%c%c%c-3'] + 1 * int22mid[5'-%s-3']",
                                                                     int_to_nuc(i), int_to_nuc(k), int_to_nuc(l), int_to_nuc(j), int_to_nuc(i), int_to_nuc(k), int_to_nuc(l), int_to_nuc(j),
                                                                     int_to_nuc(n), int_to_nuc(p), int_to_nuc(o), int_to_nuc(m), int_to_nuc(n), int_to_nuc(p), int_to_nuc(o), int_to_nuc(m),
                                                                     smid);
@@ -10956,7 +10956,7 @@ int create_building_block_strings ()
                                                             break;
                                                         case 2:
                                                             array[index] = int22[i][j][k][l][m][n][o][p];
-                                                            break;    
+                                                            break;
                                                         case 3:
                                                             fprintf (file, "%.2lf\n", int22[i][j][k][l][m][n][o][p]/100.0);
                                                             break;
@@ -10967,15 +10967,15 @@ int create_building_block_strings ()
                                                             int22[i][j][k][l][m][n][o][p] = (PARAMTYPE) param;
                                                             // now the duplicate
                                                             int22[n][m][p][o][j][i][l][k] = (PARAMTYPE) param;
-                                                            break;                                                            
+                                                            break;
                                                     }
-                                                    index++;    
+                                                    index++;
                                                 }
-                                            }                                
+                                            }
                                         }
                                 }
-                        }                                                
-                }  
+                        }
+                }
         }   // end if (!parsi_int22)
 */
 
