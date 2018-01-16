@@ -165,6 +165,12 @@ private:
     // access the correct SimpleMap with simple_maps[j]
     // then each list is in a pair accessed by a key created from k and l
     // the list itself is a linked list with d (i) being the free variable
+
+    // The reason it is a vector of maps is that it is much faster than one map with a key from j,k,l
+    // There is usually at least one candidate for a specific j, but many less than the maximum
+    // So it cannot be all a vector, as there would be a lot of unneccesary empty space.
+
+    // For example, for one specific 35 nucleotide sequence, at j=1 there are 35*35/2=612 possible k,l keys, but for that sequence only 284 of the spots are actually used.
     std::vector<SimpleMap<int,candidate>> simple_maps;
 
 public:
