@@ -19,66 +19,19 @@ private:
     /// TODO ordering this stuff for space
     energy_t w_;
 
-    //const candidate_PK *next = nullptr;
-
-    //void set_next(const candidate_PK *next_tgt) {
-    //    if (next_tgt != NULL) {
-    //        next= next_tgt;
-    //    }
-    //}
-
 public:
     candidate_PK(size_t set_d, size_t set_j, size_t set_k, energy_t set_w)
     : d_(set_d), j_(set_j), k_(set_k), w_(set_w)
     {
-        //next = nullptr;
-        //set_next(next_tgt);
-
         // make sure we can fit it in a short
         assert((set_w < 32768) && (set_w < 32767));
     }
-
-    ~candidate_PK() {
-        /// TODO reenable deleting
-        /// could redo this with ors for less stuff
-        //printf("start ~candidate_PK\n");
-
-        //if (d_ != -1 && j_ != -1 && k_ != -1) {
-            //printf("before delete next d:%d j:%d k:%d\n",d_,j_,k_);
-        //    delete next;
-            //printf("after delete next\n");
-        //}
-
-        //printf("end ~candidate_PK\n");
-    }
-
-    candidate_PK(const candidate_PK &source)
-    : d_(source.d()), j_(source.j()), k_(source.k()), w_(source.w())
-    {
-    }
-
-    candidate_PK& operator=(candidate_PK source)
-    {
-        std::swap(d_, source.d_);
-        std::swap(j_, source.j_);
-        std::swap(k_, source.k_);
-        std::swap(w_, source.w_);
-
-        return *this;
-    }
-
-   // const candidate_PK *get_next() const {
-        ///// TODO
-       // if (next != NULL)
-   //         return next;
-       // else
-  //          return nullptr;
-   // }
 
     short d() const { return d_; }
     short j() const { return j_; }
     short k() const { return k_; }
     energy_t w() const { return w_; }
+
 };
 
 
@@ -272,4 +225,3 @@ public:
     void get_CL_size(int &candidates, int &empty_lists, int &size, int &capacity) const;
 
 };
-

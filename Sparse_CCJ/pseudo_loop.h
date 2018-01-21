@@ -196,6 +196,7 @@ private:
     candidate_list *POmloop0_CL;
     candidate_list *PfromL_CL;
     candidate_list *PfromO_CL;
+
     // This is an array of [nb_nucleotides] forward lists
     std::forward_list<candidate_PK> *PK_CL;
 
@@ -248,7 +249,7 @@ private:
             //assert(c->j() > prev_j || c->d() < prev_d || c->k() > prev_k);
             //prev_j = c->j(); prev_d = c->d(); prev_k = c->k();
 
-            if (c.j() == i && c.d() == j && c.k() == k) { return &c; }
+            if (c.d() == i && c.j() == j && c.k() == k) { return &c; }
         }
         // No candidate found in CL with that i
         return nullptr;
@@ -378,6 +379,11 @@ private:
     void compute_POmloop1_ns(int i,int j, int k, int l);
     void compute_POmloop0_sp(int i,int j, int k, int l);
     void compute_POmloop0_ns(int i,int j, int k, int l);
+
+
+    // recompute all PK entries i,.,.,l
+    // fill matrix slice at i, copy candidate energies, recompute non-candidates
+    void recompute_PK(int i, int l);
 
     // I have to calculate the e_stP in a separate function
     int get_e_stP(int i, int j);

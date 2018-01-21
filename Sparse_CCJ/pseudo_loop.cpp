@@ -582,33 +582,24 @@ void pseudo_loop::compute_P_sp(int i, int l){
     int il = index[i]+l-i;
 
     for (const candidate_PK c : PK_CL[l]) {
-        // get_PK(i,j,d+1,k) + get_PK(j+1,d,k+1,l);
-        int j = c.j(), d = c.d(), k = c.k(), w = c.w();
+        int d = c.d(), j = c.j(), k = c.k(), w = c.w();
 
-        temp = get_PK(i, j-1, d+1, k-1) + w;
+        temp = get_PK(i, d-1, j+1, k-1) + w;
 
         if (temp < min_energy) {
             min_energy = temp;
-            best_j = j-1;
+            best_j = j;
             best_d = d;
-            best_k = k-1;
+            best_k = k;
             best_w = w;
         }
     }
 
+    // SW: no trace arrows required, since PK can be recomputed from PK candidates
+    // (note: in the case of P / PK this is slightly overoptimized, since it
+    // saves only O(n^2) TAs)
 
     if (min_energy < INF/2){
-        if (avoid_candidates && is_candidate(i,best_j,best_d+1,best_k, PK_CL)) {
-            // target is already candidate, we don't need to save
-            if (pl_debug)
-                printf("avoid_trace_arrow P(%d,%d)->PK(%d,%d,%d,%d)\n",i,l, i,best_j,best_d+1,best_k);
-            ta->P.avoid_trace_arrow();
-        } else {
-            // Add the first part as a trace arrow at (i,l). The second part is always a candidate so not needed
-            int new_energy = get_PK(i, best_j, best_d+1, best_k);
-            ta->register_trace_arrow(i,i+1,l-1,l, i,best_j,best_d+1,best_k, new_energy, P_P, P_PK);
-        }
-
         if (pl_debug)
             printf ("P(%d,%d) best_d = %d best_j = %d best_k = %d energy %d\n", i, l, best_d,best_j,best_k,min_energy);
 
@@ -789,13 +780,59 @@ void pseudo_loop::compute_PK(int i, int j, int k, int l){
         if (best_branch > 1) {
             if (pl_debug)
                 printf ("Push PK_CL(%d,1212),(%d,%d,%d,%d)\n", l, i, j, k, min_energy);
-            push_candidate_PK(j, i, k, l, min_energy);
-            // always keep arrows starting from candidates
-            if (use_garbage_collection)
-                ta->inc_source_ref_count(i,j,k,l,P_PK);
+            push_candidate_PK(i, j, k, l, min_energy);
+        }
+    }
+}
+
+void pseudo_loop::recompute_PK(int i, int maxl){
+    // recomputes slice at i for ikl < maxl
+
+    // initialize PK entries
+    for (int l=i+1; l<=maxl; l++) {
+        for (int j=i; j<l; j++) {
+            for (int k=j; k<l; k++) {
+                int kl = index[k]+l-k;
+                PK[j][kl] = INF+1;
+            }
         }
     }
 
+    // set candidates
+    for (int l=i+1; l<=maxl; l++) {
+        for (const candidate_PK c : PK_CL[l]){
+            int d=c.d();
+            if (d != i) continue;
+            int j=c.j();
+            int k=c.k();
+
+            int kl = index[k]+l-k;
+            PK[j][kl] = c.w();
+        }
+    }
+
+    for (int l=i+1; l<=maxl; l++) {
+        for (int j=i; j<l; j++) {
+            for (int k=l; k>j; k--) {
+                int kl = index[k]+l-k;
+
+                if (PK[j][kl]>=INF) {
+
+                    // compute minimum over all partitioning cases
+
+                    int temp = INF;
+                    for(int d=i+1; d < j; d++){
+                        temp = std::min(temp, get_PK(i,d,k,l) + get_WP(d+1,j));  // 12G1
+                    }
+                    for(int d=k+1; d < l; d++) {
+                        temp = std::min(temp, get_PK(i,j,d,l) + get_WP(k,d-1));  //1G21
+                    }
+
+                    PK[j][kl] = temp;
+                }
+            }
+        }
+    }
 }
 
 void pseudo_loop::compute_PL(int i, int j, int k, int l){
@@ -1265,7 +1302,7 @@ void pseudo_loop::compute_PfromL_sp(int i, int j, int k, int l){
 
         // Ian Wark Jan 23, 2017
         // push to candidates if better than b1
-        if (best_branch > 1 && i < j) {
+        if (best_branch > 2 && i < j) {
             if (cl_debug || pl_debug)
                 printf ("Push PfromL_CL(%d,%d,%d,12G2),(%d,%d)\n", j, k, l, i, min_energy);
             PfromL_CL->push_candidate(i, j, k, l, min_energy, best_branch);
@@ -5281,7 +5318,6 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 // then in W_final one pass over f, will create the structure in dot bracket format
 // This is the solution I found for the problem of not knowing what kind of brackets and
 // how many different brackets to use when fillinf f and structure at the same time in pseudoloop.cpp
-//void pseudo_loop::back_track(char *structure, minimum_fold *f, seq_interval *cur_interval)
 void pseudo_loop::back_track_sp(minimum_fold *f, seq_interval *cur_interval)
 {
     assert(sparsify);
@@ -5299,62 +5335,45 @@ void pseudo_loop::back_track_sp(minimum_fold *f, seq_interval *cur_interval)
         exit(-1);
     }
 
-    int min_energy = INF,x=INF,temp=INF,best_d=-1,best_j=-1,best_k=-1,best_w=-1,best_x=-1;
+    int x=INF,temp=INF,best_d=-1,best_j=-1,best_k=-1,best_w=-1,best_x=-1;
 
-    // if there is a trace arrow there
-    TraceArrow *trace = ta->P.trace_arrow_from(i,i+1, l-1, l);
-    if (trace != nullptr) {
-        x = trace->target_energy();
+    // --------------------------------------------------
+    // trace back in P
 
-        for (const candidate_PK c : PK_CL[l]) {
-            if (c.j()-1 == trace->j() && c.d()+1 == trace->k() && c.k()-1 == trace->l()) {
-                temp = x + c.w();
+    recompute_PK(i,l);
 
-                if (temp < min_energy && c.j() > i+1 ) {
-                    min_energy = temp;
-                    best_j = c.j()-1;
-                    best_d = c.d();
-                    best_k = c.k()-1;
-                    best_x = x;
-                    best_w = c.w();
-                }
-            }
-        }
-    } else {
-        for (const candidate_PK c : PK_CL[l]) {
-            index_t j = c.j(), d = c.d(), k = c.k(), w = c.w();
-            // couldn't find a trace arrow, look for a corresponding candidate
-            const candidate_PK *c2 = find_candidate(i,j-1,d+1,k-1, PK_CL);
-            if (c2 != NULL) {
-                x = c2->w();
-            }
-            // no trace arrow or candidate, not a best PK
-            else {
-                x = INF;
+    int min_energy = get_P(i,l);
+
+    //std::cerr <<" i"<<i<<" l"<<l << std::endl;
+
+    for (const candidate_PK c : PK_CL[l]) {
+        //std::cerr <<"   d"<<c.d()<<" j"<<c.j()<<" k"<<c.k() << std::endl;
+        if (c.d() < i) continue; // skip candidates outside current interval
+
+        // decomposition 1212 (where 2 is candidate c)
+
+        int e1 = get_PK(i,c.d()-1,c.j()+1,c.k()-1);
+        int e2 = c.w();
+
+        if ( e1+e2 == min_energy ) {
+
+            trace_continue(i,c.d()-1,c.j()+1,c.k()-1,P_PK,e1);
+            trace_continue(c.d(),c.j(),c.k(),l,P_PK,e2);
+
+            if (node_debug || pl_debug) {
+                printf ("P(%d,%d): tracing PK(%d,%d,%d,%d) e:%d and PK(%d,%d,%d,%d) e:%d\n",
+                        i,l,
+                        i,c.d()-1,c.j()+1,c.k()-1, e1,
+                        c.d(),c.j(),c.k(),l, e2);
             }
 
-            temp = x + w;
-
-            if (temp < min_energy && j > i) {
-                min_energy = temp;
-                best_j = j-1;
-                best_d = d;
-                best_k = k-1;
-                best_x = x;
-                best_w = w;
-            }
+            return;
         }
     }
 
-    if (node_debug || pl_debug) {
-        printf ("P(%d,%d): inserting PK(%d,%d,%d,%d) e:%d and PK(%d,%d,%d,%d) e:%d\n",i,l, i,best_j,best_d+1,best_k, best_x, best_j+1,best_d,best_k+1,l, best_w);
-        if (min_energy != get_P(i,l)){
-            printf("!!!!!!There's something wrong here! P(%d,%d) must be %d but is %d \n",i,l,get_P(i,l),min_energy);
-        }
-    }
+    // this should never be reached
+    printf("!!!!!!There's something wrong! P(%d,%d)=%d not reconstructed.\n",i,l,min_energy);   assert(false/*trace: fail from P*/);
 
-    trace_continue(best_j+1,best_d,best_k+1,l,P_PK,best_w);
-    trace_continue(i,best_j,best_d+1,best_k,P_PK,best_x);
 }
 
 void pseudo_loop::bt_WB(int i, int l) {
@@ -5693,7 +5712,9 @@ void pseudo_loop::trace_continue(int i, int j, int k, int l, char srctype, energ
             // look for candidate that could be next
             switch (srctype) {
                 // target is PK
-                case P_P: case P_PK:
+            case P_P:
+                assert(false/*unexpected attempt to trace back from P matrix*/);
+            case P_PK:
                     trace_candidate(i,j,k,l, srctype, P_PK, e, PK_CL);
                     break;
 
@@ -5931,7 +5952,7 @@ void pseudo_loop::trace_candidate(int i, int j, int k, int l, char srctype, char
     // Look through candidates,
     for (const candidate_PK c : CL[l]) {
         // if one recreates e, continue trace from there and end while loop
-        if (i == c.j()) {
+        if (i == c.d()) {
             // PK(i,c.j-1,c.d+1,c.k-1) + PK(c.j,c.d,c.k,l)
             // Find trace arrows that has the first part
                             // Only certain ways PK can move
@@ -5941,33 +5962,33 @@ void pseudo_loop::trace_candidate(int i, int j, int k, int l, char srctype, char
                             // 3. j is the same and k is greater ex. PK(i,j,k,l)->PK(i,j,d,l) (branch 2) - uses get_WP(k,c.k-1)
 
             //2. j is lesser and k is the same ex. PK(i,j,k,l)->PK(i,d,k,l) (branch 1) - uses get_WP(d+1,j)
-            int total = c.w() + get_WP(c.d()+1,j);
-            if (total == e && (c.d() < j && c.k() == k)) {
+            int total = c.w() + get_WP(c.j()+1,j);
+            if (total == e && (c.j() < j && c.k() == k)) {
                 if (node_debug || pl_debug) {
                     printf("candidate   ");
                     print_type(srctype);
                     printf("(%d,%d,%d,%d): going to ",i,j,k,l);
                     print_type(tgttype);
-                    printf("(%d,%d,%d,%d) and WP(%d,%d) e:%d\n",c.j(),c.d(),c.k(),l, c.d()+1,j, total);
+                    printf("(%d,%d,%d,%d) and WP(%d,%d) e:%d\n",c.d(),c.j(),c.k(),l, c.j()+1,j, total);
                 }
 
-                trace_continue(c.j(), c.d(), c.k(), l, tgttype, c.w());
-                bt_WP(c.d()+1,j);
+                trace_continue(c.d(), c.j(), c.k(), l, tgttype, c.w());
+                bt_WP(c.j()+1,j);
                 return;
             } else {
                 // 3. j is the same and k is greater ex. PK(i,j,k,l)->PK(i,j,d,l) (branch 2) - uses get_WP(k,c.k-1)
                 total = c.w() + get_WP(k,c.k()-1);
 
-                if (total == e && (c.d() == j && c.k() > k))  {
+                if (total == e && (c.j() == j && c.k() > k))  {
                     if (node_debug || pl_debug) {
                         printf("candidate   ");
                         print_type(srctype);
                         printf("(%d,%d,%d,%d): going to ",i,j,k,l);
                         print_type(tgttype);
-                        printf("(%d,%d,%d,%d) and WP(%d,%d) e:%d\n",c.j(),c.d(),c.k(),l, c.d()+1,j, total);
+                        printf("(%d,%d,%d,%d) and WP(%d,%d) e:%d\n",c.d(),c.j(),c.k(),l, k,c.k()-1, total);
                     }
 
-                    trace_continue(c.j(), c.d(), c.k(), l, tgttype, c.w());
+                    trace_continue(c.d(), c.j(), c.k(), l, tgttype, c.w());
                     bt_WP(k,c.k()-1);
                     return;
                 }

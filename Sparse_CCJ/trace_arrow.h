@@ -378,6 +378,7 @@ public:
     // PLiloop -> PL  PRiloop -> PR  PMiloop -> PM  POiloop -> PO
     // PLmloop01 -> PLmloop00  POmloop01 -> POmloop00
     TraceArrows P;
+
     TraceArrows PK;
 
     TraceArrows PfromL;
