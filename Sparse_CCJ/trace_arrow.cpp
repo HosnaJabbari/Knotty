@@ -223,7 +223,7 @@ MasterTraceArrows::dec_source_ref_count(size_t i, size_t j, size_t k, size_t l, 
 void
 MasterTraceArrows::gc_row( size_t i, TraceArrows &source ) {
     if (ta_debug)
-        printf("gc_row %c i:%d\n",source.source_type(),i);
+        printf("gc_row %c i:%ld\n",source.source_type(),i);
 
     assert(i<=ta_n);
 
@@ -340,7 +340,7 @@ MasterTraceArrows::gc_trace_arrow(size_t i, size_t j, size_t k, size_t l, TraceA
 void
 MasterTraceArrows::gc_to_target(size_t i, size_t j, size_t k, size_t l, TraceArrows &target) {
     if (ta_debug)
-        printf("gc_to_target(%d,%d,%d,%d)\n",i,j,k,l);
+        printf("gc_to_target(%ld,%ld,%ld,%ld)\n",i,j,k,l);
 
     if (target.exists_trace_arrow_from(i,j,k,l) ) {
         dec_source_ref_count(i,j,k,l,target.source_type());
@@ -370,19 +370,17 @@ MasterTraceArrows::MasterTraceArrows(size_t n)
     PMmloop(n,P_PMmloop),
     POmloop(n,P_POmloop),
 
-    PLmloop10(n,P_PLmloop10),
-    PLmloop00(n,P_PLmloop00),
+    PLmloop1(n,P_PLmloop1),
+    PLmloop0(n,P_PLmloop0),
 
-    PRmloop10(n,P_PRmloop10),
-    PRmloop01(n,P_PRmloop01),
-    PRmloop00(n,P_PRmloop00),
+    PRmloop1(n,P_PRmloop1),
+    PRmloop0(n,P_PRmloop0),
 
-    PMmloop10(n,P_PMmloop10),
-    PMmloop01(n,P_PMmloop01),
-    PMmloop00(n,P_PMmloop00),
+    PMmloop1(n,P_PMmloop1),
+    PMmloop0(n,P_PMmloop0),
 
-    POmloop10(n,P_POmloop10),
-    POmloop00(n,P_POmloop00)
+    POmloop1(n,P_POmloop1),
+    POmloop0(n,P_POmloop0)
 {
     ta_n = n;
 }
@@ -407,19 +405,17 @@ MasterTraceArrows::garbage_collect(size_t i) {
     gc_row(i, PMmloop);
     gc_row(i, POmloop);
 
-    gc_row(i, PLmloop10);
-    gc_row(i, PLmloop00);
+    gc_row(i, PLmloop1);
+    gc_row(i, PLmloop0);
 
-    gc_row(i, PRmloop10);
-    gc_row(i, PRmloop01);
-    gc_row(i, PRmloop00);
+    gc_row(i, PRmloop1);
+    gc_row(i, PRmloop0);
 
-    gc_row(i, PMmloop10);
-    gc_row(i, PMmloop01);
-    gc_row(i, PMmloop00);
+    gc_row(i, PMmloop1);
+    gc_row(i, PMmloop0);
 
-    gc_row(i, POmloop10);
-    gc_row(i, POmloop00);
+    gc_row(i, POmloop1);
+    gc_row(i, POmloop0);
 }
 
 void
@@ -444,19 +440,17 @@ MasterTraceArrows::resize(size_t n) {
     PMmloop.resize(n);
     POmloop.resize(n);
 
-    PLmloop10.resize(n);
-    PLmloop00.resize(n);
+    PLmloop1.resize(n);
+    PLmloop0.resize(n);
 
-    PRmloop10.resize(n);
-    PRmloop01.resize(n);
-    PRmloop00.resize(n);
+    PRmloop1.resize(n);
+    PRmloop0.resize(n);
 
-    PMmloop10.resize(n);
-    PMmloop01.resize(n);
-    PMmloop00.resize(n);
+    PMmloop1.resize(n);
+    PMmloop0.resize(n);
 
-    POmloop10.resize(n);
-    POmloop00.resize(n);
+    POmloop1.resize(n);
+    POmloop0.resize(n);
 }
 
 void
@@ -481,19 +475,17 @@ MasterTraceArrows::set_index(const int *index){
     PMmloop.set_index(index);
     POmloop.set_index(index);
 
-    PLmloop10.set_index(index);
-    PLmloop00.set_index(index);
+    PLmloop1.set_index(index);
+    PLmloop0.set_index(index);
 
-    PRmloop10.set_index(index);
-    PRmloop01.set_index(index);
-    PRmloop00.set_index(index);
+    PRmloop1.set_index(index);
+    PRmloop0.set_index(index);
 
-    PMmloop10.set_index(index);
-    PMmloop01.set_index(index);
-    PMmloop00.set_index(index);
+    PMmloop1.set_index(index);
+    PMmloop0.set_index(index);
 
-    POmloop10.set_index(index);
-    POmloop00.set_index(index);
+    POmloop1.set_index(index);
+    POmloop0.set_index(index);
 }
 
 /**
@@ -521,19 +513,17 @@ MasterTraceArrows::get_arrows_by_type(char type) {
         case P_PMmloop: target = &PMmloop; break;
         case P_POmloop: target = &POmloop; break;
 
-        case P_PLmloop10: target = &PLmloop10; break;
-        case P_PLmloop00: target = &PLmloop00; break;
+        case P_PLmloop1: target = &PLmloop1; break;
+        case P_PLmloop0: target = &PLmloop0; break;
 
-        case P_PRmloop10: target = &PRmloop10; break;
-        case P_PRmloop01: target = &PRmloop01; break;
-        case P_PRmloop00: target = &PRmloop00; break;
+        case P_PRmloop1: target = &PRmloop1; break;
+        case P_PRmloop0: target = &PRmloop0; break;
 
-        case P_PMmloop10: target = &PMmloop10; break;
-        case P_PMmloop01: target = &PMmloop01; break;
-        case P_PMmloop00: target = &PMmloop00; break;
+        case P_PMmloop1: target = &PMmloop1; break;
+        case P_PMmloop0: target = &PMmloop0; break;
 
-        case P_POmloop10: target = &POmloop10; break;
-        case P_POmloop00: target = &POmloop00; break;
+        case P_POmloop1: target = &POmloop1; break;
+        case P_POmloop0: target = &POmloop0; break;
 
         default: printf("MasterTraceArrows: Target type switch statement failed: %c\n",type); exit(-1);
     }
@@ -561,19 +551,17 @@ MasterTraceArrows::compactify() {
     PMmloop.compactify();
     POmloop.compactify();
 
-    PLmloop10.compactify();
-    PLmloop00.compactify();
+    PLmloop1.compactify();
+    PLmloop0.compactify();
 
-    PRmloop10.compactify();
-    PRmloop01.compactify();
-    PRmloop00.compactify();
+    PRmloop1.compactify();
+    PRmloop0.compactify();
 
-    PMmloop10.compactify();
-    PMmloop01.compactify();
-    PMmloop00.compactify();
+    PMmloop1.compactify();
+    PMmloop0.compactify();
 
-    POmloop10.compactify();
-    POmloop00.compactify();
+    POmloop1.compactify();
+    POmloop0.compactify();
 }
 
 void
@@ -581,53 +569,58 @@ MasterTraceArrows::print_ta_sizes(){
     unsigned long long size = P.size() + PK.size() + PfromL.size() + PfromM.size() + PfromO.size() + PfromR.size()
     + PL.size() + PR.size() + PM.size() + PO.size()
     + PLmloop.size() + PRmloop.size() + PMmloop.size() + POmloop.size()
-    + PLmloop10.size() + PLmloop00.size()
-    + PRmloop10.size() + PRmloop01.size() + PRmloop00.size()
-    + PMmloop10.size() + PMmloop01.size() + PMmloop00.size()
-    + POmloop10.size() + POmloop00.size();
+    + PLmloop1.size() + PLmloop0.size()
+    + PRmloop1.size() + PRmloop0.size()
+    + PMmloop1.size() + PMmloop0.size()
+    + POmloop1.size() + POmloop0.size();
 
     unsigned long long erased = P.erased() + PK.erased() + PfromL.erased() + PfromM.erased() + PfromO.erased() + PfromR.erased()
     + PL.erased() + PR.erased() + PM.erased() + PO.erased()
     + PLmloop.erased() + PRmloop.erased() + PMmloop.erased() + POmloop.erased()
-    + PLmloop10.erased() + PLmloop00.erased()
-    + PRmloop10.erased() + PRmloop01.erased() + PRmloop00.erased()
-    + PMmloop10.erased() + PMmloop01.erased() + PMmloop00.erased()
-    + POmloop10.erased() + POmloop00.erased();
+    + PLmloop1.erased() + PLmloop0.erased()
+    + PRmloop1.erased() + PRmloop0.erased()
+    + PMmloop1.erased() + PMmloop0.erased()
+    + POmloop1.erased() + POmloop0.erased();
 
     unsigned long long avoided = P.avoided() + PK.avoided() + PfromL.avoided() + PfromM.avoided() + PfromO.avoided() + PfromR.avoided()
     + PL.avoided() + PR.avoided() + PM.avoided() + PO.avoided()
     + PLmloop.avoided() + PRmloop.avoided() + PMmloop.avoided() + POmloop.avoided()
-    + PLmloop10.avoided() + PLmloop00.avoided()
-    + PRmloop10.avoided() + PRmloop01.avoided() + PRmloop00.avoided()
-    + PMmloop10.avoided() + PMmloop01.avoided() + PMmloop00.avoided()
-    + POmloop10.avoided() + POmloop00.avoided();
+    + PLmloop1.avoided() + PLmloop0.avoided()
+    + PRmloop1.avoided() + PRmloop0.avoided()
+    + PMmloop1.avoided() + PMmloop0.avoided()
+    + POmloop1.avoided() + POmloop0.avoided();
 
     unsigned long long shortcut = P.shortcut() + PK.shortcut() + PfromL.shortcut() + PfromM.shortcut() + PfromO.shortcut() + PfromR.shortcut()
     + PL.shortcut() + PR.shortcut() + PM.shortcut() + PO.shortcut()
     + PLmloop.shortcut() + PRmloop.shortcut() + PMmloop.shortcut() + POmloop.shortcut()
-    + PLmloop10.shortcut() + PLmloop00.shortcut()
-    + PRmloop10.shortcut() + PRmloop01.shortcut() + PRmloop00.shortcut()
-    + PMmloop10.shortcut() + PMmloop01.shortcut() + PMmloop00.shortcut()
-    + POmloop10.shortcut() + POmloop00.shortcut();
+    + PLmloop1.shortcut() + PLmloop0.shortcut()
+    + PRmloop1.shortcut() + PRmloop0.shortcut()
+    + PMmloop1.shortcut() + PMmloop0.shortcut()
+    + POmloop1.shortcut() + POmloop0.shortcut();
 
     unsigned long long replaced = P.replaced() + PK.replaced() + PfromL.replaced() + PfromM.replaced() + PfromO.replaced() + PfromR.replaced()
     + PL.replaced() + PR.replaced() + PM.replaced() + PO.replaced()
     + PLmloop.replaced() + PRmloop.replaced() + PMmloop.replaced() + POmloop.replaced()
-    + PLmloop10.replaced() + PLmloop00.replaced()
-    + PRmloop10.replaced() + PRmloop01.replaced() + PRmloop00.replaced()
-    + PMmloop10.replaced() + PMmloop01.replaced() + PMmloop00.replaced()
-    + POmloop10.replaced() + POmloop00.replaced();
+    + PLmloop1.replaced() + PLmloop0.replaced()
+    + PRmloop1.replaced() + PRmloop0.replaced()
+    + PMmloop1.replaced() + PMmloop0.replaced()
+    + POmloop1.replaced() + POmloop0.replaced();
 
     unsigned long long max = P.max() + PK.max() + PfromL.max() + PfromM.max() + PfromO.max() + PfromR.max()
     + PL.max() + PR.max() + PM.max() + PO.max()
     + PLmloop.max() + PRmloop.max() + PMmloop.max() + POmloop.max()
-    + PLmloop10.max() + PLmloop00.max()
-    + PRmloop10.max() + PRmloop01.max() + PRmloop00.max()
-    + PMmloop10.max() + PMmloop01.max() + PMmloop00.max()
-    + POmloop10.max() + POmloop00.max();
+    + PLmloop1.max() + PLmloop0.max()
+    + PRmloop1.max() + PRmloop0.max()
+    + PMmloop1.max() + PMmloop0.max()
+    + POmloop1.max() + POmloop0.max();
 
-    printf("Trace Arrows Size: %d Avoided: %d Shortcut: %d Replaced: %d Erased: %d Max: %d\n",size,avoided,shortcut,replaced,erased,max);
-    //printf("largest and smallest energies:\nlargest:%d smallest:%d\n",largest,smallest);
+    std::cout << "Trace Arrows Size: "<<size
+              <<" Avoided: "<<avoided
+              <<" Shortcut: "<<shortcut
+              <<" Replaced: "<<replaced
+              <<" Erased: "<<erased
+              <<" Max: "<<max
+              <<"\n";
 }
 
 void
@@ -650,19 +643,17 @@ MasterTraceArrows::print_ta_sizes_verbose(){
     printf("PMmloop: "); PMmloop.print_ta_size();
     printf("POmloop: "); POmloop.print_ta_size();
 
-    printf("PLmloop10: "); PLmloop10.print_ta_size();
-    printf("PLmloop00: "); PLmloop00.print_ta_size();
+    printf("PLmloop1: "); PLmloop1.print_ta_size();
+    printf("PLmloop0: "); PLmloop0.print_ta_size();
 
-    printf("PRmloop10: "); PRmloop10.print_ta_size();
-    printf("PRmloop01: "); PRmloop01.print_ta_size();
-    printf("PRmloop00: "); PRmloop00.print_ta_size();
+    printf("PRmloop1: "); PRmloop1.print_ta_size();
+    printf("PRmloop0: "); PRmloop0.print_ta_size();
 
-    printf("PMmloop10: "); PMmloop10.print_ta_size();
-    printf("PMmloop01: "); PMmloop01.print_ta_size();
-    printf("PMmloop00: "); PMmloop00.print_ta_size();
+    printf("PMmloop1: "); PMmloop1.print_ta_size();
+    printf("PMmloop0: "); PMmloop0.print_ta_size();
 
-    printf("POmloop10: "); POmloop10.print_ta_size();
-    printf("POmloop00: "); POmloop00.print_ta_size();
+    printf("POmloop1: "); POmloop1.print_ta_size();
+    printf("POmloop0: "); POmloop0.print_ta_size();
 
     print_ta_sizes();
 }
@@ -693,24 +684,20 @@ TraceArrows::print_type(char type) {
         case P_POiloop5: printf("POiloop5"); break;
 
         case P_PLmloop: printf("PLmloop"); break;
-        case P_PLmloop10: printf("PLmloop10"); break;
-        case P_PLmloop01: printf("PLmloop01"); break;
-        case P_PLmloop00: printf("PLmloop00"); break;
+        case P_PLmloop1: printf("PLmloop1"); break;
+        case P_PLmloop0: printf("PLmloop0"); break;
 
         case P_PRmloop: printf("PRmloop"); break;
-        case P_PRmloop10: printf("PRmloop10"); break;
-        case P_PRmloop01: printf("PRmloop01"); break;
-        case P_PRmloop00: printf("PRmloop00"); break;
+        case P_PRmloop1: printf("PRmloop1"); break;
+        case P_PRmloop0: printf("PRmloop0"); break;
 
         case P_PMmloop: printf("PMmloop"); break;
-        case P_PMmloop10: printf("PMmloop10"); break;
-        case P_PMmloop01: printf("PMmloop01"); break;
-        case P_PMmloop00: printf("PMmloop00"); break;
+        case P_PMmloop1: printf("PMmloop1"); break;
+        case P_PMmloop0: printf("PMmloop0"); break;
 
         case P_POmloop: printf("POmloop"); break;
-        case P_POmloop10: printf("POmloop10"); break;
-        case P_POmloop01: printf("POmloop01"); break;
-        case P_POmloop00: printf("POmloop00"); break;
+        case P_POmloop1: printf("POmloop1"); break;
+        case P_POmloop0: printf("POmloop0"); break;
 
         case P_WB: printf("WB"); break;
         case P_WBP: printf("WBP"); break;

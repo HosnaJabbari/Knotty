@@ -395,19 +395,17 @@ public:
     TraceArrows PMmloop;
     TraceArrows POmloop;
 
-    TraceArrows PLmloop10;
-    TraceArrows PLmloop00;
+    TraceArrows PLmloop1;
+    TraceArrows PLmloop0;
 
-    TraceArrows PRmloop10;
-    TraceArrows PRmloop01;
-    TraceArrows PRmloop00;
+    TraceArrows PRmloop1;
+    TraceArrows PRmloop0;
 
-    TraceArrows PMmloop10;
-    TraceArrows PMmloop01;
-    TraceArrows PMmloop00;
+    TraceArrows PMmloop1;
+    TraceArrows PMmloop0;
 
-    TraceArrows POmloop10;
-    TraceArrows POmloop00;
+    TraceArrows POmloop1;
+    TraceArrows POmloop0;
 
     /**
      * @brief Construct for sequence of specific length

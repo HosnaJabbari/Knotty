@@ -78,36 +78,32 @@ public:
     int get_PfromM(int i, int j, int k, int l);
     int get_PfromO(int i, int j, int k, int l);
 
+    int
+    get_3D_helper(int **m, int i, int j, int k, int l);
 
     int get_PLiloop(int i,int j, int k, int l);
     //int get_PLiloop5(int i,int j, int k, int l,int s);
     int get_PLmloop(int i,int j, int k, int l);
-    int get_PLmloop10(int i,int j, int k, int l);
-    int get_PLmloop01(int i,int j, int k, int l);
-    int get_PLmloop00(int i,int j, int k, int l);
+    int get_PLmloop1(int i,int j, int k, int l);
+    int get_PLmloop0(int i,int j, int k, int l);
 
     int get_PRiloop(int i,int j, int k, int l);
     //int get_PRiloop5(int i,int j, int k, int l,int s);
     int get_PRmloop(int i,int j, int k, int l);
-    int get_PRmloop10(int i,int j, int k, int l);
-    int get_PRmloop01(int i,int j, int k, int l);
-    int get_PRmloop00(int i,int j, int k, int l);
+    int get_PRmloop0(int i,int j, int k, int l);
+    int get_PRmloop1(int i,int j, int k, int l);
 
     int get_PMiloop(int i,int j, int k, int l);
     //int get_PMiloop5(int i,int j, int k, int l,int s);
     int get_PMmloop(int i,int j, int k, int l);
-    int get_PMmloop10(int i,int j, int k, int l);
-    int get_PMmloop01(int i,int j, int k, int l);
-    int get_PMmloop00(int i,int j, int k, int l);
+    int get_PMmloop1(int i,int j, int k, int l);
+    int get_PMmloop0(int i,int j, int k, int l);
 
     int get_POiloop(int i,int j, int k, int l);
     //int get_POiloop5(int i,int j, int k, int l,int s);
     int get_POmloop(int i,int j, int k, int l);
-    int get_POmloop10(int i,int j, int k, int l);
-    int get_POmloop01(int i,int j, int k, int l);
-    int get_POmloop00(int i,int j, int k, int l);
-
-
+    int get_POmloop1(int i,int j, int k, int l);
+    int get_POmloop0(int i,int j, int k, int l);
 
     // int is_weakly_closed(int i, int j);
     //int is_empty_region(int i, int j);
@@ -180,47 +176,46 @@ private:
     int ***PfromO;
 
     // internal loops and multi loops that span a band
-    //int **PLiloop;
-    //int ***PLiloop5;
-    //int **PLmloop;
-    int ***PLmloop10;
-    int ***PLmloop01;
-    int **PLmloop00;
+    int ***PLmloop1;
+    int **PLmloop0;
 
+    int **PRmloop1;
+    int **PRmloop0;
 
-    //int **PRiloop;
-    //int ***PRiloop5;
-    //int **PRmloop;
-    int **PRmloop10;
-    int **PRmloop01;
-    int **PRmloop00;
+    int **PMmloop1;
+    int **PMmloop0;
 
-
-    //int **PMiloop;
-    //int ***PMiloop5;
-    //int **PMmloop;
-    int **PMmloop10;
-    int **PMmloop01;
-    int **PMmloop00;
-
-
-    //int **POiloop;
-    //int ***POiloop5;
-    //int **POmloop;
-    int ***POmloop01;
-    int ***POmloop10;
-    int **POmloop00;
+    int ***POmloop1;
+    int **POmloop0;
 
     // Ian Wark Jan 23, 2017
     // Candidate Lists (candidate type is in h_struct.h)
     // 3D arrays pointing to linked lists where candidates point to the next in the list
     // Actually implemented as 2D arrays accessed by [j][kl]
-    candidate_list *PLmloop00_CL;
-    candidate_list *POmloop00_CL;
+    candidate_list *PLmloop0_CL;
+    candidate_list *POmloop0_CL;
     candidate_list *PfromL_CL;
     candidate_list *PfromO_CL;
     // This is an array of [nb_nucleotides] forward lists
     std::forward_list<candidate_PK> *PK_CL;
+
+
+    //! @brief allocate and initialize a 3D matrix slice
+    //! @return slice
+    int **
+    init_new_3Dslice();
+
+    //! @brief allocate and initialize an array of 3D matrix slices
+    //! @param n number of slices
+    //! @return slice
+    int ***
+    init_new_3Dslices(int n);
+
+    //! @brief allocate and initialize a 4D matrix
+    //! @return slice
+    //! @note the 4D matrix is represented as 2D matrix (product of two triangular matrices)
+    int **
+    init_new_4Dmatrix();
 
     void push_candidate_PK(int d, int j, int k, int l, int w)
     {
@@ -316,8 +311,8 @@ public:
         if (sparsify && use_compactify) {
             PfromL_CL->compactify();
             PfromO_CL->compactify();
-            PLmloop00_CL->compactify();
-            POmloop00_CL->compactify();
+            PLmloop0_CL->compactify();
+            POmloop0_CL->compactify();
 
             if (!use_garbage_collection)
                 ta->compactify();
@@ -361,7 +356,6 @@ private:
     void compute_PM(int i,int j, int k, int l);
     void compute_PO(int i,int j, int k, int l);
 
-
     void compute_PfromL_sp(int i, int j, int k, int l);
     void compute_PfromL_ns(int i, int j, int k, int l);
     void compute_PfromR(int i, int j, int k, int l);
@@ -369,38 +363,21 @@ private:
     void compute_PfromO_sp(int i, int j, int k, int l);
     void compute_PfromO_ns(int i, int j, int k, int l);
 
+    void compute_PLmloop1_sp(int i,int j, int k, int l);
+    void compute_PLmloop1_ns(int i,int j, int k, int l);
+    void compute_PLmloop0_sp(int i,int j, int k, int l);
+    void compute_PLmloop0_ns(int i,int j, int k, int l);
 
-    //void compute_PLiloop(int i,int j, int k, int l);
-    //void compute_PLiloop5(int i,int j, int k, int l,int s);
-    //void compute_PLmloop(int i,int j, int k, int l);
-    void compute_PLmloop10_sp(int i,int j, int k, int l);
-    void compute_PLmloop10_ns(int i,int j, int k, int l);
-    void compute_PLmloop01(int i,int j, int k, int l);
-    void compute_PLmloop00_sp(int i,int j, int k, int l);
-    void compute_PLmloop00_ns(int i,int j, int k, int l);
+    void compute_PRmloop1(int i,int j, int k, int l);
+    void compute_PRmloop0(int i,int j, int k, int l);
 
-    //void compute_PRiloop(int i,int j, int k, int l);
-    //void compute_PRiloop5(int i,int j, int k, int l,int s);
-    //void compute_PRmloop(int i,int j, int k, int l);
-    void compute_PRmloop10(int i,int j, int k, int l);
-    void compute_PRmloop01(int i,int j, int k, int l);
-    void compute_PRmloop00(int i,int j, int k, int l);
+    void compute_PMmloop1(int i,int j, int k, int l);
+    void compute_PMmloop0(int i,int j, int k, int l);
 
-    //void compute_PMiloop(int i,int j, int k, int l);
-    //void compute_PMiloop5(int i,int j, int k, int l,int s);
-    //void compute_PMmloop(int i,int j, int k, int l);
-    void compute_PMmloop10(int i,int j, int k, int l);
-    void compute_PMmloop01(int i,int j, int k, int l);
-    void compute_PMmloop00(int i,int j, int k, int l);
-
-    //void compute_POiloop(int i,int j, int k, int l);
-    //void compute_POiloop5(int i,int j, int k, int l,int s);
-    //void compute_POmloop(int i,int j, int k, int l);
-    void compute_POmloop10_sp(int i,int j, int k, int l);
-    void compute_POmloop10_ns(int i,int j, int k, int l);
-    void compute_POmloop01(int i,int j, int k, int l);
-    void compute_POmloop00_sp(int i,int j, int k, int l);
-    void compute_POmloop00_ns(int i,int j, int k, int l);
+    void compute_POmloop1_sp(int i,int j, int k, int l);
+    void compute_POmloop1_ns(int i,int j, int k, int l);
+    void compute_POmloop0_sp(int i,int j, int k, int l);
+    void compute_POmloop0_ns(int i,int j, int k, int l);
 
     // I have to calculate the e_stP in a separate function
     int get_e_stP(int i, int j);
@@ -416,7 +393,7 @@ private:
     void trace_update_f_with_target(int i, int j, int k, int l, char srctype, char tgttype);
 
     // Takes a char denoting type and prints out a string for that type
-    // P_POmloop10 prints "POmloop10" instead of '-', its char representation
+    // P_POmloop1 prints "POmloop1" instead of its char representation
     void print_type(char type);
 
     // used for backtracking

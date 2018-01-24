@@ -923,49 +923,47 @@ void W_final::backtrack(seq_interval *cur_interval){
 			}
 			break;
 
-        // Psuedo loop stuff
-		case P_P: p_backtrack(cur_interval); break;
-		case P_PK: p_backtrack(cur_interval); break;
+        // Pseudo loop stuff
+		case P_P: ;
+		case P_PK: ;
 
-		case P_WB: p_backtrack(cur_interval); break;
-		case P_WBP: p_backtrack(cur_interval); break;
-		case P_WP: p_backtrack(cur_interval); break;
-		case P_WPP: p_backtrack(cur_interval); break;
+		case P_WB: ;
+		case P_WBP: ;
+		case P_WP: ;
+		case P_WPP: ;
 
-		case P_PL: p_backtrack(cur_interval); break;
-		case P_PR: p_backtrack(cur_interval); break;
-		case P_PM: p_backtrack(cur_interval); break;
-		case P_PO: p_backtrack(cur_interval); break;
+		case P_PL: ;
+		case P_PR: ;
+		case P_PM: ;
+		case P_PO: ;
 
-		case P_PfromL: p_backtrack(cur_interval); break;
-		case P_PfromR: p_backtrack(cur_interval); break;
-		case P_PfromM: p_backtrack(cur_interval); break;
-		case P_PfromO: p_backtrack(cur_interval); break;
+		case P_PfromL: ;
+		case P_PfromR: ;
+		case P_PfromM: ;
+		case P_PfromO: ;
 
-		case P_PLiloop: p_backtrack(cur_interval); break;
-		case P_PRiloop: p_backtrack(cur_interval); break;
-		case P_PMiloop: p_backtrack(cur_interval); break;
-		case P_POiloop: p_backtrack(cur_interval); break;
+		case P_PLiloop: ;
+		case P_PRiloop: ;
+		case P_PMiloop: ;
+		case P_POiloop: ;
 
-		case P_PLmloop: p_backtrack(cur_interval); break;
-		case P_PLmloop10: p_backtrack(cur_interval); break;
-		case P_PLmloop01: p_backtrack(cur_interval); break;
-		case P_PLmloop00: p_backtrack(cur_interval); break;
+		case P_PLmloop: ;
+		case P_PLmloop1: ;
+		case P_PLmloop0: ;
 
-		case P_PRmloop: p_backtrack(cur_interval); break;
-		case P_PRmloop10: p_backtrack(cur_interval); break;
-		case P_PRmloop01: p_backtrack(cur_interval); break;
-		case P_PRmloop00: p_backtrack(cur_interval); break;
+		case P_PRmloop: ;
+		case P_PRmloop1: ;
+		case P_PRmloop0: ;
 
-		case P_PMmloop: p_backtrack(cur_interval); break;
-		case P_PMmloop10: p_backtrack(cur_interval); break;
-		case P_PMmloop01: p_backtrack(cur_interval); break;
-		case P_PMmloop00: p_backtrack(cur_interval); break;
+		case P_PMmloop: ;
+		case P_PMmloop1: ;
+		case P_PMmloop0: ;
 
-		case P_POmloop: p_backtrack(cur_interval); break;
-		case P_POmloop10: p_backtrack(cur_interval); break;
-		case P_POmloop01: p_backtrack(cur_interval); break;
-		case P_POmloop00: p_backtrack(cur_interval); break;
+		case P_POmloop: ;
+		case P_POmloop1: ;
+		case P_POmloop0: ;
+
+                    p_backtrack(cur_interval); break;
 
 		default:
 			printf("Should not be here!\n");
@@ -1192,7 +1190,7 @@ void W_final::fill_structure()
                     break;
                 }
             }
-            if (debug) printf("%d > %d, stack's size is: %d, open=%c, close=%c\n",i,ipair,st.size(),(st.top()).open,(st.top()).close);
+            if (debug) printf("%d > %d, stack's size is: %lu, open=%c, close=%c\n",i,ipair,st.size(),(st.top()).open,(st.top()).close);
         }
     }
 
@@ -1246,6 +1244,3 @@ void W_final::print_result ()
     printf ("%s\n", structure);
 
 }
-
-
-
