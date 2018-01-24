@@ -2226,11 +2226,11 @@ void pseudo_loop::compute_POmloop1_sp(int i, int j, int k, int l){
 
     const candidate *c = POmloop0_CL->get_front(j,k,l);                 // Ian - 12G2. based off candidate list
     while (c != NULL) {
-        temp=get_WBP(i, c->d-1) + c->w;
-        if (temp < min_energy){
-            min_energy = temp;
-            best_branch = 1;
-            best_d = c->d;
+      temp = get_WBP(i, c->d - 1) + c->w;
+      if (temp < min_energy) {
+        min_energy = temp;
+        best_branch = 1;
+        best_d = c->d;
         }
         c = c->get_next();
     }
@@ -2325,13 +2325,12 @@ void pseudo_loop::compute_POmloop0_sp(int i, int j, int k, int l){
 
     const candidate *c = POmloop0_CL->get_front(j,k,l);
     while (c != NULL) {
-        temp=get_WB(i, c->d-1) + c->w;
-        if (temp < min_energy){
-            min_energy = temp;
-            best_branch = 2;
-            best_d = c->d;
+      temp = get_WB(i, c->d - 1) + c->w;
+      if (temp < min_energy) {
+        min_energy = temp;
+        best_branch = 2;
+        best_d = c->d;
         }
-
         c = c->get_next();
     }
 
@@ -2440,10 +2439,13 @@ int pseudo_loop::get_WB(int i, int j){
 }
 
 int pseudo_loop::get_WBP(int i, int j){
-    assert(!(i>j || i< 0 || j<0 || i>=nb_nucleotides || j>=nb_nucleotides));
+    if (i<0 || j<0 || i>=nb_nucleotides || j>=nb_nucleotides){
+        return INF;
+    }
 
     int ij = index[i]+j-i;
     return WBP[ij];
+
 }
 
 int pseudo_loop::get_WP(int i, int j){
