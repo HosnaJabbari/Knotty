@@ -1302,7 +1302,7 @@ void pseudo_loop::compute_PfromL_sp(int i, int j, int k, int l){
 
         // Ian Wark Jan 23, 2017
         // push to candidates if better than b1
-        if (best_branch > 2 && i < j) {
+        if (best_branch > 1 && i < j) {
             if (cl_debug || pl_debug)
                 printf ("Push PfromL_CL(%d,%d,%d,12G2),(%d,%d)\n", j, k, l, i, min_energy);
             PfromL_CL->push_candidate(i, j, k, l, min_energy, best_branch);
