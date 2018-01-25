@@ -81,6 +81,9 @@ public:
     int
     get_3D_helper(int **m, int i, int j, int k, int l);
 
+    int
+    get_3D_helper(int ***m, int modulo, int i, int j, int k, int l);
+
     int get_PLiloop(int i,int j, int k, int l);
     //int get_PLiloop5(int i,int j, int k, int l,int s);
     int get_PLmloop(int i,int j, int k, int l);
@@ -364,6 +367,13 @@ private:
     int generic_compute_PLmloop0_sp(int i, int j, int k, int l,
                                     bool only_decomposing = false);
 
+    int generic_compute_POmloop1_sp(int i, int j, int k, int l);
+
+
+    int generic_compute_POmloop0_sp(int i, int j, int k, int l,
+                                    bool only_decomposing = false);
+
+
     //void compute_WM(int i, int j); // in base pair maximization, there is no difference between the two
     //void compute_WMP(int i, int l);
     //void compute_WB(int i, int j); // in base pair maximization, there is no difference between the two
@@ -418,9 +428,24 @@ private:
     recompute_slice_PLmloop1(int i, int max_j, int min_k, int max_l);
 
 
+    // recompute a slice of POmloop0
+    // for fix i, i<=j<=max_j min_k<=k<=l<=max_l
+    void
+    recompute_slice_POmloop0(int i, int max_j, int min_k, int max_l);
+
+    // recompute a slice of POmloop1
+    // for fix i, i<=j<=max_j min_k<=k<=l<=max_l
+    void
+    recompute_slice_POmloop1(int i, int max_j, int min_k, int max_l);
+
+
     void trace_PLmloop(int i, int j, int k, int l, int e);
     void trace_PLmloop1(int i, int j, int k, int l, int e);
     void trace_PLmloop0(int i, int j, int k, int l, int e);
+
+    void trace_POmloop(int i, int j, int k, int l, int e);
+    void trace_POmloop1(int i, int j, int k, int l, int e);
+    void trace_POmloop0(int i, int j, int k, int l, int e);
 
 
     // I have to calculate the e_stP in a separate function
