@@ -17,10 +17,10 @@ private:
     index_t k_;
 
     /// TODO ordering this stuff for space
-    energy_t w_;
+    int w_;
 
 public:
-    candidate_PK(size_t set_d, size_t set_j, size_t set_k, energy_t set_w)
+    candidate_PK(size_t set_d, size_t set_j, size_t set_k, int set_w)
     : d_(set_d), j_(set_j), k_(set_k), w_(set_w)
     {
         // make sure we can fit it in a short
@@ -30,7 +30,7 @@ public:
     short d() const { return d_; }
     short j() const { return j_; }
     short k() const { return k_; }
-    energy_t w() const { return w_; }
+    int w() const { return w_; }
 
 };
 
@@ -48,7 +48,7 @@ public:
 
     /// TODO short or size_t or what?
     index_t d;
-    energy_t w;    // Energy
+    int w;    // Energy
 
     // should only be used by candidate_list::compactify
     candidate() {

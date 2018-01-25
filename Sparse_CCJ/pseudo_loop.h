@@ -267,7 +267,7 @@ private:
     * @param e - energy value
     * @param CL - candidate list to look through
     */
-    void trace_candidate(int i, int j, int k, int l, char srctype, char tgttype, energy_t e, candidate_list *CL);
+    void trace_candidate(int i, int j, int k, int l, char srctype, char tgttype, int e, candidate_list *CL);
     void trace_candidate_continue(int i, int j, int k, int l, int m, int n, int o, int p, char srctype, char tgttype, const candidate *c);
 
 
@@ -283,7 +283,7 @@ private:
     * @param e - energy value
     * @param CL - candidate list to look through
     */
-    void trace_candidate(int i, int j, int k, int l, char srctype, char tgttype, energy_t e, std::forward_list<candidate_PK> *CL);
+    void trace_candidate(int i, int j, int k, int l, char srctype, char tgttype, int e, std::forward_list<candidate_PK> *CL);
 
 
     // Ian Wark Feb 8, 2017
@@ -342,6 +342,28 @@ private:
 
     void allocate_space_nonsparse();
 
+    bool impossible_case(int i, int l) const;
+
+    bool impossible_case(int i, int j, int k, int l) const;
+
+    // "output" parameters for generic_compute functions
+    int best_d_;
+    int best_branch_;
+
+    //@brief generic sparse computation of best energy and best case in PLmloop1
+    //@param i fragment left end
+    //@param j pos before gap
+    //@param k pos after gap
+    //@param l fragment right end
+    //@note sets best_branch_ to the best branch of the decomposition,
+    // sets best_d_ to the best d of the decomposition
+    //@returns energy
+    int generic_compute_PLmloop1_sp(int i, int j, int k, int l);
+
+
+    int generic_compute_PLmloop0_sp(int i, int j, int k, int l,
+                                    bool only_decomposing = false);
+
     //void compute_WM(int i, int j); // in base pair maximization, there is no difference between the two
     //void compute_WMP(int i, int l);
     //void compute_WB(int i, int j); // in base pair maximization, there is no difference between the two
@@ -381,9 +403,25 @@ private:
     void compute_POmloop0_ns(int i,int j, int k, int l);
 
 
-    // recompute all PK entries i,.,.,l
+    // recompute all PK entries i,j,k,l for fixed i and all j,k,l: i<=j<k<=max_l
     // fill matrix slice at i, copy candidate energies, recompute non-candidates
-    void recompute_PK(int i, int l);
+    void recompute_slice_PK(int i, int max_l);
+
+    // recompute a slice of PLmloop0
+    // for fix i, i<=j<=max_j min_k<=k<=l<=max_l
+    void
+    recompute_slice_PLmloop0(int i, int max_j, int min_k, int max_l);
+
+    // recompute a slice of PLmloop1
+    // for fix i, i<=j<=max_j min_k<=k<=l<=max_l
+    void
+    recompute_slice_PLmloop1(int i, int max_j, int min_k, int max_l);
+
+
+    void trace_PLmloop(int i, int j, int k, int l, int e);
+    void trace_PLmloop1(int i, int j, int k, int l, int e);
+    void trace_PLmloop0(int i, int j, int k, int l, int e);
+
 
     // I have to calculate the e_stP in a separate function
     int get_e_stP(int i, int j);
@@ -393,7 +431,7 @@ private:
     * @param location of source
     * @param source type
     */
-    void trace_continue(int i, int j, int k, int l, char srctype, energy_t e);
+    void trace_continue(int i, int j, int k, int l, char srctype, int e);
 
     void trace_update_f(int i, int j, int k, int l, char srctype);
     void trace_update_f_with_target(int i, int j, int k, int l, char srctype, char tgttype);
