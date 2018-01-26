@@ -10,6 +10,9 @@
 #include "trace_arrow.h"
 #include "candidate_list.h"
 
+#include "matrices.h"
+
+
 class VM_final;
 class V_final;
 class pseudo_loop{
@@ -59,12 +62,12 @@ public:
     //int get_WMP(int i, int j);
 
     // nested substr in a multiloop that spans a band
-    int get_WB(int i, int j); // in base pair maximization, there is no difference between the two
-    int get_WBP(int i, int j);
+    int get_WB(int i, int j) {return WB.get(i,j);} // in base pair maximization, there is no difference between the two
+    int get_WBP(int i, int j) {return WBP.get(i,j);}
 
     // nested substr in a pseudoloop
-    int get_WP(int i, int j); // in base pair maximization, there is no difference between the two
-    int get_WPP(int i, int j);
+    int get_WP(int i, int j)  {return WP.get(i,j);} // in base pair maximization, there is no difference between the two
+    int get_WPP(int i, int j) {return WPP.get(i,j);}
 
     int get_P(int i, int j);
     int get_PK(int i,int j, int k, int l);
@@ -155,15 +158,15 @@ private:
     //int needs_computation; // This global variable is used so that we don't compute energies in backtracking
 
 
-    //int *WP;				// the loop inside a pseudoknot (in general it looks like a W but is inside a pseudoknot) // in base pair maximization, there is no difference between the two
-    int *WPP;				// similar to WP but has at least one base pair
+    TriangleMatrix WP;				// the loop inside a pseudoknot (in general it looks like a W but is inside a pseudoknot) // in base pair maximization, there is no difference between the two
+    TriangleMatrix WPP;				// similar to WP but has at least one base pair
     // Hosna, Feb 14, 2014
     // WM and Vm recurrences in HFold and CCJ are similar, so I am keeping them here for CCJ similar to HFold
     // i.e. WM is implemented in VM_final
     //int *WM;				// the loop inside a regular multiloop // in base pair maximization, there is no difference between the two
     //int *WMP;				// similar to WM but has at least one base pair
-    //int *WB;				// the loop inside a multiloop that spans a band // in base pair maximization, there is no difference between the two
-    int *WBP;				// similar to WB but has at least one base pair
+    TriangleMatrix WB;				// the loop inside a multiloop that spans a band // in base pair maximization, there is no difference between the two
+    TriangleMatrix WBP;				// similar to WB but has at least one base pair
 
     int *P;					// the main loop for pseudoloops and bands
     int **PK;				// MFE of a TGB structure over gapped region [i,j] U [k,l]
@@ -179,17 +182,17 @@ private:
     int ***PfromO;
 
     // internal loops and multi loops that span a band
-    int ***PLmloop1;
-    int **PLmloop0;
+    MatrixSlices3D PLmloop1;
+    MatrixSlices3D PLmloop0;
 
-    int **PRmloop1;
-    int **PRmloop0;
+    MatrixSlices3D PRmloop1;
+    MatrixSlices3D PRmloop0;
 
-    int **PMmloop1;
-    int **PMmloop0;
+    MatrixSlices3D PMmloop1;
+    MatrixSlices3D PMmloop0;
 
-    int ***POmloop1;
-    int **POmloop0;
+    MatrixSlices3D POmloop1;
+    MatrixSlices3D POmloop0;
 
     // Ian Wark Jan 23, 2017
     // Candidate Lists (candidate type is in h_struct.h)
@@ -199,6 +202,10 @@ private:
     candidate_list *POmloop0_CL;
     candidate_list *PfromL_CL;
     candidate_list *PfromO_CL;
+
+    // SW - add candidate lists for R and M mloops
+    candidate_list *PRmloop0_CL;
+    candidate_list *PMmloop0_CL;
 
     // This is an array of [nb_nucleotides] forward lists
     std::forward_list<candidate_PK> *PK_CL;
@@ -316,6 +323,8 @@ public:
             PfromL_CL->compactify();
             PfromO_CL->compactify();
             PLmloop0_CL->compactify();
+            PMmloop0_CL->compactify();
+            PRmloop0_CL->compactify();
             POmloop0_CL->compactify();
 
             if (!use_garbage_collection)
@@ -349,36 +358,37 @@ private:
 
     bool impossible_case(int i, int j, int k, int l) const;
 
-    // "output" parameters for generic_compute functions
-    int best_d_;
-    int best_branch_;
+    // output parameters of generic_decomposition function
+    int best_d_; //!< best split point (end of the gap matrix)
+    int best_branch_; //!< index of best branch
+    bool decomposing_branch_; //!< whether best branch is decomposing
 
-    //@brief generic sparse computation of best energy and best case in PLmloop1
-    //@param i fragment left end
-    //@param j pos before gap
-    //@param k pos after gap
-    //@param l fragment right end
-    //@note sets best_branch_ to the best branch of the decomposition,
-    // sets best_d_ to the best d of the decomposition
-    //@returns energy
-    int generic_compute_PLmloop1_sp(int i, int j, int k, int l);
-
-
-    int generic_compute_PLmloop0_sp(int i, int j, int k, int l,
-                                    bool only_decomposing = false);
-
-    int generic_compute_POmloop1_sp(int i, int j, int k, int l);
-
-
-    int generic_compute_POmloop0_sp(int i, int j, int k, int l,
-                                    bool only_decomposing = false);
-
+    static int zero(int i, int j) {return 0;}
+    /**
+     * @brief generic computation of gap matrix "multiloop" decompositions
+     * @param decomp_cases decomposition cases (bit-encoded: 1=12G2, 2=12G1, 4=1G21, 8=1G12)
+     * @param CL candidate list, if given perform sparse computation
+     * @param get_wb access function for WB or WBP matrix
+     * @param get_entry access function for gap matrix entry
+     * @param LMRO_cases non-decomposition cases (bit-encoded: 1=L, 2=M, 4=R, 8=O)
+     * @param penalty penalty function for non-decomposition cases
+     * @returns minimum energy
+     */
+    template<class Penalty=int(*)(int,int)>
+    int
+    generic_decomposition(int i, int j, int k, int l,
+                          int decomp_cases,
+                          candidate_list *CL,
+                          const TriangleMatrix &w,
+                          const MatrixSlices3D &PX,
+                          int LMRO_cases = 0,
+                          Penalty penalty = zero);
 
     //void compute_WM(int i, int j); // in base pair maximization, there is no difference between the two
     //void compute_WMP(int i, int l);
-    //void compute_WB(int i, int j); // in base pair maximization, there is no difference between the two
+    void compute_WB(int i, int j);
     void compute_WBP(int i, int l);
-    //void compute_WP(int i, int j); // in base pair maximization, there is no difference between the two
+    void compute_WP(int i, int j);
     void compute_WPP(int i, int l);
 
     void compute_P_sp(int i, int l);
