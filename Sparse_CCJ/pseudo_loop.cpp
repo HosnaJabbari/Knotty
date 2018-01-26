@@ -179,6 +179,13 @@ void pseudo_loop::allocate_space_nonsparse()
     MOD_2 = nb_nucleotides;
     MOD_MAXLOOP = nb_nucleotides;
 
+    PfromL_CL = nullptr;
+    PfromO_CL = nullptr;
+    PLmloop0_CL = nullptr;
+    PRmloop0_CL = nullptr;
+    PMmloop0_CL = nullptr;
+    POmloop0_CL = nullptr;
+
     int total_length = TriangleMatrix::total_length(nb_nucleotides);
 
     index = TriangleMatrix::new_index(nb_nucleotides);
@@ -352,8 +359,8 @@ void pseudo_loop::compute_energies_sp(int i, int l)
         // in original recurrences we have j< k-1, so I am changing k=j+1 to k=j+2
         for(int k = l; k>=j+2; k--){//for(int k = j+2; k<=l; k++){
 
-            compute_PLmloop0_sp(i,j,k,l);
-            compute_PLmloop1_sp(i,j,k,l);
+            compute_PLmloop0(i,j,k,l);
+            compute_PLmloop1(i,j,k,l);
 
             compute_PRmloop0(i,j,k,l);
             compute_PRmloop1(i,j,k,l);
@@ -362,8 +369,8 @@ void pseudo_loop::compute_energies_sp(int i, int l)
             compute_PMmloop0(i,j,k,l);
             compute_PMmloop1(i,j,k,l);
 
-            compute_POmloop0_sp(i,j,k,l);
-            compute_POmloop1_sp(i,j,k,l);
+            compute_POmloop0(i,j,k,l);
+            compute_POmloop1(i,j,k,l);
 
             compute_PL(i,j,k,l);
             compute_PR(i,j,k,l);
@@ -418,8 +425,8 @@ void pseudo_loop::compute_energies_ns(int i, int l)
         // Hosna, July 8, 2014
         // in original recurrences we have j< k-1, so I am changing k=j+1 to k=j+2
         for(int k = l; k>=j+2; k--){//for(int k = j+2; k<=l; k++){
-            compute_PLmloop0_ns(i,j,k,l);
-            compute_PLmloop1_ns(i,j,k,l);
+            compute_PLmloop0(i,j,k,l);
+            compute_PLmloop1(i,j,k,l);
 
             compute_PRmloop0(i,j,k,l);
             compute_PRmloop1(i,j,k,l);
@@ -427,8 +434,8 @@ void pseudo_loop::compute_energies_ns(int i, int l)
             compute_PMmloop0(i,j,k,l);
             compute_PMmloop1(i,j,k,l);
 
-            compute_POmloop0_ns(i,j,k,l);
-            compute_POmloop1_ns(i,j,k,l);
+            compute_POmloop0(i,j,k,l);
+            compute_POmloop1(i,j,k,l);
 
             compute_PL(i,j,k,l);
             compute_PR(i,j,k,l);
@@ -788,6 +795,126 @@ void pseudo_loop::recompute_slice_PK(int i, int max_l){
     }
 }
 
+
+
+template<class Penalty>
+int
+pseudo_loop::generic_decomposition(int i, int j, int k, int l,
+                                   int decomp_cases,
+                                   candidate_list *CL,
+                                   const TriangleMatrix &w,
+                                   const MatrixSlices3D &PX,
+                                   int LMRO_ndcases,
+                                   Penalty penalty
+                                   ) {
+    int min_energy = INF;
+
+    best_branch_ = -1;
+    best_d_ = -1;
+    decomposing_branch_ = true;
+
+    int kl = index[k] + l - k;
+
+    if ( decomp_cases & 1 && CL!=nullptr ) {
+        // Ian Wark Jan 23 2017
+        // 12G2 using candidate list
+        for (const candidate *c = CL->get_front(j, k, l); c != NULL;
+             c = c->get_next()) {
+            int temp = w.get(i, c->d - 1) + c->w;
+            if (temp < min_energy) {
+                min_energy = temp;
+                best_branch_ = 1;
+                best_d_ = c->d;
+            }
+        }
+    }
+
+    if ( decomp_cases & 1 && CL==nullptr ) {
+        // 12G2 w/o candidate list (non-sparse)
+        for(int d = i+1; d<=j; d++){
+            int temp = w.get(i, d - 1) + PX.get(d, j, k, l);
+            if (temp < min_energy){
+                min_energy = temp;
+                best_branch_ = 1;
+                best_d_ = d;
+            }
+        }
+    }
+
+    if (decomp_cases & 2) {
+        // case 1G21
+        for (int d = i; d < j; d++) {
+            int temp = PX.get(i, d, k, l) + w.get(d + 1, j);
+            if (temp < min_energy) {
+                min_energy = temp;
+                best_branch_ = 2;
+                best_d_ = d;
+            }
+        }
+    }
+
+    if (decomp_cases & 4) {
+        // case 1G21
+        for(int d = k+1; d <= l; d++){
+            int temp = w.get(k,d-1) + PX.get(i,j,d,l);
+            if (temp < min_energy){
+                min_energy = temp;
+                best_branch_ = 3;
+                best_d_ = d;
+            }
+        }
+    }
+
+    if (decomp_cases & 8) {
+        // case 1G12
+        for (int d = i; d < j; d++) {
+            int temp = PX.get(i, j, k, d) + w.get(d + 1, j);
+            if (temp < min_energy) {
+                min_energy = temp;
+                best_branch_ = 4;
+                best_d_ = d;
+            }
+        }
+    }
+
+    if (LMRO_ndcases & 1) {
+        int temp = get_PL(i, j, k, l) + penalty(j, i);
+        if (temp < min_energy) {
+            min_energy = temp;
+            best_branch_ = 5;
+        }
+    }
+
+    if (LMRO_ndcases & 2) {
+        int temp = get_PM(i, j, k, l) + penalty(j, k);
+        if (temp < min_energy) {
+            min_energy = temp;
+            best_branch_ = 6;
+        }
+    }
+
+    if (LMRO_ndcases & 4) {
+        int temp = get_PR(i, j, k, l) + penalty(l, k);
+        if (temp < min_energy) {
+            min_energy = temp;
+            best_branch_ = 7;
+        }
+    }
+
+    if (LMRO_ndcases & 8) {
+        int temp = get_PO(i, j, k, l) + penalty(l, i);
+        if (temp < min_energy) {
+            min_energy = temp;
+            best_branch_ = 8;
+        }
+    }
+
+    decomposing_branch_ = (best_branch_ < 5);
+
+    return min_energy;
+}
+
+
 void
 pseudo_loop::recompute_slice_PLmloop0(int i, int max_j, int min_k, int max_l) {
     // set candidates
@@ -800,7 +927,7 @@ pseudo_loop::recompute_slice_PLmloop0(int i, int max_j, int min_k, int max_l) {
                 } else {
                     // decomposition cases of compute_PLmloop0_sp(i,j,k,l):
                     int min_energy =
-                        generic_decomposition(i, j, k, l, 1 || 2, PLmloop0_CL,
+                        generic_decomposition(i, j, k, l, 1 | 2, PLmloop0_CL,
                                               WB, PLmloop0);
 
                     PLmloop0.set(i, j, k, l) = min_energy;
@@ -816,7 +943,7 @@ void pseudo_loop::recompute_slice_PLmloop1(int i, int max_j, int min_k, int max_
         for (int k=l; k>=min_k; k--) {
             for (int j=i; j<=max_j; j++) {
                 int min_energy =
-                    generic_decomposition(i, j, k, l, 1 || 2, PLmloop0_CL, WBP,
+                    generic_decomposition(i, j, k, l, 1 | 2, PLmloop0_CL, WBP,
                                           PLmloop0);
                 PLmloop1.set(i,j,k,l) = min_energy;
             }
@@ -836,7 +963,7 @@ pseudo_loop::recompute_slice_POmloop0(int i, int max_j, int min_k, int max_l) {
                 } else {
                     // decomposition cases of compute_POmloop0_sp(i,j,k,l):
                     int min_energy =
-                        generic_decomposition(i, j, k, l, 1 || 8, POmloop0_CL,
+                        generic_decomposition(i, j, k, l, 1 | 8, POmloop0_CL,
                                               WB, POmloop0);
 
                     POmloop0.set(i,j,k,l) = min_energy;
@@ -852,7 +979,7 @@ void pseudo_loop::recompute_slice_POmloop1(int i, int max_j, int min_k, int max_
         for (int k=l; k>=min_k; k--) {
             for (int j=i; j<=max_j; j++) {
                 int min_energy =
-                    generic_decomposition(i, j, k, l, 1 || 8, POmloop0_CL, WBP,
+                    generic_decomposition(i, j, k, l, 1 | 8, POmloop0_CL, WBP,
                                           POmloop0);
                 POmloop1.set(i,j,k,l) = min_energy;
             }
@@ -1296,7 +1423,7 @@ void pseudo_loop::compute_PfromL_sp(int i, int j, int k, int l){
         // Ian Wark Jan 23, 2017
         // push to candidates if better than b1
         if (best_branch > 1 && i < j) {
-            if (cl_debug || pl_debug)
+            if (cl_debug | pl_debug)
                 printf ("Push PfromL_CL(%d,%d,%d,12G2),(%d,%d)\n", j, k, l, i, min_energy);
             PfromL_CL->push_candidate(i, j, k, l, min_energy, best_branch);
             // always keep arrows starting from candidates
@@ -1692,130 +1819,12 @@ void pseudo_loop::compute_PfromO_ns(int i, int j, int k, int l){
 
 }
 
-
-template<class Penalty>
-int
-pseudo_loop::generic_decomposition(int i, int j, int k, int l,
-                                   int decomp_cases,
-                                   candidate_list *CL,
-                                   const TriangleMatrix &w,
-                                   const MatrixSlices3D &PX,
-                                   int LMRO_ndcases,
-                                   Penalty penalty
-                                   ) {
-    int min_energy = INF;
-
-    best_branch_ = -1;
-    best_d_ = -1;
-    decomposing_branch_ = true;
-
-    int kl = index[k] + l - k;
-
-    if ( decomp_cases & 1 && CL!=nullptr ) {
-        // Ian Wark Jan 23 2017
-        // 12G2 using candidate list
-        for (const candidate *c = CL->get_front(j, k, l); c != NULL;
-             c = c->get_next()) {
-            int temp = w.get(i, c->d - 1) + c->w;
-            if (temp < min_energy) {
-                min_energy = temp;
-                best_branch_ = 1;
-                best_d_ = c->d;
-            }
-        }
-    }
-
-    if ( decomp_cases & 1 && CL==nullptr ) {
-        // 12G2 w/o candidate list (non-sparse)
-        for(int d = i+1; d<=j; d++){
-            int temp = w.get(i, d - 1) + PX.get(d, j, k, l);
-            if (temp < min_energy){
-                min_energy = temp;
-                best_branch_ = 1;
-                best_d_ = d;
-            }
-        }
-    }
-
-    if (decomp_cases & 2) {
-        // case 1G21
-        for (int d = i; d < j; d++) {
-            int temp = PX.get(i, d, k, l) + w.get(d + 1, j);
-            if (temp < min_energy) {
-                min_energy = temp;
-                best_branch_ = 2;
-                best_d_ = d;
-            }
-        }
-    }
-
-    if (decomp_cases & 4) {
-        // case 1G21
-        for(int d = k+1; d <= l; d++){
-            int temp = w.get(k,d-1) + PX.get(i,j,d,l);
-            if (temp < min_energy){
-                min_energy = temp;
-                best_branch_ = 3;
-                best_d_ = d;
-            }
-        }
-    }
-
-    if (decomp_cases & 8) {
-        // case 1G12
-        for (int d = i; d < j; d++) {
-            int temp = PX.get(i, j, k, d) + w.get(d + 1, j);
-            if (temp < min_energy) {
-                min_energy = temp;
-                best_branch_ = 4;
-                best_d_ = d;
-            }
-        }
-    }
-
-    if (LMRO_ndcases & 1) {
-        int temp = get_PL(i, j, k, l) + penalty(j, i);
-        if (temp < min_energy) {
-            min_energy = temp;
-            best_branch_ = 5;
-        }
-    }
-
-    if (LMRO_ndcases & 2) {
-        int temp = get_PM(i, j, k, l) + penalty(j, k);
-        if (temp < min_energy) {
-            min_energy = temp;
-            best_branch_ = 6;
-        }
-    }
-
-    if (LMRO_ndcases & 4) {
-        int temp = get_PR(i, j, k, l) + penalty(l, k);
-        if (temp < min_energy) {
-            min_energy = temp;
-            best_branch_ = 7;
-        }
-    }
-
-    if (LMRO_ndcases & 8) {
-        int temp = get_PO(i, j, k, l) + penalty(l, i);
-        if (temp < min_energy) {
-            min_energy = temp;
-            best_branch_ = 8;
-        }
-    }
-
-    decomposing_branch_ = (best_branch_ < 5);
-
-    return min_energy;
-}
-
-void pseudo_loop::compute_PLmloop1_sp(int i, int j, int k, int l){
+void pseudo_loop::compute_PLmloop1(int i, int j, int k, int l){
     best_branch_ = -1, best_d_ = -1;
 
     if (impossible_case(i,j,k,l)) {return;}
 
-    int min_energy = generic_decomposition(i, j, k, l, 1 || 2, PLmloop0_CL,
+    int min_energy = generic_decomposition(i, j, k, l, 1 | 2, PLmloop0_CL,
                                            WBP, PLmloop0);
 
     PLmloop1.set(i,j,k,l) = min_energy;
@@ -1824,85 +1833,19 @@ void pseudo_loop::compute_PLmloop1_sp(int i, int j, int k, int l){
         printf ("PLmloop1(%d,%d,%d,%d) branch:%d energy %d\n", i, j, k,l, best_branch_, min_energy);
 }
 
-void pseudo_loop::compute_POmloop1_sp(int i, int j, int k, int l){
-    best_branch_ = -1, best_d_ = -1;
+void pseudo_loop::compute_PLmloop0(int i, int j, int k, int l){
 
     if (impossible_case(i,j,k,l)) {return;}
 
-    int min_energy = generic_decomposition(i, j, k, l, 1 || 8, POmloop0_CL,
-                                           WBP, POmloop0);
-    POmloop1.set(i,j,k,l) = min_energy;
-
-    if (pl_debug)
-        printf ("POmloop1(%d,%d,%d,%d) branch:%d energy %d\n", i, j, k,l, best_branch_, min_energy);
-}
-
-void pseudo_loop::compute_PLmloop1_ns(int i, int j, int k, int l){
-    int min_energy = INF;
-
-    if (impossible_case(i,j,k,l)) {return;}
-
-    for(int d = i+1; d <= j; d++){
-        int temp = get_WBP(i,d-1) + get_PLmloop0(d,j,k,l);
-        if (temp < min_energy){
-            min_energy = temp;
-        }
-        if(d<j){
-            temp = get_PLmloop0(i,d,k,l) + get_WBP(d+1,j);
-            if (temp < min_energy){
-                min_energy = temp;
-            }
-        }
-    }
-
-    if (min_energy < INF/2){
-        if (debug)
-            printf ("PLmloop1(%d,%d,%d,%d) type %c energy %d\n", i, j, k,l,P_PLmloop1, min_energy);
-        PLmloop1.set(i,j,k,l) = min_energy;
-    }
-}
-
-void pseudo_loop::compute_PLmloop0_ns(int i, int j, int k, int l){
-    int min_energy = INF, best_d = -1;
-
-    if (impossible_case(i,j,k,l)) {return;}
-
-    min_energy = get_PL(i,j,k,l)+beta2P(j,i);
-
-    for(int d = i; d<=j; d++){
-        if (d>i){
-            int temp=get_WB(i,d-1)+get_PLmloop0(d,j,k,l);
-            if (temp < min_energy){
-                min_energy = temp;
-            }
-
-        }
-        if(d<j){
-            int temp=get_PLmloop0(i,d,k,l)+get_WB(d+1,j);
-            if (temp < min_energy){
-                min_energy = temp;
-            }
-        }
-    }
-
-    if (min_energy < INF/2){
-        if (pl_debug)
-            printf ("PLmloop0(%d,%d,%d,%d) type %c energy %d\n", i, j, k,l,P_PLmloop0, min_energy);
-        PLmloop0.set(i,j,k,l) = min_energy;
-    }
-}
-
-void pseudo_loop::compute_PLmloop0_sp(int i, int j, int k, int l){
-
-    if (impossible_case(i,j,k,l)) {return;}
-
-    int min_energy = generic_decomposition(i, j, k, l, 1 || 2, PLmloop0_CL, WB,
+    int min_energy = generic_decomposition(i, j, k, l, 1 | 2, PLmloop0_CL, WB,
                                            PLmloop0, 1, beta2P);
 
     if (pl_debug)
         printf ("PLmloop0(%d,%d,%d,%d) type %c energy %d\n", i, j, k,l,P_PLmloop0, min_energy);
 
     PLmloop0.set(i,j,k,l) = min_energy;
+
+    if (!sparsify) return;
 
     if (min_energy < INF/2){
         // Ian Wark Jan 23 2017
@@ -1918,64 +1861,21 @@ void pseudo_loop::compute_PLmloop0_sp(int i, int j, int k, int l){
     }
 }
 
-void pseudo_loop::compute_POmloop0_sp(int i, int j, int k, int l){
-
-    if (impossible_case(i,j,k,l)) {return;}
-
-    int min_energy = generic_decomposition(i, j, k, l, 1 || 8, POmloop0_CL,
-                                           WB, POmloop0,
-                                           8, beta2P);
-
-    if (pl_debug)
-        printf ("POmloop0(%d,%d,%d,%d) type %c energy %d\n", i, j, k,l,P_POmloop0, min_energy);
-
-    POmloop0.set(i,j,k,l) = min_energy;
-
-    if (min_energy < INF/2){
-        // Ian Wark Jan 23 2017
-        // push to candidates
-        if ( best_branch_ > 2 ){
-            if (cl_debug || pl_debug)
-                printf ("Push POmloop_CL(%d,%d,%d,12G2),(%d,%d)\n", j, k, l, i, min_energy);
-            POmloop0_CL->push_candidate(i, j, k, l, min_energy, best_branch_);
-            // always keep arrows starting from candidates
-            if (use_garbage_collection)
-                ta->inc_source_ref_count(i,j,k,l,P_POmloop0);
-        }
-    }
-}
-
 void pseudo_loop::compute_PRmloop1(int i, int j, int k, int l){
-    int min_energy = INF, best_d = -1, best_branch;
-
     if (impossible_case(i,j,k,l)) {return;}
 
-    // case 1G21
-    for(int d = k+1; d <= l; d++){
-        int temp = get_WBP(k,d-1) + get_PRmloop0(i,j,d,l);
-        if (temp < min_energy){
-            min_energy = temp;
-            best_branch = 1;
-            best_d = d;
-        }
-    }
+    int min_energy =
+        generic_decomposition(i, j, k, l, 4 | 8, PRmloop0_CL, WBP, PRmloop0);
 
-    // case 1G12
-    for(int d = k+1; d <= l; d++){
-        int temp = get_WBP(d,l) + get_PRmloop0(i,j,k,d-1);
-        if (temp < min_energy){
-            min_energy = temp;
-            best_branch = 2;
-            best_d = d;
-        }
+    if (min_energy < INF/2) {
+        PRmloop1.set(i, j, k, l) = min_energy;
     }
 
     // If Non-Sparse
     if (sparsify == false) {
         if (min_energy < INF/2) {
             if (pl_debug)
-                printf ("PRmloop1(%d,%d,%d,%d) branch %d energy %d\n", i, j, k,l,best_branch, min_energy);
-            PRmloop1.set(i,j,k,l)=min_energy;
+                printf ("PRmloop1(%d,%d,%d,%d) branch %d energy %d\n", i, j, k,l, best_branch_, min_energy);
         }
         return;
     }
@@ -1983,16 +1883,15 @@ void pseudo_loop::compute_PRmloop1(int i, int j, int k, int l){
     // Sparse
     if (pl_debug)
         printf ("PRmloop1(%d,%d,%d,%d) type %c energy %d\n", i, j, k,l,P_PRmloop1, min_energy);
-    PRmloop1.set(i, j, k, l) = min_energy;
 
     if (min_energy < INF/2){
-        switch (best_branch) {
-            case 1:
-                ta->register_trace_arrow(i,j,k,l, i,j,best_d,l, min_energy, P_PRmloop1, P_PRmloop0, P_WBP, k, best_d-1);
+        switch (best_branch_) {
+            case 3:
+                ta->register_trace_arrow(i,j,k,l, i,j,best_d_,l, min_energy, P_PRmloop1, P_PRmloop0, P_WBP, k, best_d_-1);
                 break;
-            case 2:
-                assert(best_d != -1);
-                ta->register_trace_arrow(i,j,k,l, i,j,k,best_d-1, min_energy, P_PRmloop1, P_PRmloop0, P_WBP, best_d, l);
+            case 4:
+                assert(best_d_ != -1);
+                ta->register_trace_arrow(i,j,k,l, i,j,k,best_d_, min_energy, P_PRmloop1, P_PRmloop0, P_WBP, best_d_+1, l);
                 break;
             default:
                 printf("default: no best branch PRmloop10(%d,%d,%d,%d) e:%d\n",i,j,k,l,min_energy);
@@ -2002,38 +1901,16 @@ void pseudo_loop::compute_PRmloop1(int i, int j, int k, int l){
 }
 
 void pseudo_loop::compute_PRmloop0(int i, int j, int k, int l){
-    int min_energy = INF,temp=INF, best_d = -1;
-
     if (impossible_case(i,j,k,l)) {return;}
 
-    int kl = index[k]+l-k;
-    min_energy = get_PR(i,j,k,l)+beta2P(l,k);
-    int best_branch = 1;
-
-    for(int d=k; d<=l; d++){
-        if(d>k){
-            temp=get_WB(k,d-1)+get_PRmloop0(i,j,d,l);
-            if (temp < min_energy){
-                min_energy = temp;
-                best_branch = 2;
-                best_d = d;
-            }
-        }
-        if (d<l){
-            temp = get_PRmloop0(i,j,k,d)+get_WB(d+1,l);
-            if (temp < min_energy){
-                min_energy = temp;
-                best_branch = 3;
-                best_d = d;
-            }
-        }
-    }
+    int min_energy = generic_decomposition(i, j, k, l, 4 | 8, PRmloop0_CL, WB,
+                                           PRmloop0, 4, beta2P);
 
     // If Non-Sparse
     if (sparsify == false) {
         if (min_energy < INF/2) {
             if (pl_debug)
-                printf ("PRmloop0(%d,%d,%d,%d) branch %d energy %d\n", i, j, k,l,best_branch, min_energy);
+                printf ("PRmloop0(%d,%d,%d,%d) branch %d energy %d\n", i, j, k,l,best_branch_, min_energy);
             PRmloop0.set(i,j,k,l)=min_energy;
         }
         return;
@@ -2045,17 +1922,17 @@ void pseudo_loop::compute_PRmloop0(int i, int j, int k, int l){
     PRmloop0.set(i,j,k,l) = min_energy;
 
     if (min_energy < INF/2){
-        switch (best_branch) {
-            case 1:
+        switch (best_branch_) {
+            case 7:
                 ta->register_trace_arrow(i,j,k,l, i,j,k,l, min_energy, P_PRmloop0, P_PR);
                 break;
-            case 2:
-                assert(best_d != -1);
-                ta->register_trace_arrow(i,j,k,l, i,j,best_d, l, min_energy, P_PRmloop0, P_PRmloop0, P_WB,k,best_d-1);
-                break;
             case 3:
-                assert(best_d != -1);
-                ta->register_trace_arrow(i,j,k,l, i,j,k,best_d, min_energy, P_PRmloop0, P_PRmloop0, P_WB, best_d+1,l);
+                assert(best_d_ != -1);
+                ta->register_trace_arrow(i,j,k,l, i,j,best_d_, l, min_energy, P_PRmloop0, P_PRmloop0, P_WB,k,best_d_-1);
+                break;
+            case 4:
+                assert(best_d_ != -1);
+                ta->register_trace_arrow(i,j,k,l, i,j,k,best_d_, min_energy, P_PRmloop0, P_PRmloop0, P_WB, best_d_+1,l);
                 break;
             default:
                 printf("default: no best branch PRmloop0(%d,%d,%d,%d) e:%d\n",i,j,k,l,min_energy);
@@ -2065,41 +1942,17 @@ void pseudo_loop::compute_PRmloop0(int i, int j, int k, int l){
 }
 
 void pseudo_loop::compute_PMmloop1(int i, int j, int k, int l){
-    int min_energy = INF;
-
     if (impossible_case(i,j,k,l)) {return;}
 
-    //int ij = index[i]+j-i;
-    int kl = index[k]+l-k;
-
-    int best_branch = -1, best_d = -1;
-
-    //case 1G21
-    for(int d=k; d<l; d++){
-        int temp = get_PMmloop0(i,j,d+1,l) + get_WBP(k,d);
-        if (temp < min_energy){
-            min_energy = temp;
-            best_branch = 1;
-            best_d = d;
-        }
-    }
-
-    //case 12G1
-    for(int d = i+1; d < j; d++){
-        int temp = get_PMmloop0(i,d-1,k,l) + get_WBP(d,j);
-        if (temp < min_energy){
-            min_energy = temp;
-            best_branch = 2;
-            best_d = d;
-        }
-    }
+    int min_energy =
+        generic_decomposition(i, j, k, l, 2 | 4, PMmloop0_CL, WBP, PMmloop0);
 
     // If Non-Sparse
     if (sparsify == false) {
         if (min_energy < INF/2) {
             if (pl_debug)
-                printf ("PMmloop10(%d,%d,%d,%d) branch %d energy %d\n", i, j, k,l,best_branch, min_energy);
-            PMmloop1.set(i,j,k,l) = min_energy;
+                printf ("PMmloop10(%d,%d,%d,%d) branch %d energy %d\n", i, j, k,l,best_branch_, min_energy);
+            PMmloop1.set(i, j, k, l) = min_energy;
         }
         return;
     }
@@ -2111,60 +1964,35 @@ void pseudo_loop::compute_PMmloop1(int i, int j, int k, int l){
 
     if (min_energy < INF/2){
         // adding trace arrows
-        switch (best_branch){
-            case 1:
-                ta->register_trace_arrow(i,j,k,l, i,j,best_d+1,l, min_energy, P_PMmloop1, P_PMmloop0, P_WBP, k,best_d);
+        switch (best_branch_){
+            case 3:
+                ta->register_trace_arrow(i,j,k,l, i,j,best_d_,l, min_energy, P_PMmloop1, P_PMmloop0, P_WBP, k,best_d_-1);
                 break;
             case 2:
-                assert(best_d != -1);
-                ta->register_trace_arrow(i,j,k,l, i,best_d-1,k,l, min_energy, P_PMmloop1, P_PMmloop0, P_WBP, best_d,j);
+                assert(best_d_ != -1);
+                ta->register_trace_arrow(i,j,k,l, i,best_d_,k,l, min_energy, P_PMmloop1, P_PMmloop0, P_WBP, best_d_+1,j);
                 break;
             default:
-                printf("default: no best branch PMmloop1 %d %d\n",min_energy, best_branch);
+                printf("default: no best branch PMmloop1 %d %d\n",min_energy, best_branch_);
         }
     }
 }
 
 void pseudo_loop::compute_PMmloop0(int i, int j, int k, int l){
-    int min_energy = INF,temp=INF;
     if (impossible_case(i,j,k,l)) {return;}
 
-    //int ij = index[i]+j-i;
-    int kl = index[k]+l-k;
-
-    int best_branch = -1, best_d = -1;
-
-    min_energy = get_PM(i,j,k,l)+beta2P(j,k);
-    best_branch = 1;
-
-    for(int d=i; d<j; d++){
-        temp=get_PMmloop0(i,d,k,l)+get_WB(d+1,j);
-        if (temp < min_energy){
-            min_energy = temp;
-            best_d = d;
-            best_branch = 2;
-        }
-
-    }
-    for(int d=k+1; d<=l; d++){
-        temp=get_PMmloop0(i,j,d,l)+get_WB(k,d-1);
-        if (temp < min_energy){
-            min_energy = temp;
-            best_d = d;
-            best_branch = 3;
-        }
-
-    }
+    int min_energy = generic_decomposition(i, j, k, l, 2 | 4, PRmloop0_CL, WB,
+                                           PRmloop0, 2, beta2P);
 
     // If Non-Sparse
-	if (sparsify == false) {
+    if (sparsify == false) {
         if (min_energy < INF/2) {
             if (pl_debug)
-                printf ("PMmloop0(%d,%d,%d,%d) branch %d energy %d\n", i, j, k,l,best_branch, min_energy);
+                printf ("PMmloop0(%d,%d,%d,%d) branch %d energy %d\n", i, j, k,l,best_branch_, min_energy);
             PMmloop0.set(i, j, k, l) = min_energy;
         }
         return;
-	}
+    }
 
     // Sparse
     if (pl_debug)
@@ -2173,74 +2001,62 @@ void pseudo_loop::compute_PMmloop0(int i, int j, int k, int l){
 
     if (min_energy < INF/2){
         // adding trace arrows
-        switch (best_branch){
-            case 1:
+        switch (best_branch_){
+            case 6:
                 ta->register_trace_arrow(i,j,k,l, i,j,k,l, min_energy, P_PMmloop0, P_PM);
                 break;
             case 2:
-                assert(best_d != -1);
-                ta->register_trace_arrow(i,j,k,l, i,best_d,k,l, min_energy, P_PMmloop0, P_PMmloop0, P_WB, best_d+1, j);
+                assert(best_d_ != -1);
+                ta->register_trace_arrow(i,j,k,l, i,best_d_,k,l, min_energy, P_PMmloop0, P_PMmloop0, P_WB, best_d_+1, j);
                 break;
             case 3:
-                assert(best_d != -1);
-                ta->register_trace_arrow(i,j,k,l, i,j,best_d,l, min_energy, P_PMmloop0, P_PMmloop0, P_WB, k, best_d-1);
+                assert(best_d_ != -1);
+                ta->register_trace_arrow(i,j,k,l, i,j,best_d_,l, min_energy, P_PMmloop0, P_PMmloop0, P_WB, k, best_d_-1);
                 break;
             default:
-                printf("default: no best branch PfromL %d %d\n",min_energy, best_branch);
+                printf("default: no best branch PfromL %d %d\n",min_energy, best_branch_);
         }
     }
 }
 
-void pseudo_loop::compute_POmloop1_ns(int i, int j, int k, int l){
-    int min_energy = INF,temp=INF;
+void pseudo_loop::compute_POmloop1(int i, int j, int k, int l){
+    best_branch_ = -1, best_d_ = -1;
 
     if (impossible_case(i,j,k,l)) {return;}
 
-    int kl = index[k]+l-k;
+    int min_energy = generic_decomposition(i, j, k, l, 1 | 8, POmloop0_CL,
+                                           WBP, POmloop0);
+    POmloop1.set(i,j,k,l) = min_energy;
 
-    for(int d=i+1; d<=j;d++){
-        temp=get_WBP(i,d-1)+get_POmloop0(d,j,k,l);
-        if (temp < min_energy){
-            min_energy = temp;
-        }
-    }
-    for(int d = k+1; d < l; d++){
-        temp = get_POmloop0(i,j,k,d) + get_WBP(d+1,l);
-        if (temp < min_energy){
-            min_energy = temp;
-        }
-    }
-
-    if (min_energy < INF/2){
-        if (debug)
-            printf ("POmloop1(%d,%d,%d,%d) type %c energy %d\n", i, j, k,l,P_POmloop1, min_energy);
-        POmloop1.set(i, j, k, l) = min_energy;
-    }
+    if (pl_debug)
+        printf ("POmloop1(%d,%d,%d,%d) branch:%d energy %d\n", i, j, k,l, best_branch_, min_energy);
 }
 
-void pseudo_loop::compute_POmloop0_ns(int i, int j, int k, int l){
-    int min_energy = INF,temp=INF;
+void pseudo_loop::compute_POmloop0(int i, int j, int k, int l){
 
     if (impossible_case(i,j,k,l)) {return;}
 
-    min_energy = get_PO(i,j,k,l)+beta2P(l,i);
-    for(int d=i+1; d<=j; d++){
-        temp=get_WB(i,d-1)+get_POmloop0(d,j,k,l);
-        if (temp < min_energy){
-            min_energy = temp;
-        }
-    }
-    for(int d=k; d<l; d++){
-        temp=get_POmloop0(i,j,k,d)+get_WB(d+1,l);
-        if (temp < min_energy){
-            min_energy = temp;
-        }
-    }
+    int min_energy = generic_decomposition(i, j, k, l, 1 | 8, POmloop0_CL, WB,
+                                           POmloop0, 8, beta2P);
+
+    if (pl_debug)
+        printf ("POmloop0(%d,%d,%d,%d) type %c energy %d\n", i, j, k,l,P_POmloop0, min_energy);
+
+    POmloop0.set(i,j,k,l) = min_energy;
+
+    if (!sparsify) return;
 
     if (min_energy < INF/2){
-        if (debug)
-            printf ("POmloop0(%d,%d,%d,%d) type %c energy %d\n", i, j, k,l,P_POmloop0, min_energy);
-        POmloop0.set(i, j, k, l) = min_energy;
+        // Ian Wark Jan 23 2017
+        // push to candidates
+        if ( !decomposing_branch_ ){
+            if (cl_debug || pl_debug)
+                printf ("Push POmloop_CL(%d,%d,%d,12G2),(%d,%d)\n", j, k, l, i, min_energy);
+            POmloop0_CL->push_candidate(i, j, k, l, min_energy, best_branch_);
+            // always keep arrows starting from candidates
+            if (use_garbage_collection)
+                ta->inc_source_ref_count(i,j,k,l,P_POmloop0);
+        }
     }
 }
 
@@ -5311,7 +5127,7 @@ void pseudo_loop::trace_PLmloop1(int i, int j, int k, int l, int e) {
 
     //determine trace case in PLmloop1
 
-    int min_energy = generic_decomposition(i, j, k, l, 1 || 2, PLmloop0_CL,
+    int min_energy = generic_decomposition(i, j, k, l, 1 | 2, PLmloop0_CL,
                                            WBP, PLmloop0);
 
     assert ( min_energy == e );
@@ -5336,7 +5152,7 @@ void pseudo_loop::trace_PLmloop1(int i, int j, int k, int l, int e) {
 void pseudo_loop::trace_PLmloop0(int i, int j, int k, int l, int e) {
     recompute_slice_PLmloop0(i,j,k,l);
 
-    int min_energy = generic_decomposition(i, j, k, l, 1 || 2, PLmloop0_CL,
+    int min_energy = generic_decomposition(i, j, k, l, 1 | 2, PLmloop0_CL,
                                            WB, PLmloop0, 1, beta2P);
 
     assert ( min_energy == e );
@@ -5377,9 +5193,8 @@ void pseudo_loop::trace_POmloop1(int i, int j, int k, int l, int e) {
 
     //determine trace case in POmloop1
 
-    int min_energy = generic_decomposition(i, j, k, l, 1 || 8, POmloop0_CL,
-                                           WBP, POmloop0);
-
+    int min_energy =
+        generic_decomposition(i, j, k, l, 1 | 8, POmloop0_CL, WBP, POmloop0);
 
     assert ( min_energy == e );
 
@@ -5402,8 +5217,8 @@ void pseudo_loop::trace_POmloop1(int i, int j, int k, int l, int e) {
 void pseudo_loop::trace_POmloop0(int i, int j, int k, int l, int e) {
     recompute_slice_POmloop0(i,j,k,l);
 
-    int min_energy = generic_decomposition(i, j, k, l, 1 || 8, POmloop0_CL,
-                                           WB, POmloop0, 8, beta2P);
+    int min_energy = generic_decomposition(i, j, k, l, 1 | 8, POmloop0_CL, WB,
+                                           POmloop0, 8, beta2P);
 
     assert ( min_energy == e );
 

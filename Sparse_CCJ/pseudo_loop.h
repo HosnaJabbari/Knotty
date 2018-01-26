@@ -373,6 +373,11 @@ private:
      * @param LMRO_cases non-decomposition cases (bit-encoded: 1=L, 2=M, 4=R, 8=O)
      * @param penalty penalty function for non-decomposition cases
      * @returns minimum energy
+     *
+     * @note sets the variables best_d_, best_branch_, and flag
+     * decomposing_branch_.  best_branch_ encodes the cases as
+     * follows: 1=outer-left (12G2), 2=inner-left (12G1), 3=inner-right (1G21),
+     * 4=outer-right (1G12), 5=PL (1), 6=PM (1), 7=PR (1), 8=PO (1)
      */
     template<class Penalty=int(*)(int,int)>
     int
@@ -406,10 +411,8 @@ private:
     void compute_PfromO_sp(int i, int j, int k, int l);
     void compute_PfromO_ns(int i, int j, int k, int l);
 
-    void compute_PLmloop1_sp(int i,int j, int k, int l);
-    void compute_PLmloop1_ns(int i,int j, int k, int l);
-    void compute_PLmloop0_sp(int i,int j, int k, int l);
-    void compute_PLmloop0_ns(int i,int j, int k, int l);
+    void compute_PLmloop1(int i,int j, int k, int l);
+    void compute_PLmloop0(int i,int j, int k, int l);
 
     void compute_PRmloop1(int i,int j, int k, int l);
     void compute_PRmloop0(int i,int j, int k, int l);
@@ -417,11 +420,8 @@ private:
     void compute_PMmloop1(int i,int j, int k, int l);
     void compute_PMmloop0(int i,int j, int k, int l);
 
-    void compute_POmloop1_sp(int i,int j, int k, int l);
-    void compute_POmloop1_ns(int i,int j, int k, int l);
-    void compute_POmloop0_sp(int i,int j, int k, int l);
-    void compute_POmloop0_ns(int i,int j, int k, int l);
-
+    void compute_POmloop1(int i,int j, int k, int l);
+    void compute_POmloop0(int i,int j, int k, int l);
 
     // recompute all PK entries i,j,k,l for fixed i and all j,k,l: i<=j<k<=max_l
     // fill matrix slice at i, copy candidate energies, recompute non-candidates
