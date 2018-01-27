@@ -120,13 +120,13 @@ void candidate_list::print_CL_size() const {
     print_type();
     printf("\n");
 
-    printf("Num lists: %d\n",simple_maps.size());
+    printf("Num lists: %ld\n",simple_maps.size());
     printf("Num empty lists: %d\n",empty_lists);
     printf("Num candidates: %d\n", candidates);
 
     int p_size = sizeof(simple_maps[0]); // size of a pointer
     int empty_space = empty_lists*p_size;
-    printf("List space: %d, Empty list space: %d \n",simple_maps.size()*p_size, empty_space);
+    printf("List space: %ld, Empty list space: %d \n",simple_maps.size()*p_size, empty_space);
 
     int c_size = sizeof(candidate);
     printf("Total candidate space: %d\n", candidates*c_size );

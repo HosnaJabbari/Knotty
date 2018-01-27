@@ -427,6 +427,22 @@ private:
     // fill matrix slice at i, copy candidate energies, recompute non-candidates
     void recompute_slice_PK(int i, int max_l);
 
+
+    void
+    generic_recompute_slice_mloop0(int i, int max_j, int min_k, int max_l,
+                                   int decomp_cases,
+                                   candidate_list *CL,
+                                   const TriangleMatrix &w,
+                                   MatrixSlices3D &PX
+                                   );
+
+    void
+    generic_recompute_slice_mloop1(int i, int max_j, int min_k, int max_l,
+                                   int decomp_cases,
+                                   const TriangleMatrix &w,
+                                   MatrixSlices3D &PX
+                                   );
+
     // recompute a slice of PLmloop0
     // for fix i, i<=j<=max_j min_k<=k<=l<=max_l
     void

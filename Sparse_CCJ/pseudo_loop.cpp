@@ -916,150 +916,90 @@ pseudo_loop::generic_decomposition(int i, int j, int k, int l,
 
 
 void
-pseudo_loop::recompute_slice_PLmloop0(int i, int max_j, int min_k, int max_l) {
+pseudo_loop::generic_recompute_slice_mloop0(int i, int max_j, int min_k, int max_l,
+                                            int decomp_cases,
+                                            candidate_list *CL,
+                                            const TriangleMatrix &w,
+                                            MatrixSlices3D &PX
+                                            ) {
     // set candidates
     for (int l=min_k; l<=max_l; l++) {
         for (int k=l; k>=min_k; k--) {
             for (int j=i; j<=max_j; j++) {
-                const candidate *c = PLmloop0_CL->find_candidate(i,j,k,l);
+                const candidate *c = CL->find_candidate(i,j,k,l);
                 if (c != NULL) {
-                    PLmloop0.set(i, j, k, l) = c->w;
+                    PX.set(i, j, k, l) = c->w;
                 } else {
                     // decomposition cases of compute_PLmloop0_sp(i,j,k,l):
                     int min_energy =
-                        generic_decomposition(i, j, k, l, 1 | 2, PLmloop0_CL,
-                                              WB, PLmloop0);
+                        generic_decomposition(i, j, k, l, decomp_cases, CL,
+                                              w, PX);
 
-                    PLmloop0.set(i, j, k, l) = min_energy;
+                    PX.set(i, j, k, l) = min_energy;
                 }
             }
         }
     }
+}
+
+void
+pseudo_loop::generic_recompute_slice_mloop1(int i, int max_j, int min_k, int max_l,
+                                            int decomp_cases,
+                                            const TriangleMatrix &w,
+                                            MatrixSlices3D &PX
+                                            ) {
+    // recompute all entries
+    for (int l=min_k; l<=max_l; l++) {
+        for (int k=l; k>=min_k; k--) {
+            for (int j=i; j<=max_j; j++) {
+                int min_energy =
+                    generic_decomposition(i, j, k, l, 1 | 2, nullptr, w, PX);
+                PX.set(i,j,k,l) = min_energy;
+            }
+        }
+    }
+}
+
+void
+pseudo_loop::recompute_slice_PLmloop0(int i, int max_j, int min_k, int max_l) {
+    generic_recompute_slice_mloop0(i, max_j, min_k, max_l, 1 | 2, PLmloop0_CL,
+                                   WB, PLmloop0);
 }
 
 void pseudo_loop::recompute_slice_PLmloop1(int i, int max_j, int min_k, int max_l) {
-    // recompute all entries
-    for (int l=min_k; l<=max_l; l++) {
-        for (int k=l; k>=min_k; k--) {
-            for (int j=i; j<=max_j; j++) {
-                int min_energy =
-                    generic_decomposition(i, j, k, l, 1 | 2, PLmloop0_CL, WBP,
-                                          PLmloop0);
-                PLmloop1.set(i,j,k,l) = min_energy;
-            }
-        }
-    }
+    generic_recompute_slice_mloop1(i, max_j, min_k, max_l, 1 | 2, WBP, PLmloop0);
 }
-
 
 void
 pseudo_loop::recompute_slice_PMmloop0(int i, int max_j, int min_k, int max_l) {
-    // set candidates
-    for (int l=min_k; l<=max_l; l++) {
-        for (int k=l; k>=min_k; k--) {
-            for (int j=i; j<=max_j; j++) {
-                const candidate *c = PMmloop0_CL->find_candidate(i,j,k,l);
-                if (c != NULL) {
-                    PMmloop0.set(i, j, k, l) = c->w;
-                } else {
-                    // decomposition cases of compute_PMmloop0_sp(i,j,k,l):
-                    int min_energy =
-                        generic_decomposition(i, j, k, l, 2 | 4, PMmloop0_CL,
-                                              WB, PMmloop0);
-
-                    PMmloop0.set(i, j, k, l) = min_energy;
-                }
-            }
-        }
-    }
+    generic_recompute_slice_mloop0(i, max_j, min_k, max_l, 2 | 4, PMmloop0_CL,
+                                   WB, PMmloop0);
 }
 
 void pseudo_loop::recompute_slice_PMmloop1(int i, int max_j, int min_k, int max_l) {
-    // recompute all entries
-    for (int l=min_k; l<=max_l; l++) {
-        for (int k=l; k>=min_k; k--) {
-            for (int j=i; j<=max_j; j++) {
-                int min_energy =
-                    generic_decomposition(i, j, k, l, 2 | 4, PMmloop0_CL, WBP,
-                                          PMmloop0);
-                PMmloop1.set(i,j,k,l) = min_energy;
-            }
-        }
-    }
+    generic_recompute_slice_mloop1(i, max_j, min_k, max_l, 2 | 4, WBP, PMmloop0);
 }
 
 void
 pseudo_loop::recompute_slice_PRmloop0(int i, int max_j, int min_k, int max_l) {
-    // set candidates
-    for (int l=min_k; l<=max_l; l++) {
-        for (int k=l; k>=min_k; k--) {
-            for (int j=i; j<=max_j; j++) {
-                const candidate *c = PRmloop0_CL->find_candidate(i,j,k,l);
-                if (c != NULL) {
-                    PRmloop0.set(i, j, k, l) = c->w;
-                } else {
-                    // decomposition cases of compute_PRmloop0_sp(i,j,k,l):
-                    int min_energy =
-                        generic_decomposition(i, j, k, l, 4 | 8, PRmloop0_CL,
-                                              WB, PRmloop0);
-
-                    PRmloop0.set(i, j, k, l) = min_energy;
-                }
-            }
-        }
-    }
+    generic_recompute_slice_mloop0(i, max_j, min_k, max_l, 4 | 8, PRmloop0_CL,
+                                   WB, PRmloop0);
 }
 
 void pseudo_loop::recompute_slice_PRmloop1(int i, int max_j, int min_k, int max_l) {
-    // recompute all entries
-    for (int l=min_k; l<=max_l; l++) {
-        for (int k=l; k>=min_k; k--) {
-            for (int j=i; j<=max_j; j++) {
-                int min_energy =
-                    generic_decomposition(i, j, k, l, 4 | 8, PRmloop0_CL, WBP,
-                                          PRmloop0);
-                PRmloop1.set(i,j,k,l) = min_energy;
-            }
-        }
-    }
+    generic_recompute_slice_mloop1(i, max_j, min_k, max_l, 4 | 8, WBP, PRmloop0);
 }
-
 
 void
 pseudo_loop::recompute_slice_POmloop0(int i, int max_j, int min_k, int max_l) {
-    // set candidates
-    for (int l=min_k; l<=max_l; l++) {
-        for (int k=l; k>=min_k; k--) {
-            for (int j=i; j<=max_j; j++) {
-                const candidate *c = POmloop0_CL->find_candidate(i,j,k,l);
-                if (c != NULL) {
-                    POmloop0.set(i,j,k,l) = c->w;
-                } else {
-                    // decomposition cases of compute_POmloop0_sp(i,j,k,l):
-                    int min_energy =
-                        generic_decomposition(i, j, k, l, 1 | 8, POmloop0_CL,
-                                              WB, POmloop0);
-
-                    POmloop0.set(i,j,k,l) = min_energy;
-                }
-            }
-        }
-    }
+    generic_recompute_slice_mloop0(i, max_j, min_k, max_l, 1 | 8, POmloop0_CL,
+                                   WB, POmloop0);
 }
 
 void pseudo_loop::recompute_slice_POmloop1(int i, int max_j, int min_k, int max_l) {
-    // recompute all entries
-    for (int l=min_k; l<=max_l; l++) {
-        for (int k=l; k>=min_k; k--) {
-            for (int j=i; j<=max_j; j++) {
-                int min_energy =
-                    generic_decomposition(i, j, k, l, 1 | 8, POmloop0_CL, WBP,
-                                          POmloop0);
-                POmloop1.set(i,j,k,l) = min_energy;
-            }
-        }
-    }
+    generic_recompute_slice_mloop1(i, max_j, min_k, max_l, 1 | 8, WBP, POmloop0);
 }
+
 
 void pseudo_loop::compute_PL(int i, int j, int k, int l){
     int min_energy = INF,b1=INF,b2=INF,b3=INF;
