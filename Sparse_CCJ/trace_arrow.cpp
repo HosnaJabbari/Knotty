@@ -178,6 +178,7 @@ void
 MasterTraceArrows::inc_source_ref_count(size_t i, size_t j, size_t k, size_t l, char type) {
     // Must check from the target arrows structure, not source
     TraceArrows *target = get_arrows_by_type(type);
+    if (target==nullptr) return; // do nothing if there are no trace arrows for the target
 
     TraceArrow *ta= target->trace_arrow_from(i,j,k,l);
     if (ta != nullptr)
@@ -304,7 +305,8 @@ MasterTraceArrows::gc_trace_arrow(int i, int j, SimpleMap<ta_key_pair, TraceArro
         source.inc_erase();
 
         assert(ta.source_ref_count() == 0);
-        assert(target != nullptr);
+
+        if (target==nullptr) return true; // stop gc if target has no trace arrows
 
         // Only continue on and delete what it is pointing at if it is going backwards
         if (tgt_i > i)
@@ -352,7 +354,6 @@ MasterTraceArrows::gc_to_target(size_t i, size_t j, size_t k, size_t l, TraceArr
 MasterTraceArrows::MasterTraceArrows(size_t n)
     : n_(n),
 
-    P(n, P_P),
     PK(n,P_PK),
 
     PfromL(n,P_PfromL),
@@ -363,24 +364,7 @@ MasterTraceArrows::MasterTraceArrows(size_t n)
     PL(n,P_PL),
     PR(n,P_PR),
     PM(n,P_PM),
-    PO(n,P_PO),
-
-    PLmloop(n,P_PLmloop),
-    PRmloop(n,P_PRmloop),
-    PMmloop(n,P_PMmloop),
-    POmloop(n,P_POmloop),
-
-    PLmloop1(n,P_PLmloop1),
-    PLmloop0(n,P_PLmloop0),
-
-    PRmloop1(n,P_PRmloop1),
-    PRmloop0(n,P_PRmloop0),
-
-    PMmloop1(n,P_PMmloop1),
-    PMmloop0(n,P_PMmloop0),
-
-    POmloop1(n,P_POmloop1),
-    POmloop0(n,P_POmloop0)
+    PO(n,P_PO)
 {
     ta_n = n;
 }
@@ -399,30 +383,12 @@ MasterTraceArrows::garbage_collect(size_t i) {
     gc_row(i, PR);
     gc_row(i, PM);
     gc_row(i, PO);
-
-    gc_row(i, PLmloop);
-    gc_row(i, PRmloop);
-    gc_row(i, PMmloop);
-    gc_row(i, POmloop);
-
-    gc_row(i, PLmloop1);
-    gc_row(i, PLmloop0);
-
-    gc_row(i, PRmloop1);
-    gc_row(i, PRmloop0);
-
-    gc_row(i, PMmloop1);
-    gc_row(i, PMmloop0);
-
-    gc_row(i, POmloop1);
-    gc_row(i, POmloop0);
 }
 
 void
 MasterTraceArrows::resize(size_t n) {
     int total_length = (n *(n+1))/2;
 
-    P.resize(n);
     PK.resize(n);
 
     PfromL.resize(n);
@@ -435,29 +401,12 @@ MasterTraceArrows::resize(size_t n) {
     PM.resize(n);
     PO.resize(n);
 
-    PLmloop.resize(n);
-    PRmloop.resize(n);
-    PMmloop.resize(n);
-    POmloop.resize(n);
-
-    PLmloop1.resize(n);
-    PLmloop0.resize(n);
-
-    PRmloop1.resize(n);
-    PRmloop0.resize(n);
-
-    PMmloop1.resize(n);
-    PMmloop0.resize(n);
-
-    POmloop1.resize(n);
-    POmloop0.resize(n);
 }
 
 void
 MasterTraceArrows::set_index(const int *index){
     index_ = index;
 
-    P.set_index(index);
     PK.set_index(index);
 
     PfromL.set_index(index);
@@ -469,23 +418,6 @@ MasterTraceArrows::set_index(const int *index){
     PR.set_index(index);
     PM.set_index(index);
     PO.set_index(index);
-
-    PLmloop.set_index(index);
-    PRmloop.set_index(index);
-    PMmloop.set_index(index);
-    POmloop.set_index(index);
-
-    PLmloop1.set_index(index);
-    PLmloop0.set_index(index);
-
-    PRmloop1.set_index(index);
-    PRmloop0.set_index(index);
-
-    PMmloop1.set_index(index);
-    PMmloop0.set_index(index);
-
-    POmloop1.set_index(index);
-    POmloop0.set_index(index);
 }
 
 /**
@@ -495,7 +427,6 @@ TraceArrows*
 MasterTraceArrows::get_arrows_by_type(char type) {
     TraceArrows *target = nullptr;
     switch(type) {
-        case P_P:  target = &P ; break;
         case P_PK: target = &PK; break;
 
         case P_PfromL: target = &PfromL; break;
@@ -508,24 +439,7 @@ MasterTraceArrows::get_arrows_by_type(char type) {
         case P_PM: target = &PM; break;
         case P_PO: target = &PO; break;
 
-        case P_PLmloop: target = &PLmloop; break;
-        case P_PRmloop: target = &PRmloop; break;
-        case P_PMmloop: target = &PMmloop; break;
-        case P_POmloop: target = &POmloop; break;
-
-        case P_PLmloop1: target = &PLmloop1; break;
-        case P_PLmloop0: target = &PLmloop0; break;
-
-        case P_PRmloop1: target = &PRmloop1; break;
-        case P_PRmloop0: target = &PRmloop0; break;
-
-        case P_PMmloop1: target = &PMmloop1; break;
-        case P_PMmloop0: target = &PMmloop0; break;
-
-        case P_POmloop1: target = &POmloop1; break;
-        case P_POmloop0: target = &POmloop0; break;
-
-        default: printf("MasterTraceArrows: Target type switch statement failed: %c\n",type); exit(-1);
+        default: target=nullptr;
     }
 
     return target;
@@ -533,7 +447,6 @@ MasterTraceArrows::get_arrows_by_type(char type) {
 
 void
 MasterTraceArrows::compactify() {
-    P.compactify();
     PK.compactify();
 
     PfromL.compactify();
@@ -545,74 +458,27 @@ MasterTraceArrows::compactify() {
     PR.compactify();
     PM.compactify();
     PO.compactify();
-
-    PLmloop.compactify();
-    PRmloop.compactify();
-    PMmloop.compactify();
-    POmloop.compactify();
-
-    PLmloop1.compactify();
-    PLmloop0.compactify();
-
-    PRmloop1.compactify();
-    PRmloop0.compactify();
-
-    PMmloop1.compactify();
-    PMmloop0.compactify();
-
-    POmloop1.compactify();
-    POmloop0.compactify();
 }
 
 void
 MasterTraceArrows::print_ta_sizes(){
-    unsigned long long size = P.size() + PK.size() + PfromL.size() + PfromM.size() + PfromO.size() + PfromR.size()
-    + PL.size() + PR.size() + PM.size() + PO.size()
-    + PLmloop.size() + PRmloop.size() + PMmloop.size() + POmloop.size()
-    + PLmloop1.size() + PLmloop0.size()
-    + PRmloop1.size() + PRmloop0.size()
-    + PMmloop1.size() + PMmloop0.size()
-    + POmloop1.size() + POmloop0.size();
+    unsigned long long size = PK.size() + PfromL.size() + PfromM.size() + PfromO.size() + PfromR.size()
+    + PL.size() + PR.size() + PM.size() + PO.size();
 
-    unsigned long long erased = P.erased() + PK.erased() + PfromL.erased() + PfromM.erased() + PfromO.erased() + PfromR.erased()
-    + PL.erased() + PR.erased() + PM.erased() + PO.erased()
-    + PLmloop.erased() + PRmloop.erased() + PMmloop.erased() + POmloop.erased()
-    + PLmloop1.erased() + PLmloop0.erased()
-    + PRmloop1.erased() + PRmloop0.erased()
-    + PMmloop1.erased() + PMmloop0.erased()
-    + POmloop1.erased() + POmloop0.erased();
+    unsigned long long erased = PK.erased() + PfromL.erased() + PfromM.erased() + PfromO.erased() + PfromR.erased()
+    + PL.erased() + PR.erased() + PM.erased() + PO.erased();
 
-    unsigned long long avoided = P.avoided() + PK.avoided() + PfromL.avoided() + PfromM.avoided() + PfromO.avoided() + PfromR.avoided()
-    + PL.avoided() + PR.avoided() + PM.avoided() + PO.avoided()
-    + PLmloop.avoided() + PRmloop.avoided() + PMmloop.avoided() + POmloop.avoided()
-    + PLmloop1.avoided() + PLmloop0.avoided()
-    + PRmloop1.avoided() + PRmloop0.avoided()
-    + PMmloop1.avoided() + PMmloop0.avoided()
-    + POmloop1.avoided() + POmloop0.avoided();
+    unsigned long long avoided = PK.avoided() + PfromL.avoided() + PfromM.avoided() + PfromO.avoided() + PfromR.avoided()
+    + PL.avoided() + PR.avoided() + PM.avoided() + PO.avoided();
 
-    unsigned long long shortcut = P.shortcut() + PK.shortcut() + PfromL.shortcut() + PfromM.shortcut() + PfromO.shortcut() + PfromR.shortcut()
-    + PL.shortcut() + PR.shortcut() + PM.shortcut() + PO.shortcut()
-    + PLmloop.shortcut() + PRmloop.shortcut() + PMmloop.shortcut() + POmloop.shortcut()
-    + PLmloop1.shortcut() + PLmloop0.shortcut()
-    + PRmloop1.shortcut() + PRmloop0.shortcut()
-    + PMmloop1.shortcut() + PMmloop0.shortcut()
-    + POmloop1.shortcut() + POmloop0.shortcut();
+    unsigned long long shortcut = PK.shortcut() + PfromL.shortcut() + PfromM.shortcut() + PfromO.shortcut() + PfromR.shortcut()
+    + PL.shortcut() + PR.shortcut() + PM.shortcut() + PO.shortcut();
 
-    unsigned long long replaced = P.replaced() + PK.replaced() + PfromL.replaced() + PfromM.replaced() + PfromO.replaced() + PfromR.replaced()
-    + PL.replaced() + PR.replaced() + PM.replaced() + PO.replaced()
-    + PLmloop.replaced() + PRmloop.replaced() + PMmloop.replaced() + POmloop.replaced()
-    + PLmloop1.replaced() + PLmloop0.replaced()
-    + PRmloop1.replaced() + PRmloop0.replaced()
-    + PMmloop1.replaced() + PMmloop0.replaced()
-    + POmloop1.replaced() + POmloop0.replaced();
+    unsigned long long replaced = PK.replaced() + PfromL.replaced() + PfromM.replaced() + PfromO.replaced() + PfromR.replaced()
+    + PL.replaced() + PR.replaced() + PM.replaced() + PO.replaced();
 
-    unsigned long long max = P.max() + PK.max() + PfromL.max() + PfromM.max() + PfromO.max() + PfromR.max()
-    + PL.max() + PR.max() + PM.max() + PO.max()
-    + PLmloop.max() + PRmloop.max() + PMmloop.max() + POmloop.max()
-    + PLmloop1.max() + PLmloop0.max()
-    + PRmloop1.max() + PRmloop0.max()
-    + PMmloop1.max() + PMmloop0.max()
-    + POmloop1.max() + POmloop0.max();
+    unsigned long long max = PK.max() + PfromL.max() + PfromM.max() + PfromO.max() + PfromR.max()
+    + PL.max() + PR.max() + PM.max() + PO.max();
 
     std::cout << "Trace Arrows Size: "<<size
               <<" Avoided: "<<avoided
@@ -625,7 +491,6 @@ MasterTraceArrows::print_ta_sizes(){
 
 void
 MasterTraceArrows::print_ta_sizes_verbose(){
-    printf("P: "); P.print_ta_size();
     printf("PK: "); PK.print_ta_size();
 
     printf("PfromL: "); PfromL.print_ta_size();
@@ -637,23 +502,6 @@ MasterTraceArrows::print_ta_sizes_verbose(){
     printf("PR: "); PR.print_ta_size();
     printf("PM: "); PM.print_ta_size();
     printf("PO: "); PO.print_ta_size();
-
-    printf("PLmloop: "); PLmloop.print_ta_size();
-    printf("PRmloop: "); PRmloop.print_ta_size();
-    printf("PMmloop: "); PMmloop.print_ta_size();
-    printf("POmloop: "); POmloop.print_ta_size();
-
-    printf("PLmloop1: "); PLmloop1.print_ta_size();
-    printf("PLmloop0: "); PLmloop0.print_ta_size();
-
-    printf("PRmloop1: "); PRmloop1.print_ta_size();
-    printf("PRmloop0: "); PRmloop0.print_ta_size();
-
-    printf("PMmloop1: "); PMmloop1.print_ta_size();
-    printf("PMmloop0: "); PMmloop0.print_ta_size();
-
-    printf("POmloop1: "); POmloop1.print_ta_size();
-    printf("POmloop0: "); POmloop0.print_ta_size();
 
     print_ta_sizes();
 }

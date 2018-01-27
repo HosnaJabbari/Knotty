@@ -438,6 +438,27 @@ private:
     recompute_slice_PLmloop1(int i, int max_j, int min_k, int max_l);
 
 
+    // recompute a slice of PLmloop0
+    // for fix i, i<=j<=max_j min_k<=k<=l<=max_l
+    void
+    recompute_slice_PMmloop0(int i, int max_j, int min_k, int max_l);
+
+    // recompute a slice of PLmloop1
+    // for fix i, i<=j<=max_j min_k<=k<=l<=max_l
+    void
+    recompute_slice_PMmloop1(int i, int max_j, int min_k, int max_l);
+
+    // recompute a slice of PLmloop0
+    // for fix i, i<=j<=max_j min_k<=k<=l<=max_l
+    void
+    recompute_slice_PRmloop0(int i, int max_j, int min_k, int max_l);
+
+    // recompute a slice of PLmloop1
+    // for fix i, i<=j<=max_j min_k<=k<=l<=max_l
+    void
+    recompute_slice_PRmloop1(int i, int max_j, int min_k, int max_l);
+
+
     // recompute a slice of POmloop0
     // for fix i, i<=j<=max_j min_k<=k<=l<=max_l
     void
@@ -448,10 +469,17 @@ private:
     void
     recompute_slice_POmloop1(int i, int max_j, int min_k, int max_l);
 
-
     void trace_PLmloop(int i, int j, int k, int l, int e);
     void trace_PLmloop1(int i, int j, int k, int l, int e);
     void trace_PLmloop0(int i, int j, int k, int l, int e);
+
+    void trace_PMmloop(int i, int j, int k, int l, int e);
+    void trace_PMmloop1(int i, int j, int k, int l, int e);
+    void trace_PMmloop0(int i, int j, int k, int l, int e);
+
+    void trace_PRmloop(int i, int j, int k, int l, int e);
+    void trace_PRmloop1(int i, int j, int k, int l, int e);
+    void trace_PRmloop0(int i, int j, int k, int l, int e);
 
     void trace_POmloop(int i, int j, int k, int l, int e);
     void trace_POmloop1(int i, int j, int k, int l, int e);

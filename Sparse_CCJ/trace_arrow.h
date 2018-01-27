@@ -373,11 +373,8 @@ private:
 
 public:
     // A seperate TraceArrows for each matrix source type
-    // Unneccesarry ones such as PMiloop have been combined into others (PM in this case)
     // Explanation in comments by ta_replace in TraceArrows
     // PLiloop -> PL  PRiloop -> PR  PMiloop -> PM  POiloop -> PO
-    // PLmloop01 -> PLmloop00  POmloop01 -> POmloop00
-    TraceArrows P;
 
     TraceArrows PK;
 
@@ -390,23 +387,6 @@ public:
     TraceArrows PR;
     TraceArrows PM;
     TraceArrows PO;
-
-    TraceArrows PLmloop;
-    TraceArrows PRmloop;
-    TraceArrows PMmloop;
-    TraceArrows POmloop;
-
-    TraceArrows PLmloop1;
-    TraceArrows PLmloop0;
-
-    TraceArrows PRmloop1;
-    TraceArrows PRmloop0;
-
-    TraceArrows PMmloop1;
-    TraceArrows PMmloop0;
-
-    TraceArrows POmloop1;
-    TraceArrows POmloop0;
 
     /**
      * @brief Construct for sequence of specific length

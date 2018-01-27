@@ -6,7 +6,7 @@
  */
 void candidate_list::print_type() const {
     switch (type_) {
-        case P_PLmloop:
+        case P_PLmloop0:
             printf("PLmloop_CL");
             break;
 
@@ -14,7 +14,7 @@ void candidate_list::print_type() const {
             printf("PfromL_CL");
             break;
 
-        case P_POmloop:
+        case P_POmloop0:
             printf("POmloop_CL");
             break;
 
@@ -113,7 +113,6 @@ void candidate_list::get_CL_size(int &candidates, int &empty_lists, int &size, i
  * @brief prints information on a single candidate list
  */
 void candidate_list::print_CL_size() const {
-/*
     int candidates = 0, empty_lists = 0, size = 0, capacity = 0;
     get_CL_size(candidates, empty_lists, size, capacity);
 
@@ -133,7 +132,4 @@ void candidate_list::print_CL_size() const {
     printf("Total candidate space: %d\n", candidates*c_size );
 
     printf("Size: %d, Capacity: %d\n", size, capacity);
-*/
-
 }
-

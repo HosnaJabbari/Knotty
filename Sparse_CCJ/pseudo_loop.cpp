@@ -951,6 +951,80 @@ void pseudo_loop::recompute_slice_PLmloop1(int i, int max_j, int min_k, int max_
     }
 }
 
+
+void
+pseudo_loop::recompute_slice_PMmloop0(int i, int max_j, int min_k, int max_l) {
+    // set candidates
+    for (int l=min_k; l<=max_l; l++) {
+        for (int k=l; k>=min_k; k--) {
+            for (int j=i; j<=max_j; j++) {
+                const candidate *c = PMmloop0_CL->find_candidate(i,j,k,l);
+                if (c != NULL) {
+                    PMmloop0.set(i, j, k, l) = c->w;
+                } else {
+                    // decomposition cases of compute_PMmloop0_sp(i,j,k,l):
+                    int min_energy =
+                        generic_decomposition(i, j, k, l, 2 | 4, PMmloop0_CL,
+                                              WB, PMmloop0);
+
+                    PMmloop0.set(i, j, k, l) = min_energy;
+                }
+            }
+        }
+    }
+}
+
+void pseudo_loop::recompute_slice_PMmloop1(int i, int max_j, int min_k, int max_l) {
+    // recompute all entries
+    for (int l=min_k; l<=max_l; l++) {
+        for (int k=l; k>=min_k; k--) {
+            for (int j=i; j<=max_j; j++) {
+                int min_energy =
+                    generic_decomposition(i, j, k, l, 2 | 4, PMmloop0_CL, WBP,
+                                          PMmloop0);
+                PMmloop1.set(i,j,k,l) = min_energy;
+            }
+        }
+    }
+}
+
+void
+pseudo_loop::recompute_slice_PRmloop0(int i, int max_j, int min_k, int max_l) {
+    // set candidates
+    for (int l=min_k; l<=max_l; l++) {
+        for (int k=l; k>=min_k; k--) {
+            for (int j=i; j<=max_j; j++) {
+                const candidate *c = PRmloop0_CL->find_candidate(i,j,k,l);
+                if (c != NULL) {
+                    PRmloop0.set(i, j, k, l) = c->w;
+                } else {
+                    // decomposition cases of compute_PRmloop0_sp(i,j,k,l):
+                    int min_energy =
+                        generic_decomposition(i, j, k, l, 4 | 8, PRmloop0_CL,
+                                              WB, PRmloop0);
+
+                    PRmloop0.set(i, j, k, l) = min_energy;
+                }
+            }
+        }
+    }
+}
+
+void pseudo_loop::recompute_slice_PRmloop1(int i, int max_j, int min_k, int max_l) {
+    // recompute all entries
+    for (int l=min_k; l<=max_l; l++) {
+        for (int k=l; k>=min_k; k--) {
+            for (int j=i; j<=max_j; j++) {
+                int min_energy =
+                    generic_decomposition(i, j, k, l, 4 | 8, PRmloop0_CL, WBP,
+                                          PRmloop0);
+                PRmloop1.set(i,j,k,l) = min_energy;
+            }
+        }
+    }
+}
+
+
 void
 pseudo_loop::recompute_slice_POmloop0(int i, int max_j, int min_k, int max_l) {
     // set candidates
@@ -1883,21 +1957,6 @@ void pseudo_loop::compute_PRmloop1(int i, int j, int k, int l){
     // Sparse
     if (pl_debug)
         printf ("PRmloop1(%d,%d,%d,%d) type %c energy %d\n", i, j, k,l,P_PRmloop1, min_energy);
-
-    if (min_energy < INF/2){
-        switch (best_branch_) {
-            case 3:
-                ta->register_trace_arrow(i,j,k,l, i,j,best_d_,l, min_energy, P_PRmloop1, P_PRmloop0, P_WBP, k, best_d_-1);
-                break;
-            case 4:
-                assert(best_d_ != -1);
-                ta->register_trace_arrow(i,j,k,l, i,j,k,best_d_, min_energy, P_PRmloop1, P_PRmloop0, P_WBP, best_d_+1, l);
-                break;
-            default:
-                printf("default: no best branch PRmloop10(%d,%d,%d,%d) e:%d\n",i,j,k,l,min_energy);
-                break;
-        }
-    }
 }
 
 void pseudo_loop::compute_PRmloop0(int i, int j, int k, int l){
@@ -1919,24 +1978,12 @@ void pseudo_loop::compute_PRmloop0(int i, int j, int k, int l){
     // Sparse
     if (pl_debug)
         printf ("PRmloop0(%d,%d,%d,%d) type %c energy %d\n", i, j, k,l,P_PRmloop0, min_energy);
-    PRmloop0.set(i,j,k,l) = min_energy;
 
     if (min_energy < INF/2){
-        switch (best_branch_) {
-            case 7:
-                ta->register_trace_arrow(i,j,k,l, i,j,k,l, min_energy, P_PRmloop0, P_PR);
-                break;
-            case 3:
-                assert(best_d_ != -1);
-                ta->register_trace_arrow(i,j,k,l, i,j,best_d_, l, min_energy, P_PRmloop0, P_PRmloop0, P_WB,k,best_d_-1);
-                break;
-            case 4:
-                assert(best_d_ != -1);
-                ta->register_trace_arrow(i,j,k,l, i,j,k,best_d_, min_energy, P_PRmloop0, P_PRmloop0, P_WB, best_d_+1,l);
-                break;
-            default:
-                printf("default: no best branch PRmloop0(%d,%d,%d,%d) e:%d\n",i,j,k,l,min_energy);
-                break;
+        PRmloop0.set(i,j,k,l) = min_energy;
+
+        if (!decomposing_branch_) {
+            PRmloop0_CL->push_candidate(i, j, k, l, min_energy, best_branch_);
         }
     }
 }
@@ -1960,21 +2007,8 @@ void pseudo_loop::compute_PMmloop1(int i, int j, int k, int l){
     // Sparse
     if (pl_debug)
         printf ("PMmloop1(%d,%d,%d,%d) type %c energy %d\n", i, j, k,l,P_PMmloop1, min_energy);
-    PMmloop1.set(i, j, k, l) = min_energy;
-
-    if (min_energy < INF/2){
-        // adding trace arrows
-        switch (best_branch_){
-            case 3:
-                ta->register_trace_arrow(i,j,k,l, i,j,best_d_,l, min_energy, P_PMmloop1, P_PMmloop0, P_WBP, k,best_d_-1);
-                break;
-            case 2:
-                assert(best_d_ != -1);
-                ta->register_trace_arrow(i,j,k,l, i,best_d_,k,l, min_energy, P_PMmloop1, P_PMmloop0, P_WBP, best_d_+1,j);
-                break;
-            default:
-                printf("default: no best branch PMmloop1 %d %d\n",min_energy, best_branch_);
-        }
+    if (min_energy < INF/2) {
+        PMmloop1.set(i, j, k, l) = min_energy;
     }
 }
 
@@ -1997,24 +2031,11 @@ void pseudo_loop::compute_PMmloop0(int i, int j, int k, int l){
     // Sparse
     if (pl_debug)
         printf ("PMmloop0(%d,%d,%d,%d) type %c energy %d\n", i, j, k,l,P_PMmloop0, min_energy);
-    PMmloop0.set(i, j, k, l) = min_energy;
-
     if (min_energy < INF/2){
-        // adding trace arrows
-        switch (best_branch_){
-            case 6:
-                ta->register_trace_arrow(i,j,k,l, i,j,k,l, min_energy, P_PMmloop0, P_PM);
-                break;
-            case 2:
-                assert(best_d_ != -1);
-                ta->register_trace_arrow(i,j,k,l, i,best_d_,k,l, min_energy, P_PMmloop0, P_PMmloop0, P_WB, best_d_+1, j);
-                break;
-            case 3:
-                assert(best_d_ != -1);
-                ta->register_trace_arrow(i,j,k,l, i,j,best_d_,l, min_energy, P_PMmloop0, P_PMmloop0, P_WB, k, best_d_-1);
-                break;
-            default:
-                printf("default: no best branch PfromL %d %d\n",min_energy, best_branch_);
+        PMmloop0.set(i, j, k, l) = min_energy;
+
+        if (!decomposing_branch_) {
+            PMmloop0_CL->push_candidate(i, j, k, l, min_energy, best_branch_);
         }
     }
 }
@@ -2450,10 +2471,6 @@ int pseudo_loop::get_PRmloop(int i, int j, int k, int l){
 
     int min_energy = get_PRmloop1(i,j,k+1,l-1) + ap_penalty + beta2P(l,k);
 
-    if (sparsify && min_energy < INF/2 && (!ta->PLmloop.exists_trace_arrow_from(i,j,k,l))) {
-        ta->register_trace_arrow(i,j,k,l, i,j,k+1,l-1, min_energy, P_PRmloop, P_PRmloop1);
-    }
-
     return min_energy;
 }
 
@@ -2531,10 +2548,6 @@ int pseudo_loop::get_PMmloop(int i, int j, int k, int l){
     assert(!(i<0 || l>= nb_nucleotides));
 
     int min_energy = get_PMmloop1(i,j-1,k+1,l)+ap_penalty+beta2P(j,k);
-
-    if (sparsify && min_energy < INF/2 && (!ta->PMmloop.exists_trace_arrow_from(i,j,k,l))) {
-        ta->register_trace_arrow(i,j,k,l,i,j-1,k+1,l,min_energy,P_PMmloop,P_PMmloop1);
-    }
 
     return min_energy;
 }
@@ -5111,6 +5124,8 @@ void pseudo_loop::bt_WPP(int i, int l) {
     }
 }
 
+// -------------------- trace PLmloop
+
 void pseudo_loop::trace_PLmloop(int i, int j, int k, int l, int e) {
     trace_update_f(i,j,k,l, P_PLmloop);
     trace_update_f_with_target(i,j,k,l, P_PLmloop, P_PLmloop1);
@@ -5176,6 +5191,147 @@ void pseudo_loop::trace_PLmloop0(int i, int j, int k, int l, int e) {
     default: assert(false);
     }
 }
+
+
+// -------------------- trace PMmloop
+
+void pseudo_loop::trace_PMmloop(int i, int j, int k, int l, int e) {
+    trace_update_f(i,j,k,l, P_PMmloop);
+    trace_update_f_with_target(i,j,k,l, P_PMmloop, P_PMmloop1);
+
+    int MLclosing = ap_penalty + beta2P(j,i); // cost of closing the multiloop
+    trace_continue(i, l, j-1, k+1, P_PMmloop1, e - MLclosing );
+}
+
+void pseudo_loop::trace_PMmloop1(int i, int j, int k, int l, int e) {
+    recompute_slice_PMmloop0(i,j,k,l);
+    recompute_slice_PMmloop1(i,j,k,l);
+    //!@todo avoid unncecessary recomputation of slices (can be done later, this
+    //! seems less important as long as we recompute only mloop matrices)
+
+    //determine trace case in PMmloop1
+
+    int min_energy = generic_decomposition(i, j, k, l, 2 | 4, PMmloop0_CL,
+                                           WBP, PMmloop0);
+
+    assert ( min_energy == e );
+
+    // SW - I am unsure what we need to update here
+    trace_update_f(i,j,k,l, P_PMmloop1);
+    trace_update_f_with_target(i,j,k,l, P_PMmloop1, P_PMmloop0);
+
+    switch (best_branch_) {
+    case 2:
+        bt_WBP(best_d_ + 1, j);
+        trace_continue(i, l, best_d_, k, P_PMmloop0, get_PMmloop0(i, best_d_, k, l) );
+        break;
+    case 3:
+        bt_WBP(best_d_ + 1, j);
+        trace_continue(i, l, j, best_d_, P_PMmloop0, get_PMmloop0(i, j, best_d_, l) );
+        break;
+    default: assert(false);
+    }
+}
+
+void pseudo_loop::trace_PMmloop0(int i, int j, int k, int l, int e) {
+    recompute_slice_PMmloop0(i,j,k,l);
+
+    int min_energy = generic_decomposition(i, j, k, l, 1 | 2, PMmloop0_CL,
+                                           WB, PMmloop0, 1, beta2P);
+
+    assert ( min_energy == e );
+
+    // SW - I am unsure what we need to update here
+    trace_update_f(i,j,k,l, P_PMmloop0);
+    trace_update_f_with_target(i,j,k,l, P_PMmloop0, P_PMmloop0);
+
+    switch (best_branch_) {
+    case 2:
+        bt_WBP(best_d_ + 1, j);
+        trace_continue(i, l, best_d_, k, P_PMmloop0, get_PMmloop0(i, best_d_, k, l) );
+        break;
+    case 3:
+        bt_WBP(best_d_ + 1, j);
+        trace_continue(i, l, j, best_d_, P_PMmloop0, get_PMmloop0(i, j, best_d_, l) );
+        break;
+    case 5:
+        trace_continue(i, l, j, k, P_PM, get_PMmloop0(i, j, k, l) );
+        break;
+    default: assert(false);
+    }
+}
+
+
+// -------------------- trace PRmloop
+
+void pseudo_loop::trace_PRmloop(int i, int j, int k, int l, int e) {
+    trace_update_f(i,j,k,l, P_PRmloop);
+    trace_update_f_with_target(i,j,k,l, P_PRmloop, P_PRmloop1);
+
+    int MLclosing = ap_penalty + beta2P(j,i); // cost of closing the multiloop
+    trace_continue(i, l-1, j, k+1, P_PRmloop1, e - MLclosing );
+}
+
+void pseudo_loop::trace_PRmloop1(int i, int j, int k, int l, int e) {
+    recompute_slice_PRmloop0(i,j,k,l);
+    recompute_slice_PRmloop1(i,j,k,l);
+    //!@todo avoid unncecessary recomputation of slices (can be done later, this
+    //! seems less important as long as we recompute only mloop matrices)
+
+    //determine trace case in PRmloop1
+
+    int min_energy = generic_decomposition(i, j, k, l, 4 | 8, PRmloop0_CL,
+                                           WBP, PRmloop0);
+
+    assert ( min_energy == e );
+
+    // SW - I am unsure what we need to update here
+    trace_update_f(i,j,k,l, P_PRmloop1);
+    trace_update_f_with_target(i,j,k,l, P_PRmloop1, P_PRmloop0);
+
+    switch (best_branch_) {
+    case 3:
+        bt_WBP(k, best_d_ - 1);
+        trace_continue(i, l, j, best_d_, P_PRmloop0, get_PRmloop0(i, j, best_d_, l) );
+        break;
+    case 4:
+        bt_WBP(best_d_ + 1, j);
+        trace_continue(i, best_d_, j, k, P_PRmloop0, get_PRmloop0(i, j, k, best_d_) );
+        break;
+    default: assert(false);
+    }
+}
+
+void pseudo_loop::trace_PRmloop0(int i, int j, int k, int l, int e) {
+    recompute_slice_PRmloop0(i,j,k,l);
+
+    int min_energy = generic_decomposition(i, j, k, l, 1 | 2, PRmloop0_CL,
+                                           WB, PRmloop0, 1, beta2P);
+
+    assert ( min_energy == e );
+
+    // SW - I am unsure what we need to update here
+    trace_update_f(i,j,k,l, P_PRmloop0);
+    trace_update_f_with_target(i,j,k,l, P_PRmloop0, P_PRmloop0);
+
+    switch (best_branch_) {
+    case 3:
+        bt_WBP(k, best_d_ - 1);
+        trace_continue(i, l, j, best_d_, P_PRmloop0, get_PRmloop0(i, j, best_d_, l) );
+        break;
+    case 4:
+        bt_WBP(best_d_ + 1, j);
+        trace_continue(i, best_d_, j, k, P_PRmloop0, get_PRmloop0(i, j, k, best_d_) );
+        break;
+    case 7:
+        trace_continue(i, l, j, k, P_PR, get_PRmloop0(i, j, k, l) );
+        break;
+    default: assert(false);
+    }
+}
+
+
+// -------------------- trace POmloop
 
 void pseudo_loop::trace_POmloop(int i, int j, int k, int l, int e) {
     trace_update_f(i,j,k,l, P_POmloop);
@@ -5261,18 +5417,18 @@ void pseudo_loop::trace_continue(int i, int j, int k, int l, char srctype, energ
         case P_PO: src_ta = &ta->PO; break;
 
         case P_PLmloop: trace_PLmloop(i,j,k,l,e); break;
-        case P_PRmloop: src_ta = &ta->PRmloop; break;
-        case P_PMmloop: src_ta = &ta->PMmloop; break;
+        case P_PRmloop: trace_PRmloop(i,j,k,l,e); break;
+        case P_PMmloop: trace_PMmloop(i,j,k,l,e); break;
         case P_POmloop: trace_POmloop(i,j,k,l,e); break;
 
         case P_PLmloop1: trace_PLmloop1(i,j,k,l,e); return;
         case P_PLmloop0: trace_PLmloop0(i,j,k,l,e); return;
 
-        case P_PRmloop1: src_ta = &ta->PRmloop1; break;
-        case P_PRmloop0: src_ta = &ta->PRmloop0; break;
+        case P_PRmloop1: trace_PRmloop1(i,j,k,l,e); break;
+        case P_PRmloop0: trace_PRmloop1(i,j,k,l,e); break;
 
-        case P_PMmloop1: src_ta = &ta->PMmloop1; break;
-        case P_PMmloop0: src_ta = &ta->PMmloop0; break;
+        case P_PMmloop1: trace_PMmloop1(i,j,k,l,e); break;
+        case P_PMmloop0: trace_PMmloop1(i,j,k,l,e); break;
 
         case P_POmloop1: trace_POmloop1(i,j,k,l,e); return;
         case P_POmloop0: trace_POmloop0(i,j,k,l,e); return;
@@ -5900,10 +6056,14 @@ void pseudo_loop::print_CL_sizes()
 }
 
 void pseudo_loop::print_CL_sizes_verbose() {
-    PLmloop0_CL->print_CL_size();
     PfromL_CL->print_CL_size();
-    POmloop0_CL->print_CL_size();
     PfromO_CL->print_CL_size();
+
+    PLmloop0_CL->print_CL_size();
+    PMmloop0_CL->print_CL_size();
+    PRmloop0_CL->print_CL_size();
+    POmloop0_CL->print_CL_size();
+
     print_PK_CL_size();
     printf("\n");
 
