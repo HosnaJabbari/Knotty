@@ -176,10 +176,10 @@ private:
     int ***PO;				// MFE of a TGB structure s.t. i.l is paired
 
     // transition recurrences
-    int ***PfromL;
-    int **PfromR;
-    int **PfromM;
-    int ***PfromO;
+    MatrixSlices3D PfromL;
+    MatrixSlices3D PfromR;
+    MatrixSlices3D PfromM;
+    MatrixSlices3D PfromO;
 
     // internal loops and multi loops that span a band
     MatrixSlices3D PLmloop1;
@@ -370,7 +370,24 @@ private:
     int best_branch_; //!< index of best branch
     bool decomposing_branch_; //!< whether best branch is decomposing
 
+
+    // cases for the generic decomposition
+    static const int CASE_12G2 = 1<<0;
+    static const int CASE_12G1 = 1<<1;
+    static const int CASE_1G21 = 1<<2;
+    static const int CASE_1G12 = 1<<3;
+    static const int CASE_L = CASE_12G2 | CASE_12G1;
+    static const int CASE_M = CASE_12G1 | CASE_1G21;
+    static const int CASE_R = CASE_1G21 | CASE_1G12;
+    static const int CASE_O = CASE_12G2 | CASE_1G12;
+    static const int CASE_PL = 1<<4;
+    static const int CASE_PM = 1<<5;
+    static const int CASE_PR = 1<<6;
+    static const int CASE_PO = 1<<7;
+
+    //! @brief dummy penalty function (constant 0)
     static int zero(int i, int j) {return 0;}
+
     /**
      * @brief generic computation of gap matrix "multiloop" decompositions
      * @param decomp_cases decomposition cases (bit-encoded: 1=12G2, 2=12G1, 4=1G21, 8=1G12)
@@ -382,9 +399,7 @@ private:
      * @returns minimum energy
      *
      * @note sets the variables best_d_, best_branch_, and flag
-     * decomposing_branch_.  best_branch_ encodes the cases as
-     * follows: 1=outer-left (12G2), 2=inner-left (12G1), 3=inner-right (1G21),
-     * 4=outer-right (1G12), 5=PL (1), 6=PM (1), 7=PR (1), 8=PO (1)
+     * decomposing_branch_.
      */
     template<class Penalty=int(*)(int,int)>
     int
@@ -411,12 +426,10 @@ private:
     void compute_PM(int i,int j, int k, int l);
     void compute_PO(int i,int j, int k, int l);
 
-    void compute_PfromL_sp(int i, int j, int k, int l);
-    void compute_PfromL_ns(int i, int j, int k, int l);
+    void compute_PfromL(int i, int j, int k, int l);
     void compute_PfromR(int i, int j, int k, int l);
     void compute_PfromM(int i, int j, int k, int l);
-    void compute_PfromO_sp(int i, int j, int k, int l);
-    void compute_PfromO_ns(int i, int j, int k, int l);
+    void compute_PfromO(int i, int j, int k, int l);
 
     void compute_PLmloop1(int i,int j, int k, int l);
     void compute_PLmloop0(int i,int j, int k, int l);
