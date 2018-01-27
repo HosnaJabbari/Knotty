@@ -111,6 +111,8 @@ void pseudo_loop::allocate_space_sparse()
     this->ta->resize(nb_nucleotides+1);
 
     PfromL_CL = new candidate_list(P_PfromL, nb_nucleotides, cl_debug);
+    PfromM_CL = new candidate_list(P_PfromM, nb_nucleotides, cl_debug);
+    PfromR_CL = new candidate_list(P_PfromR, nb_nucleotides, cl_debug);
     PfromO_CL = new candidate_list(P_PfromO, nb_nucleotides, cl_debug);
     PLmloop0_CL = new candidate_list(P_PLmloop0, nb_nucleotides, cl_debug);
     PRmloop0_CL = new candidate_list(P_PRmloop0, nb_nucleotides, cl_debug);
@@ -179,7 +181,10 @@ void pseudo_loop::allocate_space_nonsparse()
     MOD_2 = nb_nucleotides;
     MOD_MAXLOOP = nb_nucleotides;
 
+    // SW - just to be safe the pointers are null
     PfromL_CL = nullptr;
+    PfromM_CL = nullptr;
+    PfromR_CL = nullptr;
     PfromO_CL = nullptr;
     PLmloop0_CL = nullptr;
     PRmloop0_CL = nullptr;
@@ -277,8 +282,12 @@ pseudo_loop::~pseudo_loop()
 
         delete ta;
         delete PfromL_CL;
+        delete PfromM_CL;
+        delete PfromR_CL;
         delete PfromO_CL;
         delete PLmloop0_CL;
+        delete PMmloop0_CL;
+        delete PRmloop0_CL;
         delete POmloop0_CL;
 
         delete [] index;
@@ -1144,17 +1153,22 @@ void pseudo_loop::compute_PR(int i, int j, int k, int l){
                 //ta->PR.register_trace_arrow(i,j,k,l,i,j,k,l, min_energy, P_PR, P_PRiloop);
                 break;
             case 2:
-                    ta->register_trace_arrow(i,j,k,l, i,j,k,l, min_energy, P_PR, P_PRmloop);
+                ta->register_trace_arrow(i,j,k,l, i,j,k,l, min_energy, P_PR, P_PRmloop);
                 break;
-            case 3:
-                    ta->register_trace_arrow(i,j,k,l, i,j,k+1,l-1, min_energy, P_PR, P_PfromR);
-                break;
+        case 3:
+            if (avoid_candidates && PfromR_CL->is_candidate(i,j,k+1,l-1)) {
+                ta->PR.delete_trace_arrow(i, j, k, l);
+                ta->PR.avoid_trace_arrow();
+            } else {
+                ta->register_trace_arrow(i, j, k, l, i, j, k + 1, l - 1,
+                                         min_energy, P_PR, P_PfromR);
+            }
+            break;
             default:
                 printf("default: no best branch PR(%d,%d,%d,%d) e:%d\n",i,j,k,l,min_energy);
                 break;
         }
     }
-
 }
 
 void pseudo_loop::compute_PM(int i, int j, int k, int l){
@@ -1233,7 +1247,12 @@ void pseudo_loop::compute_PM(int i, int j, int k, int l){
                 ta->register_trace_arrow(i,j,k,l,i,j,k,l, min_energy, P_PM, P_PMmloop);
                 break;
             case 3:
-                ta->register_trace_arrow(i,j,k,l,i,j-1,k+1,l, min_energy, P_PM, P_PfromM);
+                if (avoid_candidates && PfromM_CL->is_candidate(i,j-1,k+1,l)) {
+                    ta->PM.delete_trace_arrow(i,j,k,l);
+                    ta->PM.avoid_trace_arrow();
+                } else {
+                    ta->register_trace_arrow(i,j,k,l,i,j-1,k+1,l, min_energy, P_PM, P_PfromM);
+                }
                 break;
             case 4:
                 // do nothing
@@ -1562,11 +1581,19 @@ void pseudo_loop::compute_PfromR(int i, int j, int k, int l){
         switch (best_branch){
             case 1:
                 assert(best_d != -1);
-                ta->register_trace_arrow(i,j,k,l, i,j,best_d,l, min_energy, P_PfromR, P_PfromR, P_WP, k, best_d-1);
+                if (avoid_candidates && PfromR_CL->is_candidate(i,j,best_d,l)) {
+                    ta->PfromR.avoid_trace_arrow();
+                } else {
+                    ta->register_trace_arrow(i,j,k,l, i,j,best_d,l, min_energy, P_PfromR, P_PfromR, P_WP, k, best_d-1);
+                }
                 break;
             case 2:
                 assert(best_d != -1);
-                ta->register_trace_arrow(i,j,k,l, i,j,k,best_d, min_energy, P_PfromR, P_PfromR, P_WP, best_d+1, l);
+                if (avoid_candidates && PfromR_CL->is_candidate(i,j,k,best_d)) {
+                    ta->PfromR.avoid_trace_arrow();
+                } else {
+                    ta->register_trace_arrow(i,j,k,l, i,j,k,best_d, min_energy, P_PfromR, P_PfromR, P_WP, best_d+1, l);
+                }
                 break;
             case 3:
                 ta->register_trace_arrow(i,j,k,l, i,j,k,l, min_energy, P_PfromR, P_PM);
@@ -1578,6 +1605,15 @@ void pseudo_loop::compute_PfromR(int i, int j, int k, int l){
                 printf("default: no best branch PfromR\n");
         }
     }
+
+    // push to candidates if better than b1
+    if (best_branch > 1 && i < j) {
+        PfromR_CL->push_candidate(i, j, k, l, min_energy, best_branch);
+        // always keep arrows starting from candidates
+        if (use_garbage_collection)
+            ta->inc_source_ref_count(i,j,k,l,P_PfromR);
+    }
+
 }
 
 void pseudo_loop::compute_PfromM(int i, int j, int k, int l){
@@ -1650,11 +1686,19 @@ void pseudo_loop::compute_PfromM(int i, int j, int k, int l){
         switch (best_branch){
             case 1:
                 assert(best_d != -1);
-                ta->register_trace_arrow(i,j,k,l,i,best_d,k,l, min_energy, P_PfromM, P_PfromM, P_WP, best_d+1, j);
+                if (avoid_candidates && PfromM_CL->is_candidate(i,best_d,k,l)) {
+                    ta->PfromM.avoid_trace_arrow();
+                } else {
+                    ta->register_trace_arrow(i,j,k,l,i,best_d,k,l, min_energy, P_PfromM, P_PfromM, P_WP, best_d+1, j);
+                }
                 break;
             case 2:
                 assert(best_d != -1);
-                ta->register_trace_arrow(i,j,k,l,i,j,best_d,l, min_energy, P_PfromM, P_PfromM, P_WP, k, best_d-1);
+                if (avoid_candidates && PfromM_CL->is_candidate(i,j,best_d,l)) {
+                    ta->PfromM.avoid_trace_arrow();
+                } else {
+                    ta->register_trace_arrow(i,j,k,l,i,j,best_d,l, min_energy, P_PfromM, P_PfromM, P_WP, k, best_d-1);
+                }
                 break;
             case 3:
                 ta->register_trace_arrow(i,j,k,l,i,j,k,l, min_energy, P_PfromM, P_PL);
@@ -1666,8 +1710,15 @@ void pseudo_loop::compute_PfromM(int i, int j, int k, int l){
                 printf("default: no best branch PfromM\n");
         }
     }
-}
 
+    // push to candidates if better than b1
+    if (best_branch > 1 && i < j) {
+        PfromM_CL->push_candidate(i, j, k, l, min_energy, best_branch);
+        // always keep arrows starting from candidates
+        if (use_garbage_collection)
+            ta->inc_source_ref_count(i,j,k,l,P_PfromM);
+    }
+}
 
 void pseudo_loop::compute_PfromO_sp(int i, int j, int k, int l){
     int min_energy = INF, temp=INF,best_branch = -1, best_d = -1;
@@ -5448,19 +5499,20 @@ void pseudo_loop::trace_continue(int i, int j, int k, int l, char srctype, energ
                     trace_candidate(i,j,k,l, srctype, P_PfromL, e, PfromL_CL);
                     break;
 
+                // target is PfromM
+                case P_PM: case P_PfromM:
+                    trace_candidate(i,j,k,l, srctype, P_PfromM, e, PfromM_CL);
+                    break;
+
+                // target is PfromR
+                case P_PR: case P_PfromR:
+                    trace_candidate(i,j,k,l, srctype, P_PfromR, e, PfromR_CL);
+                    break;
+
                 // target is PfromO
                 case P_PO: case P_PfromO:
                     trace_candidate(i,j,k,l, srctype, P_PfromO, e, PfromO_CL);
                     break;
-
-                // target is PLmloop0
-                case P_PLmloop1: case P_PLmloop0:
-                    assert(false/*unexpected trace back from PLmloop0/1 matrix*/);
-
-                // target is POmloop0
-                case P_POmloop1: case P_POmloop0:
-                    assert(false/*unexpected trace back from POmloop0/1 matrix*/);
-
             default:
                     break;
             }
@@ -5527,6 +5579,31 @@ void pseudo_loop::trace_candidate(int i, int j, int k, int l, char srctype, char
             }
             if (node_debug || pl_debug)
                 printf("backtrack: could not find candidate PL\n");
+            return;
+            break;
+
+        case P_PM:
+            assert(tgttype == P_PfromM);
+            c = PfromM_CL->find_candidate(i, j - 1, k + 1, l);
+            if (c != nullptr) {
+                trace_candidate_continue(i,j,k,l, i,j-1,k+1,l,
+                                         srctype, tgttype, c);
+                return;
+            }
+            if (node_debug || pl_debug)
+                printf("backtrack: could not find candidate PM\n");
+            return;
+            break;
+
+      case P_PR:
+            assert(tgttype == P_PfromR);
+            c = PfromR_CL->find_candidate(i, j, k+1, l-1);
+            if (c != nullptr) {
+                trace_candidate_continue(i,j,k,l, i,j,k+1,l-1, srctype, tgttype, c);
+                return;
+            }
+            if (node_debug || pl_debug)
+                printf("backtrack: could not find candidate PR\n");
             return;
             break;
 
@@ -5978,9 +6055,14 @@ void pseudo_loop::print_CL_sizes()
     int candidates = 0, PK_candidates = 0, empty_lists = 0, empty_PK = 0;
     int size = 0, capacity = 0;
 
+    // SW - currently this does not do anything
     PLmloop0_CL->get_CL_size(candidates, empty_lists, size, capacity);
+    PMmloop0_CL->get_CL_size(candidates, empty_lists, size, capacity);
+    PRmloop0_CL->get_CL_size(candidates, empty_lists, size, capacity);
     POmloop0_CL->get_CL_size(candidates, empty_lists, size, capacity);
     PfromL_CL->get_CL_size(candidates, empty_lists, size, capacity);
+    PfromM_CL->get_CL_size(candidates, empty_lists, size, capacity);
+    PfromR_CL->get_CL_size(candidates, empty_lists, size, capacity);
     PfromO_CL->get_CL_size(candidates, empty_lists, size, capacity);
 
     for (int j = 0; j < nb_nucleotides; ++j ) {
@@ -5997,6 +6079,8 @@ void pseudo_loop::print_CL_sizes()
 
 void pseudo_loop::print_CL_sizes_verbose() {
     PfromL_CL->print_CL_size();
+    PfromM_CL->print_CL_size();
+    PfromR_CL->print_CL_size();
     PfromO_CL->print_CL_size();
 
     PLmloop0_CL->print_CL_size();

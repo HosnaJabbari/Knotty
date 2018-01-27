@@ -203,9 +203,14 @@ private:
     candidate_list *PfromL_CL;
     candidate_list *PfromO_CL;
 
-    // SW - add candidate lists for R and M mloops
-    candidate_list *PRmloop0_CL;
+    // SW - add candidate lists for M and R mloops
     candidate_list *PMmloop0_CL;
+    candidate_list *PRmloop0_CL;
+
+    // SW - add candidate lists for fromM and fromR
+    candidate_list *PfromM_CL;
+    candidate_list *PfromR_CL;
+
 
     // This is an array of [nb_nucleotides] forward lists
     std::forward_list<candidate_PK> *PK_CL;
@@ -321,6 +326,8 @@ public:
     void compactify() {
         if (sparsify && use_compactify) {
             PfromL_CL->compactify();
+            PfromM_CL->compactify();
+            PfromR_CL->compactify();
             PfromO_CL->compactify();
             PLmloop0_CL->compactify();
             PMmloop0_CL->compactify();
