@@ -168,12 +168,12 @@ private:
     TriangleMatrix WB;				// the loop inside a multiloop that spans a band // in base pair maximization, there is no difference between the two
     TriangleMatrix WBP;				// similar to WB but has at least one base pair
 
-    int *P;					// the main loop for pseudoloops and bands
-    int **PK;				// MFE of a TGB structure over gapped region [i,j] U [k,l]
-    int ***PL;				// MFE of a TGB structure s.t. i.j is paired
-    int **PR;				// MFE of a TGB structure s.t. k.l is paired
-    int **PM;				// MFE of a TGB structure s.t. j.k is paired
-    int ***PO;				// MFE of a TGB structure s.t. i.l is paired
+    TriangleMatrix P;					// the main loop for pseudoloops and bands
+    MatrixSlices3D PK;				// MFE of a TGB structure over gapped region [i,j] U [k,l]
+    MatrixSlices3D PL;				// MFE of a TGB structure s.t. i.j is paired
+    MatrixSlices3D PR;				// MFE of a TGB structure s.t. k.l is paired
+    MatrixSlices3D PM;				// MFE of a TGB structure s.t. j.k is paired
+    MatrixSlices3D PO;				// MFE of a TGB structure s.t. i.l is paired
 
     // transition recurrences
     MatrixSlices3D PfromL;
@@ -215,24 +215,6 @@ private:
     // This is an array of [nb_nucleotides] forward lists
     std::forward_list<candidate_PK> *PK_CL;
 
-
-    //! @brief allocate and initialize a 3D matrix slice
-    //! @return slice
-    int **
-    init_new_3Dslice();
-
-    //! @brief allocate and initialize an array of 3D matrix slices
-    //! @param n number of slices
-    //! @return slice
-    int ***
-    init_new_3Dslices(int n);
-
-    //! @brief allocate and initialize a 4D matrix
-    //! @return slice
-    //! @note the 4D matrix is represented as 2D matrix (product of two triangular matrices)
-    int **
-    init_new_4Dmatrix();
-
     void push_candidate_PK(int d, int j, int k, int l, int w)
     {
         PK_CL[l].push_front(candidate_PK(d,j,k,w));
@@ -266,7 +248,7 @@ private:
 
             if (c.d() == i && c.j() == j && c.k() == k) { return &c; }
         }
-        // No candidate found in CL with that i
+        // No candidate found in CL with that l
         return nullptr;
     }
 

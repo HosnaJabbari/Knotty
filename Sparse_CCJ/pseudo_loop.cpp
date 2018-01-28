@@ -53,50 +53,6 @@ pseudo_loop::pseudo_loop(char *seq, V_final *V, s_hairpin_loop *H, s_stacked_pai
     }
 }
 
-int **
-pseudo_loop::init_new_4Dmatrix() {
-    // Hosna, Feb 11, 2014
-    // instead of 4D arrays, I am using 2D arrays of length (nb_nucleotides^2/2)
-    // Hosna, Jan 16, 2015
-    // instead of 4D arrays, we use 3D array [i][j][k][l], and we implement it as 2D array
-    // of length [total_length]X[total_length] i.e., [ij][kl]
-    int total_length = (nb_nucleotides *(nb_nucleotides+1))/2;
-    int ** m = new int*[total_length];
-    for(int i = 0; i < total_length; i++) {
-        m[i] = new int[total_length];
-        if(m[i] == NULL) giveup ("Cannot allocate memory", "energy");
-        for (int j=0; j< total_length; j++) m[i][j] = INF+1;
-    }
-    return m;
-}
-
-int **
-pseudo_loop::init_new_3Dslice() {
-    // Hosna, Jan 16, 2015
-    // instead of 4D arrays, we use 3D array [j][k][l], and we implement it as 2D array
-    // of length [nb_nucleotides]X[total_length] i.e., [j][kl]
-    int total_length = (nb_nucleotides *(nb_nucleotides+1))/2;
-    int ** m = new int*[nb_nucleotides];
-    for (int j=0; j<nb_nucleotides; j++){
-        m[j] = new int[total_length];
-        if(m[j] == NULL) giveup ("Cannot allocate memory", "energy");
-        for (int kl=0; kl< total_length; kl++) m[j][kl] = INF+1;
-    }
-    return m;
-}
-
-int ***
-pseudo_loop::init_new_3Dslices(int n) {
-    // Hosna, Jan 16, 2015
-    // instead of 4D arrays, we use 2*3D array [1..2][j][k][l], and we implement it as 3D array
-    // of length [n][nb_nucleotides]X[total_length] i.e., [i][j][kl]
-    int *** m = new int**[n];
-    for(int i = 0; i < n; i++) {
-        m[i] = init_new_3Dslice();
-    }
-    return m;
-}
-
 // allocates space for the sparse version
 void pseudo_loop::allocate_space_sparse()
 {
@@ -137,17 +93,14 @@ void pseudo_loop::allocate_space_sparse()
     // pass index to trace arrows structure
     ta->set_index(index);
 
-    P = new int [total_length];
-    if (P == NULL) giveup ("Cannot allocate memory", "energy");
-    for (i=0; i < total_length; i++) P[i] = INF+1;
+    P.init(nb_nucleotides,index);
 
+    PK.init(nb_nucleotides);
 
-    PK = init_new_3Dslice();
-
-    PL = init_new_3Dslices(MAXLOOP);
-    PR = init_new_3Dslice();
-    PM = init_new_3Dslice();
-    PO = init_new_3Dslices(MAXLOOP);
+    PL.init(nb_nucleotides,MAXLOOP);
+    PR.init(nb_nucleotides);
+    PM.init(nb_nucleotides);
+    PO.init(nb_nucleotides,MAXLOOP);
 
     PfromL.init(nb_nucleotides, 2);
     PfromR.init(nb_nucleotides);
@@ -200,16 +153,14 @@ void pseudo_loop::allocate_space_nonsparse()
     WB.init(nb_nucleotides,index);
     WP.init(nb_nucleotides,index);
 
-    P = new int [total_length];
-    if (P == NULL) giveup ("Cannot allocate memory", "energy");
-    for (i=0; i < total_length; i++) P[i] = INF+1;
+    P.init(nb_nucleotides,index);
 
-    PK = init_new_4Dmatrix();
+    PK.init(nb_nucleotides,nb_nucleotides);
 
-    PL = init_new_3Dslices(nb_nucleotides);
-    PR = init_new_4Dmatrix();
-    PM = init_new_4Dmatrix();
-    PO = init_new_3Dslices(nb_nucleotides);
+    PL.init(nb_nucleotides, nb_nucleotides);
+    PR.init(nb_nucleotides, nb_nucleotides);
+    PM.init(nb_nucleotides, nb_nucleotides);
+    PO.init(nb_nucleotides, nb_nucleotides);
 
     PfromL.init(nb_nucleotides, nb_nucleotides);
     PfromR.init(nb_nucleotides, nb_nucleotides);
@@ -237,31 +188,6 @@ pseudo_loop::~pseudo_loop()
 {
     // Sparse
     if (sparsify) {
-        delete [] P;
-
-        // De-Allocate 2D arrays properly to prevent memory leak
-        for (int i = 0; i < nb_nucleotides; ++i){
-            delete [] PK[i];
-
-            delete [] PR[i];
-            delete [] PM[i];
-
-        }
-
-        for (int i = 0; i < MAXLOOP; i++){
-            for(int j=0; j<nb_nucleotides; j++){
-                delete [] PL[i][j];
-                delete [] PO[i][j];
-            }
-            delete [] PL[i];
-            delete [] PO[i];
-        }
-
-        delete [] PK;
-        delete [] PL;
-        delete [] PR;
-        delete [] PM;
-        delete [] PO;
 
         delete [] PK_CL;
 
@@ -280,32 +206,6 @@ pseudo_loop::~pseudo_loop()
 
     } else {
         // Non-sparse
-        delete [] P;
-
-        int total_length = (nb_nucleotides *(nb_nucleotides+1))/2;
-        // De-Allocate 2D arrays properly to prevent memory leak
-        for (int i = 0; i < total_length; ++i){
-            delete [] PK[i];
-
-            delete [] PR[i];
-            delete [] PM[i];
-        }
-
-        for (int i =0; i< nb_nucleotides; ++i){
-            for(int j=0; j<nb_nucleotides; j++){
-                delete [] PL[i][j];
-                delete [] PO[i][j];
-            }
-            delete [] PL[i];
-            delete [] PO[i];
-        }
-
-        delete [] PK;
-        delete [] PL;
-        delete [] PR;
-        delete [] PM;
-        delete [] PO;
-
         delete [] index;
         delete [] int_sequence;
     }
@@ -593,7 +493,6 @@ void pseudo_loop::compute_PK(int i, int j, int k, int l){
 
     if (impossible_case(i,j,k,l)) {return;}
 
-    int kl = index[k]+l-k;
     int best_f = -1, best_b = -1, best_d = -1;
 
     // Hosna, july 8, 2014
@@ -633,8 +532,8 @@ void pseudo_loop::compute_PK(int i, int j, int k, int l){
     temp = get_PM(i,j,k,l) + gamma2(j,k)+PB_penalty;
     if(temp < min_energy){
         min_energy = temp;
-		best_branch = 4;
-	}
+        best_branch = 4;
+    }
 
     temp = get_PR(i,j,k,l) + gamma2(l,k)+PB_penalty;
     if(temp < min_energy){
@@ -648,21 +547,15 @@ void pseudo_loop::compute_PK(int i, int j, int k, int l){
         best_branch = 6;
     }
 
-    // If Non-Sparse, add to array and return here
-    if (sparsify == false) {
-        if (min_energy < INF/2) {
-            if (pl_debug)
-                printf ("PK(%d,%d,%d,%d) branch %d energy %d\n", i, j, k,l,best_branch, min_energy);
-            int ij = index[i]+j-i;
-            PK[ij][kl]=min_energy;
-        }
+    if (min_energy < INF/2){
+        // If Non-Sparse, add to array and return here
+        if (pl_debug)
+            printf ("PK(%d,%d,%d,%d) branch %d energy %d\n", i, j, k,l,best_branch, min_energy);
+        PK.set(i,j,k,l) = min_energy;
+    }
+    if (! sparsify) {
         return;
     }
-
-    // If Sparse, also do trace arrows and candidates
-    if (pl_debug)
-            printf ("PK(%d,%d,%d,%d) branch %d energy %d\n", i, j, k,l,best_branch, min_energy);
-    PK[j][kl]=min_energy;
 
     if (min_energy < INF/2){
         // adding trace arrows
@@ -721,21 +614,20 @@ void pseudo_loop::compute_PK(int i, int j, int k, int l){
         // adding candidates
         if (best_branch > 1) {
             if (pl_debug)
-                printf ("Push PK_CL(%d,1212),(%d,%d,%d,%d)\n", l, i, j, k, min_energy);
+                printf ("Push PK_CL(%d,1212),(%d,%d,%d,%d)\n", i, j, k, l, min_energy);
             push_candidate_PK(i, j, k, l, min_energy);
         }
     }
 }
 
-void pseudo_loop::recompute_slice_PK(int i, int max_l){
+void pseudo_loop::recompute_slice_PK(int i, int max_l) {
     // recomputes slice at i for ikl < max_l
 
     // initialize PK entries
     for (int l=i+1; l<=max_l; l++) {
         for (int j=i; j<l; j++) {
             for (int k=j; k<l; k++) {
-                int kl = index[k]+l-k;
-                PK[j][kl] = INF+1;
+                PK.set(i,j,k,l) = INF+1;
             }
         }
     }
@@ -748,17 +640,15 @@ void pseudo_loop::recompute_slice_PK(int i, int max_l){
             int j=c.j();
             int k=c.k();
 
-            int kl = index[k]+l-k;
-            PK[j][kl] = c.w();
+            PK.set(i, j, k, l) = c.w();
         }
     }
 
     for (int l=i+1; l<=max_l; l++) {
         for (int j=i; j<l; j++) {
             for (int k=l; k>j; k--) {
-                int kl = index[k]+l-k;
-
-                if (PK[j][kl]>=INF) {
+                if (PK.get(i, j, k, l) >= INF) {
+                    int kl = index[k]+l-k;
 
                     // compute minimum over all partitioning cases
 
@@ -769,8 +659,9 @@ void pseudo_loop::recompute_slice_PK(int i, int max_l){
                     for(int d=k+1; d < l; d++) {
                         min_energy = std::min(min_energy, get_PK(i,j,d,l) + get_WP(k,d-1));  //1G21
                     }
-
-                    PK[j][kl] = min_energy;
+                    if (min_energy < INF/2) {
+                        PK.set(i, j, k, l) = min_energy;
+                    }
                 }
             }
         }
@@ -988,8 +879,6 @@ void pseudo_loop::compute_PL(int i, int j, int k, int l){
 
     if (impossible_case(i,j,k,l)) {return;}
 
-    //int ij = index[i]+j-i;
-    int kl = index[k]+l-k;
     int best_branch=0;
 
     if (can_pair(int_sequence[i],int_sequence[j])){
@@ -1027,7 +916,7 @@ void pseudo_loop::compute_PL(int i, int j, int k, int l){
     if (pl_debug)
         printf ("PL(%d,%d,%d,%d) branch %d energy %d\n", i, j, k,l,best_branch, min_energy);
 
-    PL[i%MOD_MAXLOOP][j][kl]=min_energy;
+    PL.set(i, j, k, l) = min_energy;
 
     // If Non-Sparse, end here
     if (!sparsify)
@@ -1068,8 +957,6 @@ void pseudo_loop::compute_PR(int i, int j, int k, int l){
 
     if (impossible_case(i,j,k,l)) {return;}
 
-    //int ij = index[i]+j-i;
-    int kl = index[k]+l-k;
     int best_branch=0;
 
     if (can_pair(int_sequence[k],int_sequence[l])){
@@ -1107,8 +994,7 @@ void pseudo_loop::compute_PR(int i, int j, int k, int l){
         if (min_energy < INF/2) {
             if (pl_debug)
                 printf ("PR(%d,%d,%d,%d) branch %d energy %d\n", i, j, k,l,best_branch, min_energy);
-            int ij = index[i]+j-i;
-            PR[ij][kl]=min_energy;
+            PR.set(i, j, k, l) = min_energy;
         }
         return;
     }
@@ -1116,9 +1002,9 @@ void pseudo_loop::compute_PR(int i, int j, int k, int l){
     // Sparse
     if (pl_debug )
             printf ("PR(%d,%d,%d,%d) branch %d energy %d\n", i, j, k,l,best_branch, min_energy);
-        PR[j][kl]=min_energy;
+    PR.set(i, j, k, l) = min_energy;
 
-	if (min_energy < INF/2){
+    if (min_energy < INF / 2) {
         // adding trace arrows
         switch (best_branch){
             case 1:
@@ -1149,10 +1035,7 @@ void pseudo_loop::compute_PM(int i, int j, int k, int l){
 
     if (impossible_case(i,j,k,l)) {return;}
 
-    //int ij = index[i]+j-i;
-    int kl = index[k]+l-k;
     int best_branch=0;
-
 
     if (can_pair(int_sequence[j],int_sequence[k])){
         b1 = get_PMiloop(i,j,k,l);
@@ -1199,8 +1082,7 @@ void pseudo_loop::compute_PM(int i, int j, int k, int l){
         if (min_energy < INF/2) {
             if (pl_debug)
                printf ("PM(%d,%d,%d,%d) branch %d energy %d\n", i, j, k,l,best_branch, min_energy);
-            int ij = index[i]+j-i;
-            PM[ij][kl]=min_energy;
+            PM.set(i, j, k, l) = min_energy;
         }
         return;
     }
@@ -1208,7 +1090,7 @@ void pseudo_loop::compute_PM(int i, int j, int k, int l){
     // Sparse
     if (pl_debug)
         printf ("PM(%d,%d,%d,%d) branch %d energy %d\n", i, j, k,l,best_branch, min_energy);
-    PM[j][kl]=min_energy;
+    PM.set(i, j, k, l) = min_energy;
 
     if (min_energy < INF/2){
         switch (best_branch){
@@ -1242,8 +1124,6 @@ void pseudo_loop::compute_PO(int i, int j, int k, int l){
 
     if (impossible_case(i,j,k,l)) {return;}
 
-    //int ij = index[i]+j-i;
-    int kl = index[k]+l-k;
     int best_branch=0;
 
     if (can_pair(int_sequence[i],int_sequence[l])){
@@ -1278,7 +1158,7 @@ void pseudo_loop::compute_PO(int i, int j, int k, int l){
 
     if (pl_debug)
         printf ("PO(%d,%d,%d,%d) branch %d energy %d\n", i, j, k,l,best_branch, min_energy);
-    PO[i%MOD_MAXLOOP][j][kl]=min_energy;
+    PO.set(i, j, k, l) = min_energy;
 
     // If Non-Sparse stop here
     if (!sparsify) {
@@ -1804,133 +1684,47 @@ int pseudo_loop::get_P(int i, int j){
         return INF;
     }
 
-    int ij = index[i]+j-i;
-    return P[ij];
+    return P[P.ij(i, j)];
 }
 
 
 int pseudo_loop::get_PK(int i, int j, int k, int l){
-    if (!(i <= j && j < k-1 && k <= l)){
-    //printf("!get_PK(i <= j && j < k-1 && k <= l)\n");
-        return INF;
-    }
-    // Hosna, April 3, 2014
-    // adding impossible cases
-    // Ian Wark, April 7, 2017
-    // get rid of some cases because this will have already been caught
-    // eg. if i<=j<k<=l we only need to check l>=nb_nucleotides and i<0
-    // also made it an assert since it should never happen
-    assert(!(i<0 || l>= nb_nucleotides));
-
-    int kl = index[k]+l-k;
-
-    // Sparse
-    if (sparsify)
-        return PK[j][kl];
-    // Non-sparse
-    int ij = index[i]+j-i;
-    return PK[ij][kl];
+    return PK.get(i, j, k, l);
 }
 
 int pseudo_loop::get_PL(int i, int j, int k, int l){
-    if (!(i <= j && j < k-1 && k <= l)){
-    //printf("!get_PL(i <= j && j < k-1 && k <= l)\n");
-        return INF;
-    }
-    // Hosna, April 3, 2014
-    // adding impossible cases
-    // Ian Wark, April 7, 2017
-    // get rid of some cases because this will have already been caught
-    // eg. if i<=j<k<=l we only need to check l>=nb_nucleotides and i<0
-    // also made it an assert since it should never happen
-    assert(!(i<0 || l>= nb_nucleotides));
-
     if (!can_pair(int_sequence[i],int_sequence[j])){
         return INF;
     }
 
-    int kl = index[k]+l-k;
-
-    return PL[i%MOD_MAXLOOP][j][kl];
+    return PL.get(i, j, k, l);
 }
 
 int pseudo_loop::get_PR(int i, int j, int k, int l){
-    if (!(i <= j && j < k-1 && k <= l)){
-        //printf("!get_PR(i <= j && j < k-1 && k <= l)\n");
-    return INF;
-    }
-    // Hosna, April 3, 2014
-    // adding impossible cases
-    // Ian Wark, April 7, 2017
-    // get rid of some cases because this will have already been caught
-    // eg. if i<=j<k<=l we only need to check l>=nb_nucleotides and i<0
-    // also made it an assert since it should never happen
-    assert(!(i<0 || l>= nb_nucleotides));
-
     if (!can_pair(int_sequence[k],int_sequence[l])){
         return INF;
     }
 
-    int kl = index[k]+l-k;
-
-    // Sparse
-    if (sparsify)
-        return PR[j][kl];
-    // Non-sparse
-    int ij = index[i]+j-i;
-    return PR[ij][kl];
+    return PR.get(i, j, k, l);
 }
 
 int pseudo_loop::get_PM(int i, int j, int k, int l){
-    if (!(i <= j && j < k-1 && k <= l)){
-        //printf("!get_PM(i <= j && j < k-1 && k <= l)\n");
-        return INF;
-    }
-    // Hosna, April 3, 2014
-    // adding impossible cases
-    // Ian Wark, April 7, 2017
-    // get rid of some cases because this will have already been caught
-    // eg. if i<=j<k<=l we only need to check l>=nb_nucleotides and i<0
-    // also made it an assert since it should never happen
-    assert(!(i<0 || l>= nb_nucleotides));
-
     if (!can_pair(int_sequence[j],int_sequence[k])){
         return INF;
     }
 
-    if (i ==j && k ==l){
+    if (i==j && k==l){
         return (int)gamma2(i,l);
     }
 
-    int kl = index[k]+l-k;
-
-    // Sparse
-    if (sparsify)
-        return PM[j][kl];
-    // Non-sparse
-    int ij = index[i]+j-i;
-    return PM[ij][kl];
+    return PM.get(i, j, k, l);
 }
 
 int pseudo_loop::get_PO(int i, int j, int k, int l){
-    if (!(i <= j && j < k-1 && k <= l)){
-        //printf("!get_PO(i <= j && j < k-1 && k <= l)\n");
-        return INF;
-    }
-    // Hosna, April 3, 2014
-    // adding impossible cases
-    // Ian Wark, April 7, 2017
-    // get rid of some cases because this will have already been caught
-    // eg. if i<=j<k<=l we only need to check l>=nb_nucleotides and i<0
-    // also made it an assert since it should never happen
-    assert(!(i<0 || l>= nb_nucleotides));
-
     if (!can_pair(int_sequence[i],int_sequence[l])){
         return INF;
     }
-    int kl = index[k]+l-k;
-
-    return PO[i%MOD_MAXLOOP][j][kl];
+    return PO.get(i, j, k, l);
 }
 
 int pseudo_loop::get_PfromL(int i, int j, int k, int l){
@@ -5183,8 +4977,8 @@ void pseudo_loop::trace_continue(int i, int j, int k, int l, char srctype, energ
             case P_P:
                 assert(false/*unexpected trace back from P matrix*/);
             case P_PK:
-                    trace_candidate(i,j,k,l, srctype, P_PK, e, PK_CL);
-                    break;
+                trace_candidate(i,j,k,l, srctype, P_PK, e, PK_CL);
+                break;
 
                 // target is PfromL
                 case P_PL: case P_PfromL:
@@ -5488,6 +5282,7 @@ void pseudo_loop::trace_candidate(int i, int j, int k, int l, char srctype, char
             }
         }
     }
+    //printf("NO continuation for trace_candidate_PK %c (%d,%d,%d,%d) e:%d\n", tgttype,i,j,k,l,e);
 }
 
 void pseudo_loop::trace_update_f(int i, int j, int k, int l, char srctype) {
