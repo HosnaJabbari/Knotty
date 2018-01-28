@@ -348,7 +348,9 @@ private:
     bool impossible_case(int i, int j, int k, int l) const;
 
     // output parameters of generic_decomposition function
-    int best_d_; //!< best split point (end of the gap matrix)
+    // and recompute PL functions
+    int best_d_; //!< best split point (end of the gap matrix or first interior loop end)
+    int best_dp_; //!< best second split point (interior loop)
     int best_branch_; //!< index of best branch
     bool decomposing_branch_; //!< whether best branch is decomposing
 
@@ -392,6 +394,10 @@ private:
                           const MatrixSlices3D &PX,
                           int LMRO_cases = 0,
                           Penalty penalty = zero);
+
+    //! @brief generic computation of PL/M/R/O functions
+    int
+    generic_compute_PX(int i, int j, int k, int l, int type);
 
     //void compute_WM(int i, int j); // in base pair maximization, there is no difference between the two
     //void compute_WMP(int i, int l);
@@ -486,6 +492,11 @@ private:
     // for fix i, i<=j<=max_j min_k<=k<=l<=max_l
     void
     recompute_slice_POmloop1(int i, int max_j, int min_k, int max_l);
+
+    void trace_PL(int i, int j, int k, int l, int e);
+    void trace_PM(int i, int j, int k, int l, int e);
+    void trace_PR(int i, int j, int k, int l, int e);
+    void trace_PO(int i, int j, int k, int l, int e);
 
     void trace_PLmloop(int i, int j, int k, int l, int e);
     void trace_PLmloop1(int i, int j, int k, int l, int e);

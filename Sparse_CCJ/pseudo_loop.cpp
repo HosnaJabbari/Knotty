@@ -873,48 +873,132 @@ void pseudo_loop::recompute_slice_POmloop1(int i, int max_j, int min_k, int max_
     generic_recompute_slice_mloop1(i, max_j, min_k, max_l, CASE_O, WBP, POmloop0);
 }
 
+int
+pseudo_loop::generic_compute_PX(int i, int j, int k, int l, int type) {
 
-void pseudo_loop::compute_PL(int i, int j, int k, int l){
-    int min_energy = INF,b1=INF,b2=INF,b3=INF;
+    int min_energy = INF, temp;
 
-    if (impossible_case(i,j,k,l)) {return;}
+    if (impossible_case(i,j,k,l)) {return INF;}
 
-    int best_branch=0;
+    if (! can_pair(int_sequence[i],int_sequence[j])) {
+        return INF;
+    }
 
-    if (can_pair(int_sequence[i],int_sequence[j])){
-        b1 = get_PLiloop(i,j,k,l);
-        if(b1 < min_energy){
-            min_energy = b1;
-            best_branch=1;
-        }
+    // cases Xiloop
+    best_branch_ = 1;
+    switch(type) {
+    case P_PL:
+        min_energy = get_PL(i+1,j-1,k,l)+get_e_stP(i,j);
+        best_d_=i+1;
+        best_dp_=j-1;
 
-        // Hosna, April 11, 2014
-        // we need to add a branch penalty for multiloop that spans a band
-        b2 = get_PLmloop(i,j,k,l) + bp_penalty;
-        if(b2 < min_energy){
-            min_energy = b2;
-            best_branch = 2;
-        }
-
-        // Hosna, July 11, 2014
-        // To avoid addition of close base pairs we check for the following here
-        if (j>=(i+TURN+1)){
-            // Hosna April 11, 2014
-            // I think we have already added gamma2(j,i) when coming to PL, so there is no need to add it again here.
-            // Hosna July 17, 2014
-            // I am adding gamma2 back here to avoid single base pair band predictions
-            b3 = get_PfromL(i+1,j-1,k,l) + gamma2(j,i);
-            if(b3 < min_energy){
-                min_energy = b3;
-                best_branch = 3;
+        for(int d= i+1; d<MIN(j,i+MAXLOOP); d++){
+            for(int dp = j-1; dp > MAX(d+TURN,j-MAXLOOP); dp--){
+                temp = get_e_intP(i,d,dp,j) + PL.get(d,dp,k,l);
+                if(temp < min_energy){
+                    min_energy = temp;
+                    best_d_ = d;
+                    best_dp_ = dp;
+                }
             }
+        }
+        break;
+    case P_PM:
+        min_energy = get_PM(i,j-1,k+1,l)+get_e_stP(j-1,k+1);
+        best_d_ = j-1;
+        best_dp_ = k+1;
+
+        for(int d= j-1; d>MAX(i,j-MAXLOOP); d--){
+            for (int dp=k+1; dp <MIN(l,k+MAXLOOP); dp++) {
+                temp = get_e_intP(d,j,k,dp) + get_PM(i,d,dp,l);
+
+                if(temp < min_energy){
+                    min_energy = temp;
+                    best_d_ = d;
+                    best_dp_ = dp;
+                }
+            }
+        }
+        break;
+    case P_PR:
+        min_energy = get_PR(i,j,k+1,l-1)+get_e_stP(k,l);
+        best_d_ = k+1;
+        best_dp_ = l-1;
+
+        for(int d= k+1; d<MIN(l,k+MAXLOOP); d++){
+            for(int dp=l-1; dp > MAX(d+TURN,l-MAXLOOP); dp--){
+                temp = get_e_intP(k,d,dp,l) + get_PR(i,j,d,dp);
+                if(temp < min_energy){
+                    min_energy = temp;
+                    best_d_ = d;
+                    best_dp_ = dp;
+                }
+            }
+        }
+        break;
+
+    case P_PO:
+        min_energy = get_PO(i+1,j,k,l-1)+get_e_stP(i,l);
+        best_d_ = i+1;
+        best_dp_ = l-1;
+
+        for(int d= i+1; d<MIN(j,i+MAXLOOP); d++){
+            for (int dp=l-1; dp >MAX(l-MAXLOOP,k); dp--) {
+                temp = get_e_intP(i,d,dp,l) + get_PO(d,j,k,dp);
+                if(temp < min_energy){
+                    min_energy = temp;
+                    best_d_ = d;
+                    best_dp_ = dp;
+                }
+            }
+
+        }
+        break;
+    }
+
+    // Hosna, April 11, 2014
+    // we need to add a branch penalty for multiloop that spans a band
+    switch(type) {
+    case P_PL: temp = get_PLmloop(i,j,k,l); break;
+    case P_PM: temp = get_PMmloop(i,j,k,l); break;
+    case P_PR: temp = get_PRmloop(i,j,k,l); break;
+    case P_PO: temp = get_POmloop(i,j,k,l); break;
+    }
+    temp += bp_penalty;
+    if(temp < min_energy){
+        min_energy = temp;
+        best_branch_ = 2;
+    }
+
+    // Hosna, July 11, 2014
+    // To avoid addition of close base pairs we check for the following here
+    if (j>=(i+TURN+1)){
+        // Hosna April 11, 2014
+        // I think we have already added gamma2(j,i) when coming to PL, so there is no need to add it again here.
+        // Hosna July 17, 2014
+        // I am adding gamma2 back here to avoid single base pair band predictions
+        switch(type) {
+            case P_PL: temp = PfromL.get(i+1,j-1,k,l) + gamma2(j,i); break;
+            case P_PM: temp = PfromM.get(i,j-1,k+1,l) + gamma2(j,k); break;
+            case P_PR: temp = PfromR.get(i,j,k+1,l-1) + gamma2(l,k); break;
+            case P_PO: temp = PfromO.get(i+1,j,k,l-1) + gamma2(l,i); break;
+        }
+        if(temp < min_energy){
+            min_energy = temp;
+            best_branch_ = 3;
         }
     }
 
+    return min_energy;
+}
 
-    // If Sparse
-    if (pl_debug)
-        printf ("PL(%d,%d,%d,%d) branch %d energy %d\n", i, j, k,l,best_branch, min_energy);
+void pseudo_loop::compute_PL(int i, int j, int k, int l) {
+    int min_energy =
+        generic_compute_PX(i, j, k, l, P_PL);
+
+    if (min_energy < INF / 2) {
+        return;
+    }
 
     PL.set(i, j, k, l) = min_energy;
 
@@ -922,278 +1006,232 @@ void pseudo_loop::compute_PL(int i, int j, int k, int l){
     if (!sparsify)
         return;
 
-    // If Sparse
-    if (min_energy < INF/2){
-        // adding trace arrows
-        switch (best_branch){
-            case 1:
-                // This is handled in get_PLiloop
-                //ta->PL.register_trace_arrow(i,j,k,l,i,j,k,l, min_energy, P_PL, P_PLiloop);
-                break;
-            case 2:
-                ta->register_trace_arrow(i,j,k,l,i,j,k,l, min_energy, P_PL, P_PLmloop);
-                break;
-            case 3:
-                if (avoid_candidates && PfromL_CL->is_candidate(i+1,j-1,k,l)) {
-                    if (pl_debug)
-                        printf("avoid_trace_arrow PL(%d,%d,%d,%d)->PfromL(%d,%d,%d,%d)\n",i,j,k,l,i+1,j-1,k,l);
-                    //  if there is already a trace arrow there (added in get_PLiloop), delete it.
-                    ta->PL.delete_trace_arrow(i,j,k,l);
-
-                    ta->PL.avoid_trace_arrow();
-                } else {
-                    ta->register_trace_arrow(i,j,k,l,i+1,j-1,k,l, min_energy, P_PL, P_PfromL);
-                }
-                break;
-            default:
-                printf("default: no best branch PL(%d,%d,%d,%d) e:%d\n",i,j,k,l,min_energy);
-                break;
+    if (best_branch_ == 1) {
+        if (!(avoid_candidates &&
+              PLmloop0_CL->is_candidate(best_d_, best_dp_, k, l))) {
+            ta->register_trace_arrow(i, j, k, l,
+                                     best_d_, best_dp_, k, l,
+                                     min_energy, P_PL, P_PL);
         }
     }
 }
 
-void pseudo_loop::compute_PR(int i, int j, int k, int l){
-    int min_energy = INF,b1=INF,b2=INF,b3=INF;
+void pseudo_loop::compute_PM(int i, int j, int k, int l) {
+    int min_energy =
+        generic_compute_PX(i, j, k, l, P_PM);
 
-    if (impossible_case(i,j,k,l)) {return;}
-
-    int best_branch=0;
-
-    if (can_pair(int_sequence[k],int_sequence[l])){
-        b1 = get_PRiloop(i,j,k,l);
-        if(b1 < min_energy){
-            min_energy = b1;
-            best_branch = 1;
-        }
-
-        // Hosna, April 11, 2014
-        // we need to add a branch penalty for multiloop that spans a band
-        b2 = get_PRmloop(i,j,k,l)+ bp_penalty;
-        if(b2 < min_energy){
-            min_energy = b2;
-            best_branch = 2;
-        }
-
-        // Hosna, July 11, 2014
-        // To avoid addition of close base pairs we check for the following here
-        if (l>=(k+TURN+1)){
-            // Hosna April 11, 2014
-            // I think we have already added gamma2(l,k) when coming to PR, so there is no need to add it again here.
-            // Hosna July 17, 2014
-            // I am adding gamma2 back here to avoid single base pair band predictions
-            b3 = get_PfromR(i,j,k+1,l-1) + gamma2(l,k);
-            if(b3 < min_energy){
-                min_energy = b3;
-                best_branch = 3;
-            }
-        }
-    }
-
-    // If Non-Sparse
-    if (sparsify == false) {
-        if (min_energy < INF/2) {
-            if (pl_debug)
-                printf ("PR(%d,%d,%d,%d) branch %d energy %d\n", i, j, k,l,best_branch, min_energy);
-            PR.set(i, j, k, l) = min_energy;
-        }
+    if (min_energy >= INF / 2) {
         return;
     }
 
-    // Sparse
-    if (pl_debug )
-            printf ("PR(%d,%d,%d,%d) branch %d energy %d\n", i, j, k,l,best_branch, min_energy);
-    PR.set(i, j, k, l) = min_energy;
-
-    if (min_energy < INF / 2) {
-        // adding trace arrows
-        switch (best_branch){
-            case 1:
-                // This is handled in get_PRiloop
-                //ta->PR.register_trace_arrow(i,j,k,l,i,j,k,l, min_energy, P_PR, P_PRiloop);
-                break;
-            case 2:
-                ta->register_trace_arrow(i,j,k,l, i,j,k,l, min_energy, P_PR, P_PRmloop);
-                break;
-        case 3:
-            if (avoid_candidates && PfromR_CL->is_candidate(i,j,k+1,l-1)) {
-                ta->PR.delete_trace_arrow(i, j, k, l);
-                ta->PR.avoid_trace_arrow();
-            } else {
-                ta->register_trace_arrow(i, j, k, l, i, j, k + 1, l - 1,
-                                         min_energy, P_PR, P_PfromR);
-            }
-            break;
-            default:
-                printf("default: no best branch PR(%d,%d,%d,%d) e:%d\n",i,j,k,l,min_energy);
-                break;
-        }
-    }
-}
-
-void pseudo_loop::compute_PM(int i, int j, int k, int l){
-    int min_energy = INF,b1=INF,b2=INF,b3=INF,b4=INF;
-
-    if (impossible_case(i,j,k,l)) {return;}
-
-    int best_branch=0;
-
-    if (can_pair(int_sequence[j],int_sequence[k])){
-        b1 = get_PMiloop(i,j,k,l);
-        if(b1 < min_energy){
-            min_energy = b1;
-            best_branch = 1;
-        }
-
-        // Hosna, April 11, 2014
-        // we need to add a branch penalty for multiloop that spans a band
-        b2 = get_PMmloop(i,j,k,l) + bp_penalty;
-        if(b2 < min_energy){
-            min_energy = b2;
-            best_branch = 2;
-        }
-
-        // Hosna, July 11, 2014
-        // To avoid addition of close base pairs we check for the following here
-        if (k>=(j+TURN-1)){
-            // Hosna April 11, 2014
-            // I think we have already added gamma2(j,k) when coming to PM, so there is no need to add it again here.
-            // Hosna July 17, 2014
-            // I am adding gamma2 back here to avoid single base pair band predictions
-            b3 = get_PfromM(i,j-1,k+1,l) + gamma2(j,k);
-            if(b3 < min_energy){
-                min_energy = b3;
-                best_branch = 3;
-            }
-        }
-
-        // Hosna April 11, 2014
-        // adding calculation of branch 4 here too
-        if(i==j && k==l){
-            b4=gamma2(i,l);
-        }
-        if(b4 < min_energy){
-            min_energy = b4;
-            best_branch = 4;
-        }
-    }
-
-    // If Non-Sparse add then return
-    if (sparsify == false) {
-        if (min_energy < INF/2) {
-            if (pl_debug)
-               printf ("PM(%d,%d,%d,%d) branch %d energy %d\n", i, j, k,l,best_branch, min_energy);
-            PM.set(i, j, k, l) = min_energy;
-        }
-        return;
-    }
-
-    // Sparse
-    if (pl_debug)
-        printf ("PM(%d,%d,%d,%d) branch %d energy %d\n", i, j, k,l,best_branch, min_energy);
     PM.set(i, j, k, l) = min_energy;
 
-    if (min_energy < INF/2){
-        switch (best_branch){
-            case 1:
-                // This is handled in get_PMiloop
-                //ta->PM.register_trace_arrow(i,j,k,l, i,j,k,l, min_energy, P_PM, P_PMiloop);
-                break;
-            case 2:
-                ta->register_trace_arrow(i,j,k,l,i,j,k,l, min_energy, P_PM, P_PMmloop);
-                break;
-            case 3:
-                if (avoid_candidates && PfromM_CL->is_candidate(i,j-1,k+1,l)) {
-                    ta->PM.delete_trace_arrow(i,j,k,l);
-                    ta->PM.avoid_trace_arrow();
-                } else {
-                    ta->register_trace_arrow(i,j,k,l,i,j-1,k+1,l, min_energy, P_PM, P_PfromM);
-                }
-                break;
-            case 4:
-                // do nothing
-                break;
-            default:
-                printf("default: no best branch PM(%d,%d,%d,%d) e:%d\n",i,j,k,l,min_energy);
-                break;
+    // If Non-Sparse, end here
+    if (!sparsify)
+        return;
+
+    if (best_branch_ == 1) {
+        if (!(avoid_candidates &&
+              PMmloop0_CL->is_candidate(i, best_d_, best_dp_, l))) {
+            ta->register_trace_arrow(i, j, k, l,
+                                     i, best_d_, best_dp_, l,
+                                     min_energy, P_PM, P_PM);
         }
     }
 }
 
-void pseudo_loop::compute_PO(int i, int j, int k, int l){
-    int min_energy = INF,b1=INF,b2=INF,b3=INF;
+void pseudo_loop::compute_PR(int i, int j, int k, int l) {
+    int min_energy =
+        generic_compute_PX(i, j, k, l, P_PR);
 
-    if (impossible_case(i,j,k,l)) {return;}
-
-    int best_branch=0;
-
-    if (can_pair(int_sequence[i],int_sequence[l])){
-        b1 = get_POiloop(i,j,k,l);
-        if(b1 < min_energy){
-            min_energy = b1;
-            best_branch = 1;
-        }
-
-        // Hosna, April 11, 2014
-        // we need to add a branch penalty for multiloop that spans a band
-        b2 = get_POmloop(i,j,k,l)+ bp_penalty;
-        if(b2 < min_energy){
-            min_energy = b2;
-            best_branch = 2;
-        }
-
-        // Hosna, July 11, 2014
-        // To avoid addition of close base pairs we check for the following here
-        if (l>=(i+TURN+1)){
-            // Hosna April 11, 2014
-            // I think we have already added gamma2(l,i) when coming to PO, so there is no need to add it again here.
-            // Hosna July 17, 2014
-            // I am adding gamma2 back here to avoid single base pair band predictions
-            b3 = get_PfromO(i+1,j,k,l-1) + gamma2(l,i);
-            if(b3 < min_energy){
-                min_energy = b3;
-                best_branch = 3;
-            }
-        }
-    }
-
-    if (pl_debug)
-        printf ("PO(%d,%d,%d,%d) branch %d energy %d\n", i, j, k,l,best_branch, min_energy);
-    PO.set(i, j, k, l) = min_energy;
-
-    // If Non-Sparse stop here
-    if (!sparsify) {
+    if (min_energy >= INF / 2) {
         return;
     }
 
-    // Sparse only
-    if (min_energy < INF/2){
-        // adding trace arrows
-        switch (best_branch){
-            case 1:
-                // This is handled in get_POiloop
-                //ta->PO.register_trace_arrow(i,j,k,l,i,j,k,l, min_energy, P_PO, P_POiloop);
-                break;
-            case 2:
-                ta->register_trace_arrow(i,j,k,l,i,j,k,l, min_energy, P_PO, P_POmloop);
-                break;
-            case 3:
-                if (avoid_candidates && PfromO_CL->is_candidate(i+1,j,k,l-1)) {
-                    if (pl_debug)
-                        printf("avoid_trace_arrow PO(%d,%d,%d,%d)->PfromO(%d,%d,%d,%d)\n",i,j,k,l,i+1,j,k,l-1);
-                    //  if there is already a trace arrow there (added in get_PLiloop), delete it.
-                    ta->PO.delete_trace_arrow(i,j,k,l);
+    PR.set(i, j, k, l) = min_energy;
 
-                    ta->PO.avoid_trace_arrow();
-                } else {
-                    ta->register_trace_arrow(i,j,k,l,i+1,j,k,l-1, min_energy, P_PO, P_PfromO);
-                }
-                break;
-            default:
-                printf("default: no best branch PO(%d,%d,%d,%d) e:%d\n",i,j,k,l,min_energy);
-                break;
+    // If Non-Sparse, end here
+    if (!sparsify)
+        return;
+
+    if (best_branch_ == 1) {
+        if (!(avoid_candidates &&
+              PRmloop0_CL->is_candidate(i, j, best_d_, best_dp_))) {
+            ta->register_trace_arrow(i, j, k, l,
+                                     i, j, best_d_, best_dp_,
+                                     min_energy, P_PR, P_PR);
         }
     }
 }
+
+void pseudo_loop::compute_PO(int i, int j, int k, int l) {
+    int min_energy =
+        generic_compute_PX(i, j, k, l, P_PO);
+
+    if (min_energy >= INF / 2) {
+        return;
+    }
+
+    PO.set(i, j, k, l) = min_energy;
+
+    // If Non-Sparse, end here
+    if (!sparsify)
+        return;
+
+    if (best_branch_ == 1) {
+        if (!(avoid_candidates &&
+              POmloop0_CL->is_candidate(best_d_, j, k, best_dp_))) {
+            ta->register_trace_arrow(i, j, k, l,
+                                     best_d_, j, k, best_dp_,
+                                     min_energy, P_PO, P_PO);
+        }
+    }
+}
+
+void
+pseudo_loop::trace_PL(int i, int j, int k, int l, int e) {
+    int d, dp, target_energy;
+
+    // iloop case: is there a trace arrow?
+    const TraceArrow *arrow = ta->PL.trace_arrow_from(i,j,k,l);
+    if ( arrow != nullptr ) {
+        assert ( arrow->target_type()==P_PL );
+        d = arrow->i();
+        dp = arrow->j();
+        target_energy = arrow->target_energy();
+        trace_continue(d, dp, k, l, P_PL, target_energy);
+        return;
+    }
+
+    // mloop case
+    recompute_slice_PLmloop0(i+1,j-1,k,l);
+    recompute_slice_PLmloop1(i+1,j-1,k,l);
+    int min_energy = get_PLmloop(i, j, k, l);
+    char target_type=P_PLmloop1;
+    d=i;
+    dp=j;
+    target_energy = min_energy;
+
+    // from case
+    int temp = get_PfromL(i+1, j-1, k, l) + gamma2(j,i);
+    if (temp < min_energy) {
+        target_energy = get_PfromL(i+1, j-1, k, l);
+        target_type= P_PfromL;
+        d=i+1;
+        dp=j-1;
+    }
+
+    trace_continue(d, dp, j, k, target_type, target_energy);
+}
+
+void
+pseudo_loop::trace_PM(int i, int j, int k, int l, int e) {
+    int d, dp, target_energy;
+
+    // iloop case: is there a trace arrow?
+    const TraceArrow *arrow = ta->PM.trace_arrow_from(i,j,k,l);
+    if ( arrow != nullptr ) {
+        assert ( arrow->target_type()==P_PM );
+        d = arrow->j();
+        dp = arrow->k();
+        target_energy = arrow->target_energy();
+        trace_continue(i, d, dp, l, P_PM, target_energy);
+        return;
+    }
+
+    // mloop case
+    recompute_slice_PMmloop0(i, j-1, k+1, l);
+    recompute_slice_PMmloop1(i, j-1, k+1, l);
+    int min_energy = get_PMmloop(i, j, k, l);
+    char target_type=P_PMmloop1;
+    d=j;
+    dp=k;
+    target_energy = min_energy;
+
+    // from case
+    int temp = get_PfromM(i, j-1, k+1, l) + gamma2(j,k);
+    if (temp < min_energy) {
+        d=j-1;
+        dp=k+1;
+        target_type=P_PfromM;
+        target_energy = get_PfromM(i, d, dp, l);
+    }
+
+    trace_continue(i, d, dp, l, target_type, target_energy);
+}
+
+void
+pseudo_loop::trace_PR(int i, int j, int k, int l, int e) {
+    int d, dp, target_energy;
+
+    // iloop case: is there a trace arrow?
+    const TraceArrow *arrow = ta->PR.trace_arrow_from(i,j,k,l);
+    if ( arrow != nullptr ) {
+        assert ( arrow->target_type()==P_PR );
+        d = arrow->k();
+        dp = arrow->l();
+        target_energy = arrow->target_energy();
+        trace_continue(i, j, d, dp, P_PR, target_energy);
+        return;
+    }
+
+    // mloop case
+    recompute_slice_PRmloop0(i, j, k+1, l-1);
+    recompute_slice_PRmloop1(i, j, k+1, l-1);
+    int min_energy = get_PRmloop(i, j, k, l);
+    d=j;
+    dp=k;
+    char target_type=P_PRmloop1;
+    target_energy = min_energy;
+
+    // from case
+    int temp = get_PfromR(i, j, k+1, l-1) + gamma2(l,k);
+    if (temp < min_energy) {
+        d=k+1;
+        dp=l-1;
+        target_type = P_PfromR;
+        target_energy = get_PfromR(i, j, d, dp);
+    }
+
+    trace_continue(i, j, d, dp, target_type, target_energy);
+}
+
+void
+pseudo_loop::trace_PO(int i, int j, int k, int l, int e) {
+    int d, dp, target_energy;
+
+    // iloop case: is there a trace arrow?
+    const TraceArrow *arrow = ta->PO.trace_arrow_from(i,j,k,l);
+    if ( arrow != nullptr ) {
+        assert ( arrow->target_type()==P_PO );
+        d = arrow->i();
+        dp = arrow->l();
+        target_energy = arrow->target_energy();
+        trace_continue(d, j, k, dp, P_PO, target_energy);
+        return;
+    }
+
+    // mloop case
+    recompute_slice_POmloop0(i+1, j, k, l-1);
+    recompute_slice_POmloop1(i+1, j, k, l-1);
+    int min_energy = get_POmloop(i, j, k, l);
+    d=j;
+    dp=k;
+    char target_type = P_POmloop1;
+    target_energy = min_energy;
+
+    // from case
+    int temp = get_PfromO(i+1, j, k, l-1) + gamma2(l,i);
+    if (temp < min_energy) {
+        d=i+1;
+        dp=l-1;
+        target_type = P_PfromO;
+        target_energy = get_PfromO(d, j, k, dp);
+    }
+
+    trace_continue(i, j, d, dp, target_type, target_energy);
+}
+
 
 void
 pseudo_loop::compute_PfromL(int i, int j, int k, int l) {
@@ -1811,7 +1849,6 @@ int pseudo_loop::get_PfromO(int i, int j, int k, int l){
     return PfromO.get(i,j,k,l);
 }
 
-
 int pseudo_loop::get_PLiloop(int i, int j, int k, int l){
     if (!(i < j && j < k-1 && k < l)){
         //printf("!(i <= j && j < k-1 && k <= l)\n");
@@ -1859,6 +1896,7 @@ int pseudo_loop::get_PLiloop(int i, int j, int k, int l){
 
     return min_energy;
 }
+
 
 int pseudo_loop::get_PLmloop(int i, int j, int k, int l){
     if (!(i <= j && j < k-1 && k <= l)){
@@ -4888,10 +4926,10 @@ void pseudo_loop::trace_continue(int i, int j, int k, int l, char srctype, energ
         case P_PfromM: src_ta = &ta->PfromM; break;
         case P_PfromO: src_ta = &ta->PfromO; break;
 
-        case P_PL: src_ta = &ta->PL; break;
-        case P_PR: src_ta = &ta->PR; break;
-        case P_PM: src_ta = &ta->PM; break;
-        case P_PO: src_ta = &ta->PO; break;
+        case P_PL: trace_PL(i,j,k,l,e); break;
+        case P_PR: trace_PR(i,j,k,l,e); break;
+        case P_PM: trace_PM(i,j,k,l,e); break;
+        case P_PO: trace_PO(i,j,k,l,e); break;
 
         case P_PLmloop: trace_PLmloop(i,j,k,l,e); break;
         case P_PRmloop: trace_PRmloop(i,j,k,l,e); break;
