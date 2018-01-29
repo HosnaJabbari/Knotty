@@ -4,6 +4,8 @@
 #include "h_struct.h"
 #include "common.h"
 
+using matrix_type_t = char;
+
 #define P_P				'p'
 #define P_PK			'k'
 #define P_PL			'l'

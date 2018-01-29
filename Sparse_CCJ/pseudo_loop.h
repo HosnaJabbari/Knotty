@@ -87,6 +87,10 @@ public:
     int
     get_3D_helper(int ***m, int modulo, int i, int j, int k, int l);
 
+    // the methods get_P?iloop return the best energy of the iloop case
+    // and set best_d_ and best_dp_ to the inner base pair ends
+    // on success (i.e. if returned energy <INF/2)
+
     int get_PLiloop(int i,int j, int k, int l);
     //int get_PLiloop5(int i,int j, int k, int l,int s);
     int get_PLmloop(int i,int j, int k, int l);
