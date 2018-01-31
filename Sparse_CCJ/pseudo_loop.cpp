@@ -241,23 +241,24 @@ void pseudo_loop::compute_energies_sp(int i, int l)
         // in original recurrences we have j< k-1, so I am changing k=j+1 to k=j+2
         for(int k = l; k>=j+2; k--){//for(int k = j+2; k<=l; k++){
 
+            Index4D x(i,j,k,l);
+
             compute_PLmloop0(i,j,k,l);
             compute_PLmloop1(i,j,k,l);
 
             compute_PRmloop0(i,j,k,l);
             compute_PRmloop1(i,j,k,l);
 
-            compute_PM(i,j,k,l);
+            compute_PX(x,P_PM);
             compute_PMmloop0(i,j,k,l);
             compute_PMmloop1(i,j,k,l);
 
             compute_POmloop0(i,j,k,l);
             compute_POmloop1(i,j,k,l);
 
-            compute_PL(i,j,k,l);
-            compute_PR(i,j,k,l);
-            //compute_PM(i,j,k,l);
-            compute_PO(i,j,k,l);
+            compute_PX(x,P_PL);
+            compute_PX(x,P_PR);
+            compute_PX(x,P_PO);
 
             compute_PfromL(i,j,k,l);
             compute_PfromR(i,j,k,l);
@@ -319,10 +320,11 @@ void pseudo_loop::compute_energies_ns(int i, int l)
             compute_POmloop0(i,j,k,l);
             compute_POmloop1(i,j,k,l);
 
-            compute_PL(i,j,k,l);
-            compute_PR(i,j,k,l);
-            compute_PM(i,j,k,l);
-            compute_PO(i,j,k,l);
+            Index4D x(i,j,k,l);
+            compute_PX(x,P_PL);
+            compute_PX(x,P_PR);
+            compute_PX(x,P_PM);
+            compute_PX(x,P_PO);
 
             compute_PfromL(i,j,k,l);
             compute_PfromR(i,j,k,l);
@@ -869,40 +871,66 @@ void pseudo_loop::recompute_slice_POmloop1(int i, int max_j, int min_k, int max_
 }
 
 int
-pseudo_loop::generic_compute_PX(int i, int j, int k, int l, matrix_type_t type) {
+pseudo_loop::calc_PXiloop(const Index4D &x, matrix_type_t type) {
+    switch (type) {
+    case P_PL: return calc_PLiloop(x.i(), x.j(), x.k(), x.l());
+    case P_PM: return calc_PMiloop(x.i(), x.j(), x.k(), x.l());
+    case P_PR: return calc_PRiloop(x.i(), x.j(), x.k(), x.l());
+    case P_PO: return calc_POiloop(x.i(), x.j(), x.k(), x.l());
+    }
+    assert(false);
+}
+
+int
+pseudo_loop::calc_PXmloop(const Index4D &x, matrix_type_t type) {
+    switch(type) {
+    case P_PL: return calc_PLmloop(x.i(), x.j(), x.k(), x.l());
+    case P_PM: return calc_PMmloop(x.i(), x.j(), x.k(), x.l());
+    case P_PR: return calc_PRmloop(x.i(), x.j(), x.k(), x.l());
+    case P_PO: return calc_POmloop(x.i(), x.j(), x.k(), x.l());
+    }
+    assert(false);
+}
+
+int
+pseudo_loop::calc_PfromX(const Index4D &x, matrix_type_t type) {
+    switch(type) {
+    case P_PL: return calc_PfromL(x.i(), x.j(), x.k(), x.l());
+    case P_PM: return calc_PfromM(x.i(), x.j(), x.k(), x.l());
+    case P_PR: return calc_PfromR(x.i(), x.j(), x.k(), x.l());
+    case P_PO: return calc_PfromO(x.i(), x.j(), x.k(), x.l());
+    }
+    assert(false);
+}
+
+template<class Penalty>
+int
+pseudo_loop::penalty(const Index4D &x, Penalty p, matrix_type_t type) {
+    switch(type) {
+    case P_PL: return p(x.j(),x.i());
+    case P_PM: return p(x.j(),x.k());
+    case P_PR: return p(x.l(),x.k());
+    case P_PO: return p(x.l(),x.i());
+    }
+    assert(false);
+}
+
+int
+pseudo_loop::generic_compute_PX_helper(const Index4D &x, matrix_type_t type) {
 
     int min_energy = INF, temp;
     best_branch_=-1;
 
-    if (impossible_case(Index4D(i,j,k,l))) {return INF;}
+    if (impossible_case(x)) {return INF;}
 
-    // cases Xiloop
-    switch(type) {
-    case P_PL:
-        min_energy = calc_PLiloop(i, j, k, l);
-        break;
-    case P_PM:
-        min_energy = calc_PMiloop(i, j, k, l);
-        break;
-    case P_PR:
-        min_energy = calc_PRiloop(i, j, k, l);
-        break;
-    case P_PO:
-        min_energy = calc_POiloop(i, j, k, l);
-        break;
-    default: assert(false);
-    }
+    min_energy = calc_PXiloop(x, type);
 
     if (min_energy < INF/2) {
         best_branch_ = 1;
     }
 
-    switch(type) {
-    case P_PL: temp = calc_PLmloop(i,j,k,l); break;
-    case P_PM: temp = calc_PMmloop(i,j,k,l); break;
-    case P_PR: temp = calc_PRmloop(i,j,k,l); break;
-    case P_PO: temp = calc_POmloop(i,j,k,l); break;
-    }
+    temp = calc_PXmloop(x,type);
+
     // Hosna, April 11, 2014
     // we need to add a branch penalty for multiloop that spans a band
     temp += bp_penalty;
@@ -913,17 +941,16 @@ pseudo_loop::generic_compute_PX(int i, int j, int k, int l, matrix_type_t type) 
 
     // Hosna, July 11, 2014
     // To avoid addition of close base pairs we check for the following here
-    if (j>=(i+TURN+1)){
+
+    if ( x.difference(type) > TURN ) {
         // Hosna April 11, 2014
         // I think we have already added gamma2(j,i) when coming to PL, so there is no need to add it again here.
         // Hosna July 17, 2014
         // I am adding gamma2 back here to avoid single base pair band predictions
-        switch(type) {
-            case P_PL: temp = calc_PfromL(i+1,j-1,k,l) + gamma2(j,i); break;
-            case P_PM: temp = calc_PfromM(i,j-1,k+1,l) + gamma2(j,k); break;
-            case P_PR: temp = calc_PfromR(i,j,k+1,l-1) + gamma2(l,k); break;
-            case P_PO: temp = calc_PfromO(i+1,j,k,l-1) + gamma2(l,i); break;
-        }
+        Index4D y(x);
+        y.shrink(1,1,type);
+        calc_PfromX(y,type) + penalty(x, gamma2, type);
+
         if(temp < min_energy){
             min_energy = temp;
             best_branch_ = 3;
@@ -933,111 +960,228 @@ pseudo_loop::generic_compute_PX(int i, int j, int k, int l, matrix_type_t type) 
     return min_energy;
 }
 
-void pseudo_loop::compute_PL(int i, int j, int k, int l) {
-    int min_energy =
-        generic_compute_PX(i, j, k, l, P_PL);
+MatrixSlices3D &
+pseudo_loop::matrix_by_type(matrix_type_t type) {
+    switch(type) {
+    case P_PL: return PL;
+    case P_PM: return PM;
+    case P_PR: return PR;
+    case P_PO: return PO;
+    default: assert(false);
+    }
+}
 
-    PL.setI(i, j, k, l, min_energy);
+candidate_list *pseudo_loop::mloop0_cl_by_type(matrix_type_t type) {
+    switch(type) {
+    case P_PL: return PLmloop0_CL;
+    case P_PM: return PMmloop0_CL;
+    case P_PR: return PRmloop0_CL;
+    case P_PO: return POmloop0_CL;
+    default: assert(false);
+    }
+}
+
+TraceArrows &pseudo_loop::ta_by_type(matrix_type_t type) {
+    switch(type) {
+    case P_PL: return ta->PL;
+    case P_PM: return ta->PM;
+    case P_PR: return ta->PR;
+    case P_PO: return ta->PO;
+    default: assert(false);
+    }
+}
+
+int pseudo_loop::calc_PX(const Index4D &x, matrix_type_t type) {
+    switch(type) {
+    case P_PL: return calc_PL(x);
+    case P_PM: return calc_PM(x);
+    case P_PR: return calc_PR(x);
+    case P_PO: return calc_PO(x);
+    default: assert(false);
+    }
+}
+
+void pseudo_loop::compute_PX(Index4D x, matrix_type_t type) {
+    MatrixSlices3D &PX = matrix_by_type(type);
+
+    int min_energy =
+        generic_compute_PX_helper(x, type);
+
+    PX.setI(x, min_energy);
 
     // If Non-Sparse or infinite energy, end here
     if (!sparsify || min_energy>=INF/2)
         return;
 
     if (best_branch_ == 1) {
+        Index4D xp=x;
+        xp.set(best_d_, best_dp_, type);
         if (avoid_candidates &&
-              PLmloop0_CL->is_candidate(best_d_, best_dp_, k, l)) {
-            ta->PL.avoid_trace_arrow();
+            mloop0_cl_by_type(type)->is_candidate(xp)) {
+            ta_by_type(type).avoid_trace_arrow();
         } else {
-            ta->register_trace_arrow(i, j, k, l,
-                                     best_d_, best_dp_, k, l,
-                                     calc_PL(best_d_, best_dp_, k, l),
-                                     P_PL, P_PL);
+            ta->register_trace_arrow(x, xp, calc_PX(xp,type), type, type);
         }
     }
 }
 
-void pseudo_loop::compute_PM(int i, int j, int k, int l) {
-    int min_energy =
-        generic_compute_PX(i, j, k, l, P_PM);
+// void
+// pseudo_loop::trace_PK(int i, int j, int k, int l, int e) {
+//     int best_d, best_branch;
 
-    PM.setI(i, j, k, l, min_energy);
+//     Index4D x(i,j,k,l);
 
-    // If Non-Sparse or infinite energy, end here
-    if (!sparsify || min_energy>=INF/2)
-        return;
+//     trace_update_f(i,j,k,l, P_PK);
 
-    if (best_branch_ == 1) {
-        if (avoid_candidates &&
-            PMmloop0_CL->is_candidate(i, best_d_, best_dp_, l)) {
-            ta->PM.avoid_trace_arrow();
+//     recompute_slice_PK(i,j,k,l);
 
-            auto *c = PMmloop0_CL->find_candidate(i, best_d_, best_dp_, l);
-            // std::cerr << "avoid PM trace arrow " << i << " " << j << " " << k
-            //           << " " << l << "; " << i << " " << best_d_ << " "
-            //           << best_dp_ << " " << l << "; " << min_energy <<"; "
-            //           << c->w + energy_offset -beta2P(best_d_,best_dp_)
-            //           << std::endl;
+//     int min_energy = INF;
+//     // check decomposing branches
 
-        } else {
-            // int energy_offset=INF;
-            // if (best_d_==j-1 && best_dp_==k+1) {
-            //     energy_offset = calc_e_stP(j-1,k+1);
-            // } else {
-            //     energy_offset = calc_e_intP(best_d_,j,k,best_dp_);
-            // }
+//     // Hosna, july 8, 2014
+//     // based on original recurrences we should have i<d, and
+//     // it is not clear to me why we have i<=d here, so I am changing this back to original
+//     // by changing d=i to d=i+1
+//     for(int d=i+1; d < j; d++){
+//         int temp = PK.get(i,d,k,l) + WP.get(d+1,j);  // 12G1
 
-            ta->register_trace_arrow(i, j, k, l,
-                                     i, best_d_, best_dp_, l,
-                                     calc_PM(i, best_d_, best_dp_, l) , P_PM, P_PM);
-        }
-    }
-}
+//         if (temp < min_energy){
+//             min_energy=temp;
+//             best_d = d;
+//             best_branch = 1;
+//         }
+//     }
 
-void pseudo_loop::compute_PR(int i, int j, int k, int l) {
-    int min_energy =
-        generic_compute_PX(i, j, k, l, P_PR);
+//     // Hosna, july 8, 2014
+//     // based on original recurrences we should have d<l, and
+//     // it is not clear to me why we have d<=l here, so I am changing this back to original
+//     // by changing d<=l to d<l
+//     for(int d=k+1; d < l; d++){
+//         int temp = PK.get(i,j,d,l) + WP.get(k,d-1);  //1G21
 
-    PR.setI(i, j, k, l, min_energy);
+//         if (temp < min_energy){
+//             min_energy=temp;
+//             best_d = d;
+//             best_branch = 2;
+//         }
+//     }
 
-    // If Non-Sparse or infinite energy, end here
-    if (!sparsify || min_energy>=INF/2)
-        return;
+//     if (e == min_energy) {
+//         if (best_branch==1) {
+//             bt_WP(best_d+1,j);
+//             trace_continue(i,best_d,k,l,P_PK,PK.get(i,best_d,k,l));
+//         } else {
+//             assert(best_branch==2);
+//             bt_WP(k,best_d-1);
+//             trace_continue(i,best_d,k,l,P_PK,PK.get(i,k,best_d,l));
+//         }
+//     }
 
-    if (best_branch_ == 1) {
-        if (avoid_candidates &&
-              PRmloop0_CL->is_candidate(i, j, best_d_, best_dp_)) {
-            ta->PR.avoid_trace_arrow();
-        } else {
-            ta->register_trace_arrow(i, j, k, l,
-                                     i, j, best_d_, best_dp_,
-                                     calc_PR(i, j, best_d_, best_dp_),
-                                     P_PR, P_PR);
-        }
-    }
-}
+//     // continue trace with one of the recursion cases to PL,PM,PR,PO
+//     int best_penalty;
+//     int best_target_type;
 
-void pseudo_loop::compute_PO(int i, int j, int k, int l) {
-    int min_energy =
-        generic_compute_PX(i, j, k, l, P_PO);
+//     assert(min_energy == INF);
 
-    PO.setI(i, j, k, l, min_energy);
+//     for (auto type : {P_PL,P_PM,P_PR,P_PO}) {
+//         int temp = recompute_PX(x,P_PL);
+//         if(temp < min_energy){
+//             min_energy = temp;
+//             best_penalty = penalty(x,gamma2,P_PL)+PB_penalty;
+//             best_target_type = P_PL;
+//         }
+//     }
 
-    // If Non-Sparse or infinite energy, end here
-    if (!sparsify || min_energy>=INF/2)
-        return;
+//     assert( min_energy+best_penalty == e );
 
-    if (best_branch_ == 1) {
-        if (avoid_candidates &&
-              POmloop0_CL->is_candidate(best_d_, j, k, best_dp_)) {
-            ta->PO.avoid_trace_arrow();
-        } else {
-            ta->register_trace_arrow(i, j, k, l,
-                                     best_d_, j, k, best_dp_,
-                                     calc_PO(best_d_, j, k, best_dp_),
-                                     P_PO, P_PO);
-        }
-    }
-}
+//     trace_update_f_with_target(i,j,k,l, P_PK, best_target_type);
+//     trace_continue(i,j,k,l,best_target_type,min_energy);
+// }
+
+// @todo split trace_PX into recompute_PX and trace_PX method that uses recompute_PX
+// recompute_PL/M/R/O must store cases
+
+// int
+// pseudo_loop::recompute_PX(const Index4D &x, matrix_type_t type) {
+//     // implement as stub -- to make this working,
+//     // keep entire PX matrices --- CHANGE later again
+
+//     std::cerr << "pseudo_loop::recompute_PX stub " << x <<" "<< type << std::endl;
+//     return calc_PX(x,type);
+
+//     // // if there is a trace arrow, use it
+//     // //
+//     // const TraceArrow *arrow = ta->PL.trace_arrow_from(i,j,k,l);
+//     // if ( arrow != nullptr ) {
+//     //     assert ( arrow->target_type()==P_PL );
+//     //     int best_x_ = Index4D(arrow->i(), arrow->j(),
+//     //                                  arrow->k(), arrow0->l());
+//     //     best_target_type_ = type;
+//     //     best_target_energy = arrow->target_energy();
+//     // }
+
+//     // // otherwise check PXmloop0 candidates (avoided TAs)
+//     // // note that PXmloop0 candidates are PX type fragments
+//     // //
+//     // candidate_list = mloop0_cl_by_type(type);
+
+//     // int min_energy = INF;
+//     // for(int dp = j-1; dp > j-MAXLOOP; dp--) {
+//     //     for (const candidate *c = CL->get_front(dp, k, l); c != NULL;
+//     //          c = c->get_next()) {
+//     //         int d = c->d;
+
+//     //         if (d <= i || (j - dp + d - i) > MAXLOOP)
+//     //             continue;
+
+//     //         int te = c->w;
+
+//     //         // the energy of candidates (from PLmloop0_CL)
+//     //         // is shifted by the beta2P penalty against PL;
+//     //         // thus we subtract this penalty again!
+//     //         te -=  beta2P(dp,d);
+
+//     //         if ( d == i+1 && dp == j-1 ) {
+//     //             temp = te + calc_e_stP(i,j);
+//     //         } else {
+//     //             temp = te + calc_e_intP(i,d,dp,j);
+//     //         }
+
+//     //         if (temp < min_energy) {
+//     //             min_energy = temp;
+//     //             target_energy = te;
+//     //             best_d = d;
+//     //             best_dp = dp;
+//     //         }
+//     //     }
+//     // }
+
+//     // Index4D xp = x; xp.shrink(1,1,type);
+
+//     // // mloop case
+//     // recompute_slice_PXmloop0(xp, type);
+//     // recompute_slice_PXmloop1(xp, type);
+
+//     // temp = calc_PXmloop(x, type);
+//     // if (temp < min_energy) {
+//     //     min_energy = temp;
+//     //     target_energy = temp;
+//     //     target_type = corresponding_mloop1_type(type);
+//     //     best_d=i;
+//     //     best_dp=j;
+//     // }
+
+//     // // from case
+//     // temp = calc_PfromX(xp, type) + gamma2(j,i);
+//     // if (temp < min_energy) {
+//     //     min_energy = temp;
+//     //     target_energy = calc_PfromL(i+1, j-1, k, l);
+//     //     target_type = corresponding_from_type(type);
+//     //     best_d=i+1;
+//     //     best_dp=j-1;
+//     // }
+
+// }
 
 void
 pseudo_loop::trace_PL(int i, int j, int k, int l, int e) {
@@ -4428,12 +4572,13 @@ void pseudo_loop::back_track_sp(minimum_fold *f, seq_interval *cur_interval)
         int e2 = c.w();
 
         if ( e1+e2 == min_energy ) {
-            //if (node_debug || pl_debug) {
-                printf ("P(%d,%d): tracing PK(%d,%d,%d,%d) e:%d and PK(%d,%d,%d,%d) e:%d\n",
-                        i,l,
-                        i,c.d()-1,c.j()+1,c.k()-1, e1,
-                        c.d(),c.j(),c.k(),l, e2);
-            //}
+            if (node_debug || pl_debug) {
+                printf(
+                    "P(%d,%d): tracing PK(%d,%d,%d,%d) e:%d and "
+                    "PK(%d,%d,%d,%d) e:%d\n",
+                    i, l, i, c.d() - 1, c.j() + 1, c.k() - 1, e1, c.d(), c.j(),
+                    c.k(), l, e2);
+            }
 
             trace_continue(i,c.d()-1,c.j()+1,c.k()-1,P_PK,e1);
             trace_continue(c.d(),c.j(),c.k(),l,P_PK,e2);
@@ -4956,7 +5101,7 @@ void pseudo_loop::trace_POmloop0(int i, int j, int k, int l, int e) {
 
 void pseudo_loop::trace_continue(int i, int j, int k, int l, char srctype, energy_t e)
 {
-    printf("trace_continue(%d,%d,%d,%d,%c,%d)\n",i,j,k,l,srctype,e);
+    //printf("trace_continue(%d,%d,%d,%d,%c,%d)\n",i,j,k,l,srctype,e);
     assert (i<=j && j<=k && k<=l);
 
     TraceArrows *src_ta = nullptr;

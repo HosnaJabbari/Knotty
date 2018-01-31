@@ -406,9 +406,25 @@ private:
                           int LMRO_cases = 0,
                           Penalty penalty = zero);
 
-    //! @brief generic computation of PL/M/R/O functions
+
+    //! select 4D matrix by type
+    MatrixSlices3D &
+    matrix_by_type(matrix_type_t type);
+
+    candidate_list *
+    mloop0_cl_by_type(matrix_type_t type);
+
+    TraceArrows &
+    ta_by_type(matrix_type_t type);
+
+
+    //! @brief helper for generic computation of PL/M/R/O function
     int
-    generic_compute_PX(int i, int j, int k, int l, matrix_type_t type);
+    generic_compute_PX_helper(const Index4D &x, matrix_type_t type);
+
+    //! @brief generic computation of PL/M/R/O functions
+    void
+    compute_PX(Index4D x, matrix_type_t type);
 
 
     //void compute_WM(int i, int j); // in base pair maximization, there is no difference between the two
@@ -421,10 +437,6 @@ private:
     void compute_P_sp(int i, int l);
     void compute_P_ns(int i, int l);
     void compute_PK(int i,int j, int k, int l);
-    void compute_PL(int i,int j, int k, int l);
-    void compute_PR(int i,int j, int k, int l);
-    void compute_PM(int i,int j, int k, int l);
-    void compute_PO(int i,int j, int k, int l);
 
     void compute_PfromL(int i, int j, int k, int l);
     void compute_PfromR(int i, int j, int k, int l);
@@ -503,6 +515,8 @@ private:
     // for fix i, i<=j<=max_j min_k<=k<=l<=max_l
     void
     recompute_slice_POmloop1(int i, int max_j, int min_k, int max_l);
+
+    void trace_PK(int i, int j, int k, int l, int e);
 
     void trace_PL(int i, int j, int k, int l, int e);
     void trace_PM(int i, int j, int k, int l, int e);
