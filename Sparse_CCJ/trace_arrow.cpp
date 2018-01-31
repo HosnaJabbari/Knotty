@@ -293,7 +293,7 @@ MasterTraceArrows::gc_trace_arrow(int i, int j, SimpleMap<ta_key_pair, TraceArro
     assert(ta.source_ref_count() >= 0);
     if (ta.source_ref_count() == 0) {
         // Save i,j,k,l of target trace arrow before deleting source arrow
-        int tgt_i = ta.i(), tgt_j = ta.j(), tgt_k = ta.k(), tgt_l = ta.l();
+        int target_i = ta.i(), target_j = ta.j(), target_k = ta.k(), target_l = ta.l();
 
         // get container trace arrows of target_type
         TraceArrows *target = get_arrows_by_type(ta.target_type());
@@ -309,9 +309,9 @@ MasterTraceArrows::gc_trace_arrow(int i, int j, SimpleMap<ta_key_pair, TraceArro
         if (target==nullptr) return true; // stop gc if target has no trace arrows
 
         // Only continue on and delete what it is pointing at if it is going backwards
-        if (tgt_i > i)
+        if (target_i > i)
             // continue to what source arrow was pointing at
-            gc_to_target(tgt_i, tgt_j, tgt_k, tgt_l, *target);
+            gc_to_target(target_i, target_j, target_k, target_l, *target);
 
         return true;
     }

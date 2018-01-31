@@ -55,31 +55,16 @@ public:
     // in order to be able to check the border values consistantly
     // I am adding these get functions
 
-    // getter functions for nested substructures
+    int calc_P(int i, int j);
+    int calc_PL(int i,int j, int k, int l);
+    int calc_PR(int i,int j, int k, int l);
+    int calc_PM(int i,int j, int k, int l);
+    int calc_PO(int i,int j, int k, int l);
 
-    // nested substr in a regular multiloop
-    //int get_WM(int i, int j); // in base pair maximization, there is no difference between the two
-    //int get_WMP(int i, int j);
-
-    // nested substr in a multiloop that spans a band
-    int get_WB(int i, int j) {return WB.get(i,j);} // in base pair maximization, there is no difference between the two
-    int get_WBP(int i, int j) {return WBP.get(i,j);}
-
-    // nested substr in a pseudoloop
-    int get_WP(int i, int j)  {return WP.get(i,j);} // in base pair maximization, there is no difference between the two
-    int get_WPP(int i, int j) {return WPP.get(i,j);}
-
-    int get_P(int i, int j);
-    int get_PK(int i,int j, int k, int l);
-    int get_PL(int i,int j, int k, int l);
-    int get_PR(int i,int j, int k, int l);
-    int get_PM(int i,int j, int k, int l);
-    int get_PO(int i,int j, int k, int l);
-
-    int get_PfromL(int i, int j, int k, int l);
-    int get_PfromR(int i, int j, int k, int l);
-    int get_PfromM(int i, int j, int k, int l);
-    int get_PfromO(int i, int j, int k, int l);
+    int calc_PfromL(int i, int j, int k, int l);
+    int calc_PfromR(int i, int j, int k, int l);
+    int calc_PfromM(int i, int j, int k, int l);
+    int calc_PfromO(int i, int j, int k, int l);
 
     int
     get_3D_helper(int **m, int i, int j, int k, int l);
@@ -91,29 +76,21 @@ public:
     // and set best_d_ and best_dp_ to the inner base pair ends
     // on success (i.e. if returned energy <INF/2)
 
-    int get_PLiloop(int i,int j, int k, int l);
-    //int get_PLiloop5(int i,int j, int k, int l,int s);
-    int get_PLmloop(int i,int j, int k, int l);
-    int get_PLmloop1(int i,int j, int k, int l);
-    int get_PLmloop0(int i,int j, int k, int l);
+    int calc_PLiloop(int i,int j, int k, int l);
+    //int calc_PLiloop5(int i,int j, int k, int l,int s);
+    int calc_PLmloop(int i,int j, int k, int l);
 
-    int get_PRiloop(int i,int j, int k, int l);
-    //int get_PRiloop5(int i,int j, int k, int l,int s);
-    int get_PRmloop(int i,int j, int k, int l);
-    int get_PRmloop0(int i,int j, int k, int l);
-    int get_PRmloop1(int i,int j, int k, int l);
+    int calc_PRiloop(int i,int j, int k, int l);
+    //int calc_PRiloop5(int i,int j, int k, int l,int s);
+    int calc_PRmloop(int i,int j, int k, int l);
 
-    int get_PMiloop(int i,int j, int k, int l);
-    //int get_PMiloop5(int i,int j, int k, int l,int s);
-    int get_PMmloop(int i,int j, int k, int l);
-    int get_PMmloop1(int i,int j, int k, int l);
-    int get_PMmloop0(int i,int j, int k, int l);
+    int calc_PMiloop(int i,int j, int k, int l);
+    //int calc_PMiloop5(int i,int j, int k, int l,int s);
+    int calc_PMmloop(int i,int j, int k, int l);
 
-    int get_POiloop(int i,int j, int k, int l);
-    //int get_POiloop5(int i,int j, int k, int l,int s);
-    int get_POmloop(int i,int j, int k, int l);
-    int get_POmloop1(int i,int j, int k, int l);
-    int get_POmloop0(int i,int j, int k, int l);
+    int calc_POiloop(int i,int j, int k, int l);
+    //int calc_POiloop5(int i,int j, int k, int l,int s);
+    int calc_POmloop(int i,int j, int k, int l);
 
     // int is_weakly_closed(int i, int j);
     //int is_empty_region(int i, int j);
@@ -336,7 +313,7 @@ public:
     }
 
 private:
-    void get_PK_CL_size(int &candidates, int &empty_lists);
+    void calc_PK_CL_size(int &candidates, int &empty_lists);
     //int *weakly_closed;		// the array which is keeping track of which regions are weakly closed
     //int *not_paired_all;	// the array which keeps track of empty regions
     int *index;				// the array to keep the index of two dimensional arrays like weakly_closed
@@ -520,8 +497,8 @@ private:
 
 
     // I have to calculate the e_stP in a separate function
-    int get_e_stP(int i, int j);
-    int get_e_intP(int i,int ip, int jp, int j);
+    int calc_e_stP(int i, int j);
+    int calc_e_intP(int i,int ip, int jp, int j);
 
     /**
     * @param location of source

@@ -227,8 +227,8 @@ void pseudo_loop::compute_energies_sp(int i, int l)
 
     // 1) compute all energies over region [i,l]
     compute_P_sp(i,l);
-    if(pl_debug && get_P(i,l)<INF/2){
-        printf("P(%d,%d) = %d \n",i,l,get_P(i,l));
+    if(pl_debug && calc_P(i,l)<INF/2){
+        printf("P(%d,%d) = %d \n",i,l,calc_P(i,l));
     }
     compute_WBP(i,l);
     compute_WPP(i,l);
@@ -294,8 +294,8 @@ void pseudo_loop::compute_energies_ns(int i, int l)
 
     // 1) compute all energies over region [i,l]
     compute_P_ns(i,l);
-    if(pl_debug && get_P(i,l)<INF/2){
-        printf("P(%d,%d) = %d \n",i,l,get_P(i,l));
+    if(pl_debug && calc_P(i,l)<INF/2){
+        printf("P(%d,%d) = %d \n",i,l,calc_P(i,l));
     }
     compute_WBP(i,l);
     compute_WPP(i,l);
@@ -369,10 +369,10 @@ void pseudo_loop::compute_WBP(int i, int l){
             // Hosna, August 26, 2014
             // comparing calculation of WI in HFold and WPP in CCJ, I found that
             // in HFold we add another penalty called PPS_penalty for closed regions inside a pseudoloop or multiloop that spans a band
-            //int common = get_WB(i,d-1) + beta1P*(l-e);
-            int common = get_WB(i,d-1) + beta1P*(l-e)+PPS_penalty;
+            //int common = WB.get(i,d-1) + beta1P*(l-e);
+            int common = WB.get(i,d-1) + beta1P*(l-e)+PPS_penalty;
             b1 = V->get_energy(d,e) + beta2P(e,d) + common;
-            b2 = get_P(d,e) + gamma0m + common;
+            b2 = calc_P(d,e) + gamma0m + common;
             if(b1 < min_energy || b2 < min_energy){
                 min_energy = MIN(b1,b2);
             }
@@ -388,7 +388,7 @@ void pseudo_loop::compute_WBP(int i, int l){
 
 void pseudo_loop::compute_WB(int i, int l){
     assert(!impossible_case(i,l));
-    WB[WB.ij(i,l)] = (MIN(beta1P*(l-i+1),get_WBP(i,l)));
+    WB[WB.ij(i,l)] = (MIN(beta1P*(l-i+1),WBP.get(i,l)));
 }
 
 void pseudo_loop::compute_WPP(int i, int l){
@@ -402,9 +402,9 @@ void pseudo_loop::compute_WPP(int i, int l){
             // Hosna, August 26, 2014
             // comparing calculation of WI in HFold and WPP in CCJ, I found that
             // in HFold we add another penalty called PPS_penalty for closed regions inside a pseudoloop or multiloop that spans a band
-            int common = get_WP(i,d-1) + gamma1*(l-e) + PPS_penalty;
+            int common = WP.get(i,d-1) + gamma1*(l-e) + PPS_penalty;
             b1 = V->get_energy(d,e) + gamma2(e,d) + common;
-            b2 = get_P(d,e) + gamma0P + common;
+            b2 = calc_P(d,e) + gamma0P + common;
             if(b1 < min_energy || b2 < min_energy){
                 min_energy = MIN(b1,b2);
             }
@@ -435,7 +435,7 @@ void pseudo_loop::compute_P_sp(int i, int l){
     for (const candidate_PK c : PK_CL[l]) {
         int d = c.d(), j = c.j(), k = c.k(), w = c.w();
 
-        temp = get_PK(i, d-1, j+1, k-1) + w;
+        temp = PK.get(i, d-1, j+1, k-1) + w;
 
         if (temp < min_energy) {
             min_energy = temp;
@@ -468,7 +468,7 @@ void pseudo_loop::compute_P_ns(int i, int l){
     for(int j=i; j< l; j++){
         for (int d=j+1; d<l; d++){
             for (int k=d+1; k<l; k++){
-                b1 = get_PK(i,j,d+1,k) + get_PK(j+1,d,k+1,l);
+                b1 = PK.get(i,j,d+1,k) + PK.get(j+1,d,k+1,l);
 
                 if(b1 < min_energy){
                     min_energy = b1;
@@ -500,7 +500,7 @@ void pseudo_loop::compute_PK(int i, int j, int k, int l){
     // it is not clear to me why we have i<=d here, so I am changing this back to original
     // by changing d=i to d=i+1
     for(int d=i+1; d < j; d++){
-        int temp = get_PK(i,d,k,l) + get_WP(d+1,j);  // 12G1
+        int temp = PK.get(i,d,k,l) + WP.get(d+1,j);  // 12G1
 
         if (temp < min_energy){
             min_energy=temp;
@@ -514,7 +514,7 @@ void pseudo_loop::compute_PK(int i, int j, int k, int l){
     // it is not clear to me why we have d<=l here, so I am changing this back to original
     // by changing d<=l to d<l
     for(int d=k+1; d < l; d++){
-        int temp = get_PK(i,j,d,l) + get_WP(k,d-1);  //1G21
+        int temp = PK.get(i,j,d,l) + WP.get(k,d-1);  //1G21
 
         if (temp < min_energy){
             min_energy=temp;
@@ -523,25 +523,25 @@ void pseudo_loop::compute_PK(int i, int j, int k, int l){
         }
     }
 
-    temp = get_PL(i,j,k,l) + gamma2(j,i)+PB_penalty;
+    temp = calc_PL(i,j,k,l) + gamma2(j,i)+PB_penalty;
     if(temp < min_energy){
         min_energy = temp;
         best_branch = 3;
     }
 
-    temp = get_PM(i,j,k,l) + gamma2(j,k)+PB_penalty;
+    temp = calc_PM(i,j,k,l) + gamma2(j,k)+PB_penalty;
     if(temp < min_energy){
         min_energy = temp;
         best_branch = 4;
     }
 
-    temp = get_PR(i,j,k,l) + gamma2(l,k)+PB_penalty;
+    temp = calc_PR(i,j,k,l) + gamma2(l,k)+PB_penalty;
     if(temp < min_energy){
         min_energy = temp;
         best_branch = 5;
     }
 
-    temp = get_PO(i,j,k,l) + gamma2(l,i)+PB_penalty;
+    temp = calc_PO(i,j,k,l) + gamma2(l,i)+PB_penalty;
     if(temp < min_energy){
         min_energy = temp;
         best_branch = 6;
@@ -664,10 +664,10 @@ void pseudo_loop::recompute_slice_PK(int i, int max_l) {
 
                     int min_energy = INF;
                     for(int d=i+1; d < j; d++){
-                        min_energy = std::min(min_energy, get_PK(i,d,k,l) + get_WP(d+1,j));  // 12G1
+                        min_energy = std::min(min_energy, PK.get(i,d,k,l) + WP.get(d+1,j));  // 12G1
                     }
                     for(int d=k+1; d < l; d++) {
-                        min_energy = std::min(min_energy, get_PK(i,j,d,l) + get_WP(k,d-1));  //1G21
+                        min_energy = std::min(min_energy, PK.get(i,j,d,l) + WP.get(k,d-1));  //1G21
                     }
 
                     PK.setI(i, j, k, l, min_energy);
@@ -760,7 +760,7 @@ pseudo_loop::generic_decomposition(int i, int j, int k, int l,
     }
 
     if (LMRO_ndcases & CASE_PL) {
-        int temp = get_PL(i, j, k, l) + penalty(j, i);
+        int temp = calc_PL(i, j, k, l) + penalty(j, i);
         if (temp < min_energy) {
             min_energy = temp;
             best_branch_ = CASE_PL;
@@ -768,7 +768,7 @@ pseudo_loop::generic_decomposition(int i, int j, int k, int l,
     }
 
     if (LMRO_ndcases & CASE_PM) {
-        int temp = get_PM(i, j, k, l) + penalty(j, k);
+        int temp = calc_PM(i, j, k, l) + penalty(j, k);
         if (temp < min_energy) {
             min_energy = temp;
             best_branch_ = CASE_PM;
@@ -776,7 +776,7 @@ pseudo_loop::generic_decomposition(int i, int j, int k, int l,
     }
 
     if (LMRO_ndcases & CASE_PR) {
-        int temp = get_PR(i, j, k, l) + penalty(l, k);
+        int temp = calc_PR(i, j, k, l) + penalty(l, k);
         if (temp < min_energy) {
             min_energy = temp;
             best_branch_ = CASE_PR;
@@ -784,7 +784,7 @@ pseudo_loop::generic_decomposition(int i, int j, int k, int l,
     }
 
     if (LMRO_ndcases & CASE_PO) {
-        int temp = get_PO(i, j, k, l) + penalty(l, i);
+        int temp = calc_PO(i, j, k, l) + penalty(l, i);
         if (temp < min_energy) {
             min_energy = temp;
             best_branch_ = CASE_PO;
@@ -894,16 +894,16 @@ pseudo_loop::generic_compute_PX(int i, int j, int k, int l, int type) {
     // cases Xiloop
     switch(type) {
     case P_PL:
-        min_energy = get_PLiloop(i, j, k, l);
+        min_energy = calc_PLiloop(i, j, k, l);
         break;
     case P_PM:
-        min_energy = get_PMiloop(i, j, k, l);
+        min_energy = calc_PMiloop(i, j, k, l);
         break;
     case P_PR:
-        min_energy = get_PRiloop(i, j, k, l);
+        min_energy = calc_PRiloop(i, j, k, l);
         break;
     case P_PO:
-        min_energy = get_POiloop(i, j, k, l);
+        min_energy = calc_POiloop(i, j, k, l);
         break;
     default: assert(false);
     }
@@ -913,10 +913,10 @@ pseudo_loop::generic_compute_PX(int i, int j, int k, int l, int type) {
     }
 
     switch(type) {
-    case P_PL: temp = get_PLmloop(i,j,k,l); break;
-    case P_PM: temp = get_PMmloop(i,j,k,l); break;
-    case P_PR: temp = get_PRmloop(i,j,k,l); break;
-    case P_PO: temp = get_POmloop(i,j,k,l); break;
+    case P_PL: temp = calc_PLmloop(i,j,k,l); break;
+    case P_PM: temp = calc_PMmloop(i,j,k,l); break;
+    case P_PR: temp = calc_PRmloop(i,j,k,l); break;
+    case P_PO: temp = calc_POmloop(i,j,k,l); break;
     }
     // Hosna, April 11, 2014
     // we need to add a branch penalty for multiloop that spans a band
@@ -934,10 +934,10 @@ pseudo_loop::generic_compute_PX(int i, int j, int k, int l, int type) {
         // Hosna July 17, 2014
         // I am adding gamma2 back here to avoid single base pair band predictions
         switch(type) {
-            case P_PL: temp = PfromL.get(i+1,j-1,k,l) + gamma2(j,i); break;
-            case P_PM: temp = PfromM.get(i,j-1,k+1,l) + gamma2(j,k); break;
-            case P_PR: temp = PfromR.get(i,j,k+1,l-1) + gamma2(l,k); break;
-            case P_PO: temp = PfromO.get(i+1,j,k,l-1) + gamma2(l,i); break;
+            case P_PL: temp = calc_PfromL(i+1,j-1,k,l) + gamma2(j,i); break;
+            case P_PM: temp = calc_PfromM(i,j-1,k+1,l) + gamma2(j,k); break;
+            case P_PR: temp = calc_PfromR(i,j,k+1,l-1) + gamma2(l,k); break;
+            case P_PO: temp = calc_PfromO(i+1,j,k,l-1) + gamma2(l,i); break;
         }
         if(temp < min_energy){
             min_energy = temp;
@@ -965,7 +965,7 @@ void pseudo_loop::compute_PL(int i, int j, int k, int l) {
         } else {
             ta->register_trace_arrow(i, j, k, l,
                                      best_d_, best_dp_, k, l,
-                                     get_PL(best_d_, best_dp_, k, l),
+                                     calc_PL(best_d_, best_dp_, k, l),
                                      P_PL, P_PL);
         }
     }
@@ -996,14 +996,14 @@ void pseudo_loop::compute_PM(int i, int j, int k, int l) {
         } else {
             // int energy_offset=INF;
             // if (best_d_==j-1 && best_dp_==k+1) {
-            //     energy_offset = get_e_stP(j-1,k+1);
+            //     energy_offset = calc_e_stP(j-1,k+1);
             // } else {
-            //     energy_offset = get_e_intP(best_d_,j,k,best_dp_);
+            //     energy_offset = calc_e_intP(best_d_,j,k,best_dp_);
             // }
 
             ta->register_trace_arrow(i, j, k, l,
                                      i, best_d_, best_dp_, l,
-                                     get_PM(i, best_d_, best_dp_, l) , P_PM, P_PM);
+                                     calc_PM(i, best_d_, best_dp_, l) , P_PM, P_PM);
         }
     }
 }
@@ -1025,7 +1025,7 @@ void pseudo_loop::compute_PR(int i, int j, int k, int l) {
         } else {
             ta->register_trace_arrow(i, j, k, l,
                                      i, j, best_d_, best_dp_,
-                                     get_PR(i, j, best_d_, best_dp_),
+                                     calc_PR(i, j, best_d_, best_dp_),
                                      P_PR, P_PR);
         }
     }
@@ -1048,7 +1048,7 @@ void pseudo_loop::compute_PO(int i, int j, int k, int l) {
         } else {
             ta->register_trace_arrow(i, j, k, l,
                                      best_d_, j, k, best_dp_,
-                                     get_PO(best_d_, j, k, best_dp_),
+                                     calc_PO(best_d_, j, k, best_dp_),
                                      P_PO, P_PO);
         }
     }
@@ -1094,9 +1094,9 @@ pseudo_loop::trace_PL(int i, int j, int k, int l, int e) {
             te -=  beta2P(dp,d);
 
             if ( d == i+1 && dp == j-1 ) {
-                temp = te + get_e_stP(i,j);
+                temp = te + calc_e_stP(i,j);
             } else {
-                temp = te + get_e_intP(i,d,dp,j);
+                temp = te + calc_e_intP(i,d,dp,j);
             }
 
             if (temp < min_energy) {
@@ -1111,7 +1111,7 @@ pseudo_loop::trace_PL(int i, int j, int k, int l, int e) {
     // mloop case
     recompute_slice_PLmloop0(i+1,j-1,k,l);
     recompute_slice_PLmloop1(i+1,j-1,k,l);
-    temp = get_PLmloop(i, j, k, l);
+    temp = calc_PLmloop(i, j, k, l);
     if (temp < min_energy) {
         min_energy = temp;
         target_energy = temp;
@@ -1121,10 +1121,10 @@ pseudo_loop::trace_PL(int i, int j, int k, int l, int e) {
     }
 
     // from case
-    temp = get_PfromL(i+1, j-1, k, l) + gamma2(j,i);
+    temp = calc_PfromL(i+1, j-1, k, l) + gamma2(j,i);
     if (temp < min_energy) {
         min_energy = temp;
-        target_energy = get_PfromL(i+1, j-1, k, l);
+        target_energy = calc_PfromL(i+1, j-1, k, l);
         target_type= P_PfromL;
         best_d=i+1;
         best_dp=j-1;
@@ -1175,9 +1175,9 @@ pseudo_loop::trace_PM(int i, int j, int k, int l, int e) {
                 te -=  beta2P(d,dp);
 
                 if ( d == j-1 && dp == k+1 ) {
-                    temp = te + get_e_stP(d,dp);
+                    temp = te + calc_e_stP(d,dp);
                 } else {
-                    temp = get_e_intP(d,j,k,dp) + te;
+                    temp = calc_e_intP(d,j,k,dp) + te;
                 }
 
                 if (temp < min_energy) {
@@ -1193,7 +1193,7 @@ pseudo_loop::trace_PM(int i, int j, int k, int l, int e) {
     // mloop case
     recompute_slice_PMmloop0(i, j-1, k+1, l);
     recompute_slice_PMmloop1(i, j-1, k+1, l);
-    temp = get_PMmloop(i, j, k, l);
+    temp = calc_PMmloop(i, j, k, l);
     if (temp < min_energy) {
         min_energy = temp;
         target_energy = temp;
@@ -1203,10 +1203,10 @@ pseudo_loop::trace_PM(int i, int j, int k, int l, int e) {
     }
 
     // from case
-    temp = get_PfromM(i, j-1, k+1, l) + gamma2(j,k);
+    temp = calc_PfromM(i, j-1, k+1, l) + gamma2(j,k);
     if (temp < min_energy) {
         min_energy = temp;
-        target_energy = get_PfromM(i, j-1, k+1, l);
+        target_energy = calc_PfromM(i, j-1, k+1, l);
         target_type= P_PfromM;
         best_d=j-1;
         best_dp=k+1;
@@ -1216,7 +1216,7 @@ pseudo_loop::trace_PM(int i, int j, int k, int l, int e) {
         std::cerr << i<<" "<<j<<" "<<k<<" "<<l<<" "<<min_energy<<" "<<e<<std::endl;
         std::cerr << best_d << " " << best_dp <<" " << target_type << " " << target_energy
                   <<" "
-                  << get_e_intP(best_d,j,k,best_dp) <<std::endl;
+                  << calc_e_intP(best_d,j,k,best_dp) <<std::endl;
     }
 
     assert(min_energy == e);
@@ -1259,9 +1259,9 @@ pseudo_loop::trace_PR(int i, int j, int k, int l, int e) {
                 te -=  beta2P(dp,d);
 
                 if ( d == k+1 && dp == l-1 ) {
-                    temp = te + get_e_stP(k,l);
+                    temp = te + calc_e_stP(k,l);
                 } else {
-                    temp = te + get_e_intP(k,d,dp,l);
+                    temp = te + calc_e_intP(k,d,dp,l);
                 }
 
                 if (temp < min_energy) {
@@ -1277,7 +1277,7 @@ pseudo_loop::trace_PR(int i, int j, int k, int l, int e) {
     // mloop case
     recompute_slice_PRmloop0(i, j, k+1, l-1);
     recompute_slice_PRmloop1(i, j, k+1, l-1);
-    temp = get_PRmloop(i, j, k, l);
+    temp = calc_PRmloop(i, j, k, l);
     if (temp < min_energy) {
         min_energy = temp;
         target_energy = temp;
@@ -1287,12 +1287,12 @@ pseudo_loop::trace_PR(int i, int j, int k, int l, int e) {
     }
 
     // from case
-    temp = get_PfromR(i, j, k+1, l-1) + gamma2(l,k);
+    temp = calc_PfromR(i, j, k+1, l-1) + gamma2(l,k);
     if (temp < min_energy) {
         min_energy = temp;
         best_d = k+1;
         best_dp = l-1;
-        target_energy = get_PfromR(i, j, best_d, best_dp);
+        target_energy = calc_PfromR(i, j, best_d, best_dp);
         target_type= P_PfromR;
     }
 
@@ -1337,9 +1337,9 @@ pseudo_loop::trace_PO(int i, int j, int k, int l, int e) {
             te -=  beta2P(d,dp);
 
             if ( d == i+1 && dp == l-1 ) {
-                temp = te + get_e_stP(i,l);
+                temp = te + calc_e_stP(i,l);
             } else {
-                temp = te + get_e_intP(i,d,dp,j);
+                temp = te + calc_e_intP(i,d,dp,j);
             }
 
             if (temp < min_energy) {
@@ -1354,7 +1354,7 @@ pseudo_loop::trace_PO(int i, int j, int k, int l, int e) {
     // mloop case
     recompute_slice_POmloop0(i+1,j,k,l-1);
     recompute_slice_POmloop1(i+1,j,k,l-1);
-    temp = get_POmloop(i, j, k, l);
+    temp = calc_POmloop(i, j, k, l);
     if (temp < min_energy) {
         min_energy = temp;
         target_energy = temp;
@@ -1364,10 +1364,10 @@ pseudo_loop::trace_PO(int i, int j, int k, int l, int e) {
     }
 
     // from case
-    temp = get_PfromO(i+1, j, k, l-1) + gamma2(l,i);
+    temp = calc_PfromO(i+1, j, k, l-1) + gamma2(l,i);
     if (temp < min_energy) {
         min_energy = temp;
-        target_energy = get_PfromO(i+1, j, k, l-1);
+        target_energy = calc_PfromO(i+1, j, k, l-1);
         target_type= P_PfromO;
         best_d=i+1;
         best_dp=l-1;
@@ -1553,7 +1553,7 @@ void pseudo_loop::compute_PfromM(int i, int j, int k, int l){
     //Hosna, May 2, 2014
     // I think I should block going from PM to PO as it will solve the same band from 2 sides jumping over possible internal loops
     /*
-    b5 = get_PO(i,j,k,l) + gamma2(l,i);
+    b5 = calc_PO(i,j,k,l) + gamma2(l,i);
     if(b5 < min_energy){
         min_energy = b5;
     }
@@ -1850,7 +1850,7 @@ void pseudo_loop::compute_POmloop0(int i, int j, int k, int l){
     }
 }
 
-int pseudo_loop::get_P(int i, int j){
+int pseudo_loop::calc_P(int i, int j){
     if (i >= j  || i<0 || j<0 || i>=nb_nucleotides || j>=nb_nucleotides){
         return INF;
     }
@@ -1858,12 +1858,7 @@ int pseudo_loop::get_P(int i, int j){
     return P[P.ij(i, j)];
 }
 
-
-int pseudo_loop::get_PK(int i, int j, int k, int l){
-    return PK.get(i, j, k, l);
-}
-
-int pseudo_loop::get_PL(int i, int j, int k, int l){
+int pseudo_loop::calc_PL(int i, int j, int k, int l){
     if (!can_pair(int_sequence[i],int_sequence[j])){
         return INF;
     }
@@ -1871,7 +1866,7 @@ int pseudo_loop::get_PL(int i, int j, int k, int l){
     return PL.get(i, j, k, l);
 }
 
-int pseudo_loop::get_PR(int i, int j, int k, int l){
+int pseudo_loop::calc_PR(int i, int j, int k, int l){
     if (!can_pair(int_sequence[k],int_sequence[l])){
         return INF;
     }
@@ -1879,7 +1874,7 @@ int pseudo_loop::get_PR(int i, int j, int k, int l){
     return PR.get(i, j, k, l);
 }
 
-int pseudo_loop::get_PM(int i, int j, int k, int l){
+int pseudo_loop::calc_PM(int i, int j, int k, int l){
     assert(j>=0 && k>=0 && j<nb_nucleotides && k<nb_nucleotides);
     if (!can_pair(int_sequence[j],int_sequence[k])){
         return INF;
@@ -1892,14 +1887,14 @@ int pseudo_loop::get_PM(int i, int j, int k, int l){
     return PM.get(i, j, k, l);
 }
 
-int pseudo_loop::get_PO(int i, int j, int k, int l){
+int pseudo_loop::calc_PO(int i, int j, int k, int l){
     if (!can_pair(int_sequence[i],int_sequence[l])){
         return INF;
     }
     return PO.get(i, j, k, l);
 }
 
-int pseudo_loop::get_PfromL(int i, int j, int k, int l){
+int pseudo_loop::calc_PfromL(int i, int j, int k, int l){
     // Hosna, April 3, 2014
     // adding impossible cases
     // Ian Wark, April 7, 2017
@@ -1920,7 +1915,7 @@ int pseudo_loop::get_PfromL(int i, int j, int k, int l){
     return PfromL.get(i,j,k,l);
 }
 
-int pseudo_loop::get_PfromR(int i, int j, int k, int l){
+int pseudo_loop::calc_PfromR(int i, int j, int k, int l){
     // Hosna, April 3, 2014
     // adding impossible cases
     // Ian Wark, April 7, 2017
@@ -1941,7 +1936,7 @@ int pseudo_loop::get_PfromR(int i, int j, int k, int l){
     return PfromR.get(i,j,k,l);
 }
 
-int pseudo_loop::get_PfromM(int i, int j, int k, int l){
+int pseudo_loop::calc_PfromM(int i, int j, int k, int l){
     // Hosna, April 3, 2014
     // adding impossible cases
     // Ian Wark, April 7, 2017
@@ -1962,7 +1957,7 @@ int pseudo_loop::get_PfromM(int i, int j, int k, int l){
     return PfromM.get(i,j,k,l);
 }
 
-int pseudo_loop::get_PfromO(int i, int j, int k, int l){
+int pseudo_loop::calc_PfromO(int i, int j, int k, int l){
     // Hosna, April 3, 2014
     // adding impossible cases
     // Ian Wark, April 7, 2017
@@ -1983,7 +1978,7 @@ int pseudo_loop::get_PfromO(int i, int j, int k, int l){
     return PfromO.get(i,j,k,l);
 }
 
-int pseudo_loop::get_PLiloop(int i, int j, int k, int l){
+int pseudo_loop::calc_PLiloop(int i, int j, int k, int l){
     if (!(i < j && j < k-1 && k < l)){
         //printf("!(i <= j && j < k-1 && k <= l)\n");
         return INF;
@@ -2002,14 +1997,14 @@ int pseudo_loop::get_PLiloop(int i, int j, int k, int l){
 
     int min_energy=INF;
     if ( i+TURN+2 < j ) { // SW -- is this check required?
-        min_energy = get_PL(i+1,j-1,k,l)+get_e_stP(i,j);
+        min_energy = calc_PL(i+1,j-1,k,l)+calc_e_stP(i,j);
         best_d_=i+1;
         best_dp_=j-1;
     }
 
     for(int d= i+1; d<MIN(j,i+MAXLOOP); d++){
         for(int dp = j-1; dp > MAX(d+TURN,j-MAXLOOP); dp--){
-            int temp = get_e_intP(i,d,dp,j) + get_PL(d,dp,k,l);
+            int temp = calc_e_intP(i,d,dp,j) + calc_PL(d,dp,k,l);
             if(temp < min_energy){
                 min_energy = temp;
                 best_d_ = d;
@@ -2022,7 +2017,7 @@ int pseudo_loop::get_PLiloop(int i, int j, int k, int l){
 }
 
 
-int pseudo_loop::get_PLmloop(int i, int j, int k, int l){
+int pseudo_loop::calc_PLmloop(int i, int j, int k, int l){
     if (!(i <= j && j < k-1 && k <= l)){
         //printf("!(i <= j && j < k-1 && k <= l)\n");
         return INF;
@@ -2035,22 +2030,14 @@ int pseudo_loop::get_PLmloop(int i, int j, int k, int l){
     // also made it an assert since it should never happen
     assert(!(i<0 || l>= nb_nucleotides));
 
-    int min_energy = get_PLmloop1(i+1,j-1,k,l)+ ap_penalty + beta2P(j,i);
+    int min_energy = PLmloop1.get(i+1,j-1,k,l)+ ap_penalty + beta2P(j,i);
 
     // SW - no need for trace arrows
 
     return min_energy;
 }
 
-int pseudo_loop::get_PLmloop1(int i, int j, int k, int l){
-    return PLmloop1.get(i, j, k, l);
-}
-
-int pseudo_loop::get_PLmloop0(int i, int j, int k, int l){
-    return PLmloop0.get(i, j, k, l);
-}
-
-int pseudo_loop::get_PRiloop(int i, int j, int k, int l){
+int pseudo_loop::calc_PRiloop(int i, int j, int k, int l){
     if (!(i <= j && j < k-1 && k <= l)){
         //printf("!(i <= j && j < k-1 && k <= l)\n");
         return INF;
@@ -2069,14 +2056,14 @@ int pseudo_loop::get_PRiloop(int i, int j, int k, int l){
 
     int min_energy=INF;
     if ( k+TURN+2 < l ) { // SW -- is this check required?
-        min_energy = get_PR(i,j,k+1,l-1)+get_e_stP(k,l);
+        min_energy = calc_PR(i,j,k+1,l-1)+calc_e_stP(k,l);
         best_d_ = k+1;
         best_dp_ = l-1;
     }
 
     for(int d= k+1; d<MIN(l,k+MAXLOOP); d++){
         for(int dp=l-1; dp > MAX(d+TURN,l-MAXLOOP); dp--){
-            int temp = get_e_intP(k,d,dp,l) + get_PR(i,j,d,dp);
+            int temp = calc_e_intP(k,d,dp,l) + calc_PR(i,j,d,dp);
             if(temp < min_energy){
                 min_energy = temp;
                 best_d_ = d;
@@ -2088,7 +2075,7 @@ int pseudo_loop::get_PRiloop(int i, int j, int k, int l){
     return min_energy;
 }
 
-int pseudo_loop::get_PRmloop(int i, int j, int k, int l){
+int pseudo_loop::calc_PRmloop(int i, int j, int k, int l){
     if (!(i <= j && j < k-1 && k <= l)){
         //printf("!(i <= j && j < k-1 && k <= l)\n");
         return INF;
@@ -2101,20 +2088,12 @@ int pseudo_loop::get_PRmloop(int i, int j, int k, int l){
     // also made it an assert since it should never happen
     assert(!(i<0 || l>= nb_nucleotides));
 
-    int min_energy = get_PRmloop1(i,j,k+1,l-1) + ap_penalty + beta2P(l,k);
+    int min_energy = PRmloop1.get(i,j,k+1,l-1) + ap_penalty + beta2P(l,k);
 
     return min_energy;
 }
 
-int pseudo_loop::get_PRmloop1(int i, int j, int k, int l){
-    return PRmloop1.get(i, j, k, l);
-}
-
-int pseudo_loop::get_PRmloop0(int i, int j, int k, int l){
-    return PRmloop0.get(i, j, k, l);
-}
-
-int pseudo_loop::get_PMiloop(int i, int j, int k, int l){
+int pseudo_loop::calc_PMiloop(int i, int j, int k, int l){
     if (!(i <= j && j < k-1 && k <= l)){
         //printf("!(i <= j && j < k-1 && k <= l)\n");
         return INF;
@@ -2133,7 +2112,7 @@ int pseudo_loop::get_PMiloop(int i, int j, int k, int l){
 
     int min_energy=INF;
     if (i<j && k<l) {
-        min_energy = get_PM(i,j-1,k+1,l)+get_e_stP(j-1,k+1);
+        min_energy = calc_PM(i,j-1,k+1,l)+calc_e_stP(j-1,k+1);
         best_d_ = j-1;
         best_dp_ = k+1;
     }
@@ -2141,7 +2120,7 @@ int pseudo_loop::get_PMiloop(int i, int j, int k, int l){
     int temp = INF;
     for(int d= j-1; d>MAX(i,j-MAXLOOP); d--){
         for (int dp=k+1; dp <MIN(l,k+MAXLOOP); dp++) {
-            temp = get_e_intP(d,j,k,dp) + get_PM(i,d,dp,l);
+            temp = calc_e_intP(d,j,k,dp) + calc_PM(i,d,dp,l);
 
             if(temp < min_energy){
                 min_energy = temp;
@@ -2152,12 +2131,12 @@ int pseudo_loop::get_PMiloop(int i, int j, int k, int l){
     }
 
     if (pl_debug)
-        printf("get_PMiloop(%d,%d,%d,%d) d:%d dp:%d e:%d\n",i,j,k,l, best_d_, best_dp_, min_energy);
+        printf("calc_PMiloop(%d,%d,%d,%d) d:%d dp:%d e:%d\n",i,j,k,l, best_d_, best_dp_, min_energy);
 
     return min_energy;
 }
 
-int pseudo_loop::get_PMmloop(int i, int j, int k, int l){
+int pseudo_loop::calc_PMmloop(int i, int j, int k, int l){
     if (!(i <= j && j < k-1 && k <= l)){
         //printf("!(i <= j && j < k-1 && k <= l)\n");
         return INF;
@@ -2170,20 +2149,13 @@ int pseudo_loop::get_PMmloop(int i, int j, int k, int l){
     // also made it an assert since it should never happen
     assert(!(i<0 || l>= nb_nucleotides));
 
-    int min_energy = get_PMmloop1(i,j-1,k+1,l)+ap_penalty+beta2P(j,k);
+    int min_energy = PMmloop1.get(i,j-1,k+1,l)+ap_penalty+beta2P(j,k);
 
     return min_energy;
 }
 
-int pseudo_loop::get_PMmloop1(int i, int j, int k, int l){
-    return PMmloop1.get(i, j, k, l);
-}
 
-int pseudo_loop::get_PMmloop0(int i, int j, int k, int l){
-    return PMmloop0.get(i, j, k, l);
-}
-
-int pseudo_loop::get_POiloop(int i, int j, int k, int l){
+int pseudo_loop::calc_POiloop(int i, int j, int k, int l){
     if (!(i <= j && j < k-1 && k <= l)){
         //printf("!(i <= j && j < k-1 && k <= l)\n");
         return INF;
@@ -2202,14 +2174,14 @@ int pseudo_loop::get_POiloop(int i, int j, int k, int l){
 
     int min_energy=INF;
     if (i<j && k<l) {
-        min_energy = get_PO(i+1,j,k,l-1)+get_e_stP(i,l);
+        min_energy = calc_PO(i+1,j,k,l-1)+calc_e_stP(i,l);
         best_d_ = i+1;
         best_dp_ = l-1;
     }
 
     for(int d= i+1; d<MIN(j,i+MAXLOOP); d++){
         for (int dp=l-1; dp >MAX(l-MAXLOOP,k); dp--) {
-            int temp = get_e_intP(i,d,dp,l) + get_PO(d,j,k,dp);
+            int temp = calc_e_intP(i,d,dp,l) + calc_PO(d,j,k,dp);
 
             if(temp < min_energy){
                 min_energy = temp;
@@ -2223,7 +2195,7 @@ int pseudo_loop::get_POiloop(int i, int j, int k, int l){
     return min_energy;
 }
 
-int pseudo_loop::get_POmloop(int i, int j, int k, int l){
+int pseudo_loop::calc_POmloop(int i, int j, int k, int l){
     if (!(i <= j && j < k-1 && k <= l)){
         //printf("!(i <= j && j < k-1 && k <= l)\n");
         return INF;
@@ -2236,20 +2208,12 @@ int pseudo_loop::get_POmloop(int i, int j, int k, int l){
     // also made it an assert since it should never happen
     assert(!(i<0 || l>= nb_nucleotides));
 
-    int min_energy = get_POmloop1(i+1,j,k,l-1) + ap_penalty + beta2P(l,i);
+    int min_energy = POmloop1.get(i+1,j,k,l-1) + ap_penalty + beta2P(l,i);
 
     return min_energy;
 }
 
-int pseudo_loop::get_POmloop1(int i, int j, int k, int l){
-    return POmloop1.get(i, j, k, l);
-}
-
-int pseudo_loop::get_POmloop0(int i, int j, int k, int l){
-    return POmloop0.get(i, j, k, l);
-}
-
-int pseudo_loop::get_e_stP(int i, int j){
+int pseudo_loop::calc_e_stP(int i, int j){
     if (i+1 == j-1 || i< 0 || j< 0 || i>=nb_nucleotides || j>=nb_nucleotides ){
         return INF;
     }
@@ -2266,7 +2230,7 @@ int pseudo_loop::get_e_stP(int i, int j){
 }
 
 
-int pseudo_loop::get_e_intP(int i, int ip, int jp, int j){
+int pseudo_loop::calc_e_intP(int i, int ip, int jp, int j){
 //    if (i< 0 || j< 0 || ip < 0 || jp < 0 || i>=nb_nucleotides || j>=nb_nucleotides || ip>= nb_nucleotides || jp>= nb_nucleotides){
 //    return INF;
 //}
@@ -2280,9 +2244,8 @@ int pseudo_loop::get_e_intP(int i, int ip, int jp, int j){
     }
 }
 
-
 int pseudo_loop::get_energy(int i, int j){
-    return get_P(i,j);
+    return calc_P(i,j);
 }
 
 void pseudo_loop::back_track(minimum_fold *f, seq_interval *cur_interval) {
@@ -2313,7 +2276,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
             int i = cur_interval->i;
             int l = cur_interval->j;
             if (debug) {
-                printf ("\t(%d,%d) P_P energy %d\n", i,l,get_P(i,l));
+                printf ("\t(%d,%d) P_P energy %d\n", i,l,calc_P(i,l));
             }
             if (i >= l){
                 //return;
@@ -2326,8 +2289,8 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
             for(int j=i; j< l; j++){
                 for (int d=j+1; d<l; d++){
                     for (int k=d+1; k<l; k++){
-                        x = get_PK(i,j,d+1,k);
-                        w = get_PK(j+1,d,k+1,l);
+                        x = PK.get(i,j,d+1,k);
+                        w = PK.get(j+1,d,k+1,l);
                         temp = x + w;
 
                         if(temp < min_energy){
@@ -2344,8 +2307,8 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 
             if (node_debug || debug) {
                 printf ("P(%d,%d): inserting PK(%d,%d,%d,%d) e:%d and PK(%d,%d,%d,%d) e:%d\n",i,l,i,best_j,best_d+1,best_k,best_x,best_j+1,best_d,best_k+1,l,best_w);
-                if (min_energy != get_P(i,l)){
-                    printf("!!!!!!There's something wrong here! P(%d,%d) must be %d but is %d \n",i,l,get_P(i,l),min_energy);
+                if (min_energy != calc_P(i,l)){
+                    printf("!!!!!!There's something wrong here! P(%d,%d) must be %d but is %d \n",i,l,calc_P(i,l),min_energy);
                 }
             }
 
@@ -2377,7 +2340,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
             }
 
             if (debug) {
-                printf ("\t(%d,%d,%d,%d) P_PK energy %d\n", i,j,k,l,get_PK(i,j,k,l));
+                printf ("\t(%d,%d,%d,%d) P_PK energy %d\n", i,j,k,l,PK.get(i,j,k,l));
             }
             int min_energy = INF,temp=INF,best_row = -1,best_d=-1;
 
@@ -2387,7 +2350,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
             // it is not clear to me why we have d=i here, so I am changing this back to original
             // by changing d=i to d=i+1
             for(int d=i+1; d< j; d++){
-                temp = get_PK(i,d,k,l) + get_WP(d+1,j);
+                temp = PK.get(i,d,k,l) + WP.get(d+1,j);
                 if (temp < min_energy){
                     min_energy=temp;
                     best_row = 1;
@@ -2401,7 +2364,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
             // it is not clear to me why we have d<=l here, so I am changing this back to original
             // by changing d<=l to d<l
             for(int d=k+1; d< l; d++){
-                temp = get_PK(i,j,d,l) + get_WP(k,d-1);
+                temp = PK.get(i,j,d,l) + WP.get(k,d-1);
                 if (temp < min_energy){
                     min_energy=temp;
                     best_row = 2;
@@ -2410,7 +2373,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
             }
 
             // branch 3
-            temp = get_PL(i,j,k,l) + gamma2(j,i)+PB_penalty;
+            temp = calc_PL(i,j,k,l) + gamma2(j,i)+PB_penalty;
             if(temp < min_energy){
                 min_energy = temp;
                 best_row = 3;
@@ -2418,7 +2381,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
             }
 
             //branch 4
-            temp = get_PM(i,j,k,l) + gamma2(j,k)+PB_penalty;
+            temp = calc_PM(i,j,k,l) + gamma2(j,k)+PB_penalty;
             if(temp < min_energy){
                 min_energy = temp;
                 best_row = 4;
@@ -2426,7 +2389,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
             }
 
             // branch 5
-            temp = get_PR(i,j,k,l) + gamma2(l,k)+PB_penalty;
+            temp = calc_PR(i,j,k,l) + gamma2(l,k)+PB_penalty;
             if(temp < min_energy){
                 min_energy = temp;
                 best_row = 5;
@@ -2434,7 +2397,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
             }
 
             // branch 6
-            temp = get_PO(i,j,k,l) + gamma2(l,i)+PB_penalty;
+            temp = calc_PO(i,j,k,l) + gamma2(l,i)+PB_penalty;
             if(temp < min_energy){
                 min_energy = temp;
                 best_row = 6;
@@ -2516,7 +2479,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			}
 
 			if (debug) {
-				printf ("\t(%d,%d,%d,%d) P_PL energy %d\n", i,j,k,l,get_PL(i,j,k,l));
+				printf ("\t(%d,%d,%d,%d) P_PL energy %d\n", i,j,k,l,calc_PL(i,j,k,l));
 			}
 
 			int min_energy = INF,temp=INF,best_row = -1;
@@ -2524,7 +2487,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			if (can_pair(int_sequence[i],int_sequence[j])){
 
 				//branch 1
-				temp = get_PLiloop(i,j,k,l);
+				temp = calc_PLiloop(i,j,k,l);
 				if(temp < min_energy){
 					min_energy = temp;
 					best_row = 1;
@@ -2533,7 +2496,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 				//branch 2
 				// Hosna, April 11, 2014
 				// we need to add a branch penalty for multiloop that spans a band
-				temp = get_PLmloop(i,j,k,l) + bp_penalty;
+				temp = calc_PLmloop(i,j,k,l) + bp_penalty;
 				if(temp < min_energy){
 					min_energy = temp;
 					best_row=2;
@@ -2547,7 +2510,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 					// I think we have already added gamma2(j,i) when coming to PL, so there is no need to add it again here.
 					// Hosna July 17, 2014
 					// I am adding gamma2 back here to avoid single base pair band predictions
-					temp = get_PfromL(i+1,j-1,k,l) + gamma2(j,i);
+					temp = calc_PfromL(i+1,j-1,k,l) + gamma2(j,i);
 					if(temp < min_energy){
 						min_energy = temp;
 						best_row= 3;
@@ -2615,14 +2578,14 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			}
 
 			if (debug) {
-				printf ("\t(%d,%d,%d,%d) P_PR energy %d\n", i,j,k,l,get_PR(i,j,k,l));
+				printf ("\t(%d,%d,%d,%d) P_PR energy %d\n", i,j,k,l,calc_PR(i,j,k,l));
 			}
 
 
 			int min_energy = INF,temp=INF,best_row = -1;
 			if (can_pair(int_sequence[k],int_sequence[l])){
 				//branch 1
-				temp = get_PRiloop(i,j,k,l);
+				temp = calc_PRiloop(i,j,k,l);
 				if(temp < min_energy){
 					min_energy = temp;
 					best_row = 1;
@@ -2631,7 +2594,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 				//branch 2
 				// Hosna, April 11, 2014
 				// we need to add a branch penalty for multiloop that spans a band
-				temp = get_PRmloop(i,j,k,l)+ bp_penalty;
+				temp = calc_PRmloop(i,j,k,l)+ bp_penalty;
 				if(temp < min_energy){
 					min_energy = temp;
 					best_row=2;
@@ -2645,7 +2608,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 					// I think we have already added gamma2(l,k) when coming to PR, so there is no need to add it again here.
 					// Hosna July 17, 2014
 					// I am adding gamma2 back here to avoid single base pair band predictions
-					temp = get_PfromR(i,j,k+1,l-1) + gamma2(l,k);
+					temp = calc_PfromR(i,j,k+1,l-1) + gamma2(l,k);
 					if(temp < min_energy){
 						min_energy = temp;
 						best_row= 3;
@@ -2711,7 +2674,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			}
 
 			if (debug) {
-				printf ("\t(%d,%d,%d,%d) P_PM energy %d\n", i,j,k,l,get_PM(i,j,k,l));
+				printf ("\t(%d,%d,%d,%d) P_PM energy %d\n", i,j,k,l,calc_PM(i,j,k,l));
 			}
 
 			if (i==j && k ==l){
@@ -2729,7 +2692,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 
 			if (can_pair(int_sequence[j],int_sequence[k])){
 				//branch 1
-				temp = get_PMiloop(i,j,k,l);
+				temp = calc_PMiloop(i,j,k,l);
 				if(temp < min_energy){
 					min_energy = temp;
 					best_row = 1;
@@ -2737,7 +2700,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 				//branch 2
 				// Hosna, April 11, 2014
 				// we need to add a branch penalty for multiloop that spans a band
-				temp = get_PMmloop(i,j,k,l) + bp_penalty;
+				temp = calc_PMmloop(i,j,k,l) + bp_penalty;
 				if(temp < min_energy){
 					min_energy = temp;
 					best_row=2;
@@ -2750,7 +2713,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 					// I think we have already added gamma2(j,k) when coming to PM, so there is no need to add it again here.
 					// Hosna July 17, 2014
 					// I am adding gamma2 back here to avoid single base pair band predictions
-					temp = get_PfromM(i,j-1,k+1,l) + gamma2(j,k);
+					temp = calc_PfromM(i,j-1,k+1,l) + gamma2(j,k);
 					if(temp < min_energy){
 						min_energy = temp;
 						best_row= 3;
@@ -2815,14 +2778,14 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			}
 
 			if (debug) {
-				printf ("\t(%d,%d,%d,%d) P_PO energy %d\n", i,j,k,l,get_PO(i,j,k,l));
+				printf ("\t(%d,%d,%d,%d) P_PO energy %d\n", i,j,k,l,calc_PO(i,j,k,l));
 			}
 
 
 			int min_energy = INF,temp=INF,best_row = -1;
 			if (can_pair(int_sequence[i],int_sequence[l])){
 				//branch 1
-				temp = get_POiloop(i,j,k,l);
+				temp = calc_POiloop(i,j,k,l);
 				if(temp < min_energy){
 					min_energy = temp;
 					best_row = 1;
@@ -2830,7 +2793,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 				//branch 2
 				// Hosna, April 11, 2014
 				// we need to add a branch penalty for multiloop that spans a band
-				temp = get_POmloop(i,j,k,l)+bp_penalty;
+				temp = calc_POmloop(i,j,k,l)+bp_penalty;
 				if(temp < min_energy){
 					min_energy = temp;
 					best_row=2;
@@ -2843,7 +2806,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 					// I think we have already added gamma2(l,i) when coming to PO, so there is no need to add it again here.
 					// Hosna July 17, 2014
 					// I am adding gamma2 back here to avoid single base pair band predictions
-					temp = get_PfromO(i+1,j,k,l-1) + gamma2(l,i);
+					temp = calc_PfromO(i+1,j,k,l-1) + gamma2(l,i);
 					if(temp < min_energy){
 						min_energy = temp;
 						best_row= 3;
@@ -2909,7 +2872,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 
 
 			if (debug) {
-				printf ("\t(%d,%d,%d,%d) P_PfromL energy %d\n", i,j,k,l,get_PfromL(i,j,k,l));
+				printf ("\t(%d,%d,%d,%d) P_PfromL energy %d\n", i,j,k,l,calc_PfromL(i,j,k,l));
 			}
 
 			if (i==j && k==l){
@@ -2920,7 +2883,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 
             for(int d=i+1; d< j; d++){
 				//branch 1
-                temp=get_PfromL(d,j,k,l)+get_WP(i,d-1);
+                temp=calc_PfromL(d,j,k,l)+WP.get(i,d-1);
 				if(temp < min_energy){
 					min_energy=temp;
 					best_row=1;
@@ -2928,7 +2891,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 
 				}
 				//branch 2
-				temp=get_PfromL(i,d,k,l)+get_WP(d+1,j);
+				temp=calc_PfromL(i,d,k,l)+WP.get(d+1,j);
 				if(temp < min_energy){
 					min_energy=temp;
 					best_row=2;
@@ -2938,7 +2901,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			// branch 3
 			//Hosna, July 28, 2014
 			// I think going from PfromX to PX we are changing bands and so should be paying a band penalty
-			temp = get_PR(i,j,k,l) + gamma2(l,k)+PB_penalty;
+			temp = calc_PR(i,j,k,l) + gamma2(l,k)+PB_penalty;
 			if(temp < min_energy){
 				min_energy = temp;
 				best_row=3;
@@ -2948,7 +2911,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			//branch 4
 			//Hosna, July 28, 2014
 			// I think going from PfromX to PX we are changing bands and so should be paying a band penalty
-			temp = get_PM(i,j,k,l) + gamma2(j,k)+PB_penalty;
+			temp = calc_PM(i,j,k,l) + gamma2(j,k)+PB_penalty;
 			if(temp < min_energy){
 				min_energy = temp;
 				best_row=4;
@@ -2958,7 +2921,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			// branch 5
 			//Hosna, July 28, 2014
 			// I think going from PfromX to PX we are changing bands and so should be paying a band penalty
-			temp = get_PO(i,j,k,l) + gamma2(l,i)+PB_penalty;
+			temp = calc_PO(i,j,k,l) + gamma2(l,i)+PB_penalty;
 			if(temp < min_energy){
 				min_energy = temp;
 				best_row=5;
@@ -3035,7 +2998,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 
 
 			if (debug) {
-				printf ("\t(%d,%d,%d,%d) P_PfromR energy %d\n", i,j,k,l,get_PfromR(i,j,k,l));
+				printf ("\t(%d,%d,%d,%d) P_PfromR energy %d\n", i,j,k,l,calc_PfromR(i,j,k,l));
 			}
 
 			if (i==j && k==l){
@@ -3046,7 +3009,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 
 			for(int d=k+1; d< l; d++){
 				//branch 1
-				temp=get_PfromR(i,j,d,l)+get_WP(k,d-1);
+				temp=calc_PfromR(i,j,d,l)+WP.get(k,d-1);
 				if(temp < min_energy){
 					min_energy = temp;
 					best_row=1;
@@ -3054,7 +3017,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 
 				}
 				//branch 2
-				temp=get_PfromR(i,j,k,d)+get_WP(d+1,l);
+				temp=calc_PfromR(i,j,k,d)+WP.get(d+1,l);
 				if(temp < min_energy){
 					min_energy=temp;
 					best_row=2;
@@ -3065,7 +3028,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			//branch 3
 			//Hosna, July 28, 2014
 			// I think going from PfromX to PX we are changing bands and so should be paying a band penalty
-			temp = get_PM(i,j,k,l) + gamma2(j,k)+PB_penalty;
+			temp = calc_PM(i,j,k,l) + gamma2(j,k)+PB_penalty;
 			if(temp < min_energy){
 				min_energy = temp;
 				best_row=3;
@@ -3075,7 +3038,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			// branch 4
 			//Hosna, July 28, 2014
 			// I think going from PfromX to PX we are changing bands and so should be paying a band penalty
-			temp = get_PO(i,j,k,l) + gamma2(l,i)+PB_penalty;
+			temp = calc_PO(i,j,k,l) + gamma2(l,i)+PB_penalty;
 			if(temp < min_energy){
 				min_energy = temp;
 				best_row=4;
@@ -3144,7 +3107,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			}
 
 			if (debug) {
-				printf ("\t(%d,%d,%d,%d) P_PfromM energy %d\n", i,j,k,l,get_PfromM(i,j,k,l));
+				printf ("\t(%d,%d,%d,%d) P_PfromM energy %d\n", i,j,k,l,calc_PfromM(i,j,k,l));
 			}
 
 			if (i==j && k==l){
@@ -3155,7 +3118,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 
 			for(int d=i+1; d< j; d++){
 				//branch 1
-				temp=get_PfromM(i,d,k,l)+get_WP(d+1,j);
+				temp=calc_PfromM(i,d,k,l)+WP.get(d+1,j);
 				if(temp < min_energy){
 					min_energy=temp;
 					best_row=1;
@@ -3165,7 +3128,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			}
 			for(int d=k+1; d< l; d++){
 				//branch 2
-				temp=get_PfromM(i,j,d,l)+get_WP(k,d-1);
+				temp=calc_PfromM(i,j,d,l)+WP.get(k,d-1);
 				if(temp < min_energy){
 					min_energy=temp;
 					best_row=2;
@@ -3175,7 +3138,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			// branch 3
 			//Hosna, July 28, 2014
 			// I think going from PfromX to PX we are changing bands and so should be paying a band penalty
-			temp = get_PL(i,j,k,l) + gamma2(j,i)+PB_penalty;
+			temp = calc_PL(i,j,k,l) + gamma2(j,i)+PB_penalty;
 			if(temp < min_energy){
 				min_energy = temp;
 				best_row=3;
@@ -3185,7 +3148,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			//branch 4
 			//Hosna, July 28, 2014
 			// I think going from PfromX to PX we are changing bands and so should be paying a band penalty
-			temp = get_PR(i,j,k,l) + gamma2(l,k)+PB_penalty;
+			temp = calc_PR(i,j,k,l) + gamma2(l,k)+PB_penalty;
 			if(temp < min_energy){
 				min_energy = temp;
 				best_row=4;
@@ -3197,7 +3160,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 
 			// branch 5
 			/*
-			temp = get_PO(i,j,k,l) + gamma2(l,i);
+			temp = calc_PO(i,j,k,l) + gamma2(l,i);
 			if(temp < min_energy){
 				min_energy = temp;
 				best_row=5;
@@ -3279,7 +3242,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			}
 
 			if (debug) {
-				printf ("\t(%d,%d,%d,%d) P_PfromO energy %d\n", i,j,k,l,get_PfromO(i,j,k,l));
+				printf ("\t(%d,%d,%d,%d) P_PfromO energy %d\n", i,j,k,l,calc_PfromO(i,j,k,l));
 			}
 
 			if (i==j && k==l){
@@ -3290,7 +3253,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			int kl = index[k]+l-k;
 
             for(int d=i+1; d< j; d++){
-                temp=get_PfromO(d,j,k,l)+get_WP(i,d-1);
+                temp=calc_PfromO(d,j,k,l)+WP.get(i,d-1);
                 if(temp < min_energy){
                     min_energy=temp;
                     best_row = 1;
@@ -3298,7 +3261,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
                 }
             }
             for(int d=k+1; d<l; d++){
-                temp=get_PfromO(i,j,k,d)+get_WP(d+1,l);
+                temp=calc_PfromO(i,j,k,d)+WP.get(d+1,l);
                 if(temp < min_energy){
                     min_energy=temp;
                     best_row = 2;
@@ -3308,7 +3271,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 
             //Hosna, July 28, 2014
             // I think going from PfromX to PX we are changing bands and so should be paying a band penalty
-            temp = get_PL(i,j,k,l) + gamma2(j,i) + PB_penalty;
+            temp = calc_PL(i,j,k,l) + gamma2(j,i) + PB_penalty;
             if(temp < min_energy){
                 min_energy = temp;
                 best_row = 3;
@@ -3316,7 +3279,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 
             //Hosna, July 28, 2014
             // I think going from PfromX to PX we are changing bands and so should be paying a band penalty
-            temp = get_PR(i,j,k,l) + gamma2(l,k)+PB_penalty;
+            temp = calc_PR(i,j,k,l) + gamma2(l,k)+PB_penalty;
             if(temp < min_energy){
                 min_energy = temp;
                 best_row = 4;
@@ -3403,7 +3366,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			}
 
 			if (debug) {
-				printf ("\t(%d,%d,%d,%d) P_PLiloop energy %d\n", i,j,k,l,get_PLiloop(i,j,k,l));
+				printf ("\t(%d,%d,%d,%d) P_PLiloop energy %d\n", i,j,k,l,calc_PLiloop(i,j,k,l));
 			}
 
 
@@ -3418,14 +3381,14 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
                 printf("pair P_PLiloop(%d,%d)\n",i,j);
 
 
-			min_energy = get_PL(i+1,j-1,k,l)+get_e_stP(i,j);
+			min_energy = calc_PL(i+1,j-1,k,l)+calc_e_stP(i,j);
 			best_row = 1;
 
             int branch2 = INF;
             for(int d= i+1; d<MIN(j,i+MAXLOOP); d++){
         //        for (int dp=d+TURN; dp <MIN(j,d+TURN+MAXLOOP); dp++) {
                 for(int dp = j-1; dp > MAX(d+TURN,j-MAXLOOP); dp--){
-                    branch2 = get_e_intP(i,d,dp,j) + get_PL(d,dp,k,l);
+                    branch2 = calc_e_intP(i,d,dp,j) + calc_PL(d,dp,k,l);
                     if(branch2 < min_energy){
                         min_energy = branch2;
                         best_d = d;
@@ -3479,7 +3442,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			}
 
 			if (debug) {
-				printf ("\t(%d,%d,%d,%d) P_PLmloop energy %d\n", i,j,k,l,get_PLmloop(i,j,k,l));
+				printf ("\t(%d,%d,%d,%d) P_PLmloop energy %d\n", i,j,k,l,calc_PLmloop(i,j,k,l));
 			}
 
 			// Hosna, Feb 25, 2014
@@ -3490,7 +3453,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			if (f_pair_debug || debug)
                 printf("pair P_PLmloop(%d,%d)\n",i,j);
 
-            int min_energy = get_PLmloop1(i+1,j-1,k,l)+ ap_penalty + beta2P(j,i);
+            int min_energy = PLmloop1.get(i+1,j-1,k,l)+ ap_penalty + beta2P(j,i);
 
             insert_node(i+1,l,j-1,k,P_PLmloop1);
 
@@ -3518,21 +3481,21 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			}
 
 			if (debug) {
-				printf ("\t(%d,%d,%d,%d) P_PLmloop10 energy %d\n", i,j,k,l,get_PLmloop0(i,j,k,l));
+				printf ("\t(%d,%d,%d,%d) P_PLmloop10 energy %d\n", i,j,k,l,PLmloop0.get(i,j,k,l));
 			}
 
             int kl = index[k]+l-k;
             int min_energy = INF, best_row = -1, best_d = -1, temp = INF;
 
             for(int d = i+1; d <= j; d++){
-                int temp = get_WBP(i,d-1) + get_PLmloop0(d,j,k,l);
+                int temp = WBP.get(i,d-1) + PLmloop0.get(d,j,k,l);
                 if (temp < min_energy){
                     min_energy = temp;
                     best_row = 1;
                     best_d = d;
                 }
                 if(d<j){
-                    temp = get_PLmloop0(i,d,k,l) + get_WBP(d+1,j);
+                    temp = PLmloop0.get(i,d,k,l) + WBP.get(d+1,j);
                     if (temp < min_energy){
                         min_energy = temp;
                         best_row = 2;
@@ -3586,19 +3549,19 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			}
 
 			if (debug) {
-				printf ("\t(%d,%d,%d,%d) P_PLmloop0 energy %d\n", i,j,k,l,get_PLmloop0(i,j,k,l));
+				printf ("\t(%d,%d,%d,%d) P_PLmloop0 energy %d\n", i,j,k,l,PLmloop0.get(i,j,k,l));
 			}
 
-            int min_energy = get_PL(i,j,k,l)+beta2P(j,i);
+            int min_energy = calc_PL(i,j,k,l)+beta2P(j,i);
             int best_row = 1, best_d = -1, temp = INF;
             int kl = index[k]+l-k;
 
-            min_energy = get_PL(i,j,k,l)+beta2P(j,i);
+            min_energy = calc_PL(i,j,k,l)+beta2P(j,i);
             best_row = 1;
 
             for(int d = i; d<=j; d++){
                 if (d>i){
-                    temp=get_WB(i,d-1)+get_PLmloop0(d,j,k,l);
+                    temp=WB.get(i,d-1)+PLmloop0.get(d,j,k,l);
                     if (temp < min_energy){
                         min_energy = temp;
                         best_row = 2;
@@ -3607,7 +3570,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 
                 }
                 if(d<j){
-                    temp=get_PLmloop0(i,d,k,l)+get_WB(d+1,j);
+                    temp=PLmloop0.get(i,d,k,l)+WB.get(d+1,j);
                     if (temp < min_energy){
                         min_energy = temp;
                         best_row = 3;
@@ -3668,7 +3631,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			}
 
 			if (debug) {
-				printf ("\t(%d,%d,%d,%d) P_PRiloop energy %d\n", i,j,k,l,get_PRiloop(i,j,k,l));
+				printf ("\t(%d,%d,%d,%d) P_PRiloop energy %d\n", i,j,k,l,calc_PRiloop(i,j,k,l));
 			}
 
 			// Hosna, Feb 25, 2014
@@ -3679,13 +3642,13 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			if (f_pair_debug || debug)
                 printf("pair P_PRiloop(%d,%d)\n",k,l);
 
-            int min_energy = get_PR(i,j,k+1,l-1)+get_e_stP(k,l);
+            int min_energy = calc_PR(i,j,k+1,l-1)+calc_e_stP(k,l);
             int best_row = 1, best_d = -1, best_dp = -1;
             int branch2 = INF;
             for(int d= k+1; d<MIN(l,k+MAXLOOP); d++){
             //        for (int dp=d+TURN; dp <MIN(l,d+TURN+MAXLOOP); dp++) {
                 for(int dp=l-1; dp > MAX(d+TURN,l-MAXLOOP); dp--){
-                    branch2 = get_e_intP(k,d,dp,l) + get_PR(i,j,d,dp);
+                    branch2 = calc_e_intP(k,d,dp,l) + calc_PR(i,j,d,dp);
                     if(branch2 < min_energy){
                         min_energy = branch2;
                         best_d = d;
@@ -3739,7 +3702,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			}
 
 			if (debug) {
-				printf ("\t(%d,%d,%d,%d) P_PRmloop energy %d\n", i,j,k,l,get_PRmloop(i,j,k,l));
+				printf ("\t(%d,%d,%d,%d) P_PRmloop energy %d\n", i,j,k,l,calc_PRmloop(i,j,k,l));
 			}
 
 			// Hosna, Feb 25, 2014
@@ -3751,7 +3714,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
                 printf("pair P_PRmloop(%d,%d)\n",k,l);
 
                         int temp=INF, best_d=-1;
-			int min_energy = get_PRmloop1(i,j,k+1,l-1) + ap_penalty + beta2P(l,k);
+			int min_energy = PRmloop1.get(i,j,k+1,l-1) + ap_penalty + beta2P(l,k);
 
                         if (node_debug || debug){
                             printf("PRmloop(%d,%d,%d,%d)(1): Pushing PRmloop1(%d,%d,%d,%d) e:%d\n",i,j,k,l, i,j,k+1,l-1, min_energy);
@@ -3782,14 +3745,14 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			}
 
 			if (debug) {
-				printf ("\t(%d,%d,%d,%d) P_PRmloop1 energy %d\n", i,j,k,l,get_PRmloop1(i,j,k,l));
+				printf ("\t(%d,%d,%d,%d) P_PRmloop1 energy %d\n", i,j,k,l,PRmloop1.get(i,j,k,l));
 			}
 
             int min_energy = INF, best_row = -1, best_d = -1;
 
             // case 1G21
             for(int d = k+1; d <= l; d++){
-                int temp = get_WBP(k,d-1) + get_PRmloop0(i,j,d,l);
+                int temp = WBP.get(k,d-1) + PRmloop0.get(i,j,d,l);
                 if (temp < min_energy){
                     min_energy = temp;
                     best_row = 1;
@@ -3799,7 +3762,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 
             // case 1G12
             for(int d = k+1; d <= l; d++){
-                int temp = get_WBP(d,l) + get_PRmloop0(i,j,k,d-1);
+                int temp = WBP.get(d,l) + PRmloop0.get(i,j,k,d-1);
                 if (temp < min_energy){
                     min_energy = temp;
                     best_row = 2;
@@ -3853,16 +3816,16 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			}
 
 			if (debug) {
-				printf ("\t(%d,%d,%d,%d) P_PRmloop01 energy %d\n", i,j,k,l,get_PRmloop0(i,j,k,l));
+				printf ("\t(%d,%d,%d,%d) P_PRmloop01 energy %d\n", i,j,k,l,PRmloop0.get(i,j,k,l));
 			}
 
 			int min_energy = INF,temp=INF,best_d=-1;
-            min_energy = get_PRmloop0(i,j,k,l-1);
+            min_energy = PRmloop0.get(i,j,k,l-1);
             int best_row = 1;
 
             // case 1G21
             for(int d = k+1; d <= l; d++){
-                int temp = get_WBP(k,d-1) + get_PRmloop0(i,j,d,l);
+                int temp = WBP.get(k,d-1) + PRmloop0.get(i,j,d,l);
                 if (temp < min_energy){
                     min_energy = temp;
                     best_row = 1;
@@ -3872,7 +3835,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 
             // case 1G12
             for(int d = k+1; d <= l; d++){
-                int temp = get_WBP(d,l) + get_PRmloop0(i,j,k,d-1);
+                int temp = WBP.get(d,l) + PRmloop0.get(i,j,k,d-1);
                 if (temp < min_energy){
                     min_energy = temp;
                     best_row = 2;
@@ -3926,7 +3889,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			}
 
 			if (debug) {
-				printf ("\t(%d,%d,%d,%d) P_PMiloop energy %d\n", i,j,k,l,get_PMiloop(i,j,k,l));
+				printf ("\t(%d,%d,%d,%d) P_PMiloop energy %d\n", i,j,k,l,calc_PMiloop(i,j,k,l));
 			}
 
 			// Hosna, Feb 25, 2014
@@ -3937,12 +3900,12 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			if (f_pair_debug || debug)
                 printf("pair P_PMiloop(%d,%d)\n",j,k);
 
-            int min_energy = get_PM(i,j-1,k+1,l)+get_e_stP(j-1,k+1);
+            int min_energy = calc_PM(i,j-1,k+1,l)+calc_e_stP(j-1,k+1);
             int best_row = 1, best_d = -1, best_dp = -1;
             int branch2 = INF;
             for(int d= j-1; d>MAX(i,j-MAXLOOP); d--){
                 for (int dp=k+1; dp <MIN(l,k+MAXLOOP); dp++) {
-                    branch2 = get_e_intP(d,j,k,dp) + get_PM(i,d,dp,l);
+                    branch2 = calc_e_intP(d,j,k,dp) + calc_PM(i,d,dp,l);
 
                     if(branch2 < min_energy){
                         min_energy = branch2;
@@ -3997,7 +3960,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			}
 
 			if (debug) {
-				printf ("\t(%d,%d,%d,%d) P_PMmloop energy %d\n", i,j,k,l,get_PMmloop(i,j,k,l));
+				printf ("\t(%d,%d,%d,%d) P_PMmloop energy %d\n", i,j,k,l,calc_PMmloop(i,j,k,l));
 			}
 
 			// Hosna, Feb 25, 2014
@@ -4008,7 +3971,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			if (f_pair_debug || debug)
                 printf("pair P_PMmloop(%d,%d)\n",j,k);
 
-            int min_energy = get_PMmloop1(i,j-1,k+1,l)+ap_penalty+beta2P(j,k);
+            int min_energy = PMmloop1.get(i,j-1,k+1,l)+ap_penalty+beta2P(j,k);
 
             if (node_debug || debug){
                 printf("PMmloop(%d,%d,%d,%d)(1): Pushing PMmloop10(%d,%d,%d,%d) e:%d\n",i,j,k,l,i,j-1,k+1,l, min_energy);
@@ -4038,14 +4001,14 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			}
 
 			if (debug) {
-				printf ("\t(%d,%d,%d,%d) P_PMmloop0 energy %d\n", i,j,k,l,get_PMmloop0(i,j,k,l));
+				printf ("\t(%d,%d,%d,%d) P_PMmloop0 energy %d\n", i,j,k,l,PMmloop0.get(i,j,k,l));
 			}
 
 			int min_energy = INF,temp=INF,best_d=-1, best_row;
 
                         //case 1G21
                         for(int d=k; d<l; d++){
-                            int temp = get_PMmloop0(i,j,d+1,l) + get_WBP(k,d);
+                            int temp = PMmloop0.get(i,j,d+1,l) + WBP.get(k,d);
                             if (temp < min_energy){
                                 min_energy = temp;
                                 best_row = 1;
@@ -4055,7 +4018,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 
                         //case 12G1
                         for(int d = i+1; d < j; d++){
-                            int temp = get_PMmloop0(i,d-1,k,l) + get_WBP(d,j);
+                            int temp = PMmloop0.get(i,d-1,k,l) + WBP.get(d,j);
                             if (temp < min_energy){
                                 min_energy = temp;
                                 best_row = 2;
@@ -4110,14 +4073,14 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			}
 
 			if (debug) {
-				printf ("\t(%d,%d,%d,%d) P_PMmloop0 energy %d\n", i,j,k,l,get_PMmloop0(i,j,k,l));
+				printf ("\t(%d,%d,%d,%d) P_PMmloop0 energy %d\n", i,j,k,l,PMmloop0.get(i,j,k,l));
 			}
 
-			int min_energy = get_PM(i,j,k,l)+beta2P(j,k);
+			int min_energy = calc_PM(i,j,k,l)+beta2P(j,k);
 			int best_row = 1, best_d = -1, temp = INF;
 
             for(int d=i; d<j; d++){
-                temp=get_WB(d+1,j)+get_PMmloop0(i,d,k,l);
+                temp=WB.get(d+1,j)+PMmloop0.get(i,d,k,l);
                 if (temp < min_energy){
                     min_energy = temp;
                     best_row = 2;
@@ -4125,7 +4088,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
                 }
             }
             for(int d=k+1; d<=l; d++){
-                temp=get_PMmloop0(i,j,d,l)+get_WB(k,d-1);
+                temp=PMmloop0.get(i,j,d,l)+WB.get(k,d-1);
                 if (temp < min_energy){
                     min_energy = temp;
                     best_row = 3;
@@ -4190,7 +4153,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			}
 
 			if (debug) {
-				printf ("\t(%d,%d,%d,%d) P_POiloop energy %d\n", i,j,k,l,get_POiloop(i,j,k,l));
+				printf ("\t(%d,%d,%d,%d) P_POiloop energy %d\n", i,j,k,l,calc_POiloop(i,j,k,l));
 			}
 
 			// Hosna, Feb 25, 2014
@@ -4202,11 +4165,11 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
                 printf("pair P_POiloop(%d,%d)\n",i,l);
 
 
-			int min_energy = get_PO(i+1,j,k,l-1)+get_e_stP(i,l);
+			int min_energy = calc_PO(i+1,j,k,l-1)+calc_e_stP(i,l);
             int best_row = 1, best_d = -1, best_dp = -1;
             for(int d= i+1; d<MIN(j,i+MAXLOOP); d++){
                 for (int dp=l-1; dp >MAX(l-MAXLOOP,k); dp--) {
-                    int branch2 = get_e_intP(i,d,dp,l) + get_PO(d,j,dp,k);
+                    int branch2 = calc_e_intP(i,d,dp,l) + calc_PO(d,j,dp,k);
 
                     if(branch2 < min_energy){
                         min_energy = branch2;
@@ -4263,7 +4226,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			}
 
 			if (debug) {
-				printf ("\t(%d,%d,%d,%d) P_POmloop energy %d\n", i,j,k,l,get_POmloop(i,j,k,l));
+				printf ("\t(%d,%d,%d,%d) P_POmloop energy %d\n", i,j,k,l,calc_POmloop(i,j,k,l));
 			}
 
 			// Hosna, Feb 25, 2014
@@ -4274,7 +4237,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			if (f_pair_debug || debug)
                 printf("pair P_POmloop(%d,%d)\n",i,l);
 
-            int min_energy = get_POmloop1(i+1,j,k,l-1) + ap_penalty + beta2P(l,i);
+            int min_energy = POmloop1.get(i+1,j,k,l-1) + ap_penalty + beta2P(l,i);
 
             if (node_debug || debug){
                 printf("POmloop(%d,%d,%d,%d)(1): Pushing POmloop1(%d,%d,%d,%d) e:%d\n",i,j,k,l,i+1,j,k,l-1, min_energy);
@@ -4304,13 +4267,13 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 			}
 
 			if (debug) {
-				printf ("\t(%d,%d,%d,%d) P_POmloop1 energy %d\n", i,j,k,l,get_POmloop1(i,j,k,l));
+				printf ("\t(%d,%d,%d,%d) P_POmloop1 energy %d\n", i,j,k,l,POmloop1.get(i,j,k,l));
 			}
 
 			int min_energy = INF, best_row = -1, best_d = -1, temp = INF;
 
             for(int d=i+1; d<=j;d++){
-                temp=get_WBP(i,d-1)+get_POmloop0(d,j,k,l);
+                temp=WBP.get(i,d-1)+POmloop0.get(d,j,k,l);
                 if (temp < min_energy){
                     min_energy = temp;
                     best_row = 1;
@@ -4319,7 +4282,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 
             }
             for(int d = k+1; d < l; d++){
-                temp = get_POmloop0(i,j,k,d) + get_WBP(d+1,l);
+                temp = POmloop0.get(i,j,k,d) + WBP.get(d+1,l);
                 if (temp < min_energy){
                     min_energy = temp;
                     best_row = 2;
@@ -4372,18 +4335,18 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
         }
 
         if (debug) {
-            printf ("\t(%d,%d,%d,%d) P_POmloop0 energy %d\n", i,j,k,l,get_POmloop0(i,j,k,l));
+            printf ("\t(%d,%d,%d,%d) P_POmloop0 energy %d\n", i,j,k,l,POmloop0.get(i,j,k,l));
         }
 
-        int min_energy = get_PO(i,j,k,l)+beta2P(l,i);
+        int min_energy = calc_PO(i,j,k,l)+beta2P(l,i);
         int best_row = 1, best_d = -1, temp = INF;
         int kl = index[k]+l-k;
 
-        min_energy = get_PO(i,j,k,l)+beta2P(l,i);
+        min_energy = calc_PO(i,j,k,l)+beta2P(l,i);
         best_row = 1;
 
         for(int d=i+1; d<=j; d++){
-            temp=get_WB(i,d-1)+get_POmloop0(d,j,k,l);
+            temp=WB.get(i,d-1)+POmloop0.get(d,j,k,l);
             if (temp < min_energy){
                 min_energy = temp;
                 best_row = 2;
@@ -4391,7 +4354,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
             }
         }
         for(int d=k; d<l; d++){
-            temp=get_POmloop0(i,j,k,d)+get_WB(d+1,l);
+            temp=POmloop0.get(i,j,k,d)+WB.get(d+1,l);
             if (temp < min_energy){
                 min_energy = temp;
                 best_row = 3;
@@ -4454,7 +4417,7 @@ void pseudo_loop::back_track_sp(minimum_fold *f, seq_interval *cur_interval)
     int i = cur_interval->i;
     int l = cur_interval->j;
     if (pl_debug) {
-        printf ("\t(%d,%d) P_P energy %d\n", i,l,get_P(i,l));
+        printf ("\t(%d,%d) P_P energy %d\n", i,l,calc_P(i,l));
     }
     if (i >= l){
         //return;
@@ -4469,14 +4432,14 @@ void pseudo_loop::back_track_sp(minimum_fold *f, seq_interval *cur_interval)
 
     recompute_slice_PK(i,l);
 
-    int min_energy = get_P(i,l);
+    int min_energy = calc_P(i,l);
 
     for (const candidate_PK c : PK_CL[l]) {
         if (c.d() < i) continue; // skip candidates outside current interval
 
         // decomposition 1212 (where 2 is candidate c)
 
-        int e1 = get_PK(i,c.d()-1,c.j()+1,c.k()-1);
+        int e1 = PK.get(i,c.d()-1,c.j()+1,c.k()-1);
         int e2 = c.w();
 
         if ( e1+e2 == min_energy ) {
@@ -4510,7 +4473,7 @@ void pseudo_loop::bt_WB(int i, int l) {
     }
 
     if (pl_debug) {
-        printf ("\t(%d,%d) P_WB energy %d\n", i,l,get_WB(i,l));
+        printf ("\t(%d,%d) P_WB energy %d\n", i,l,WB.get(i,l));
     }
 
     if (i>l){
@@ -4519,7 +4482,7 @@ void pseudo_loop::bt_WB(int i, int l) {
 
     int min_energy = INF,temp=INF,best_row = -1;
     //branch 1
-    temp = get_WBP(i,l);
+    temp = WBP.get(i,l);
     if (temp < min_energy){
         min_energy = temp;
         best_row=1;
@@ -4564,7 +4527,7 @@ void pseudo_loop::bt_WBP(int i, int l) {
     }
 
     if (pl_debug) {
-        printf ("\t(%d,%d) P_WBP energy %d\n", i,l,get_WBP(i,l));
+        printf ("\t(%d,%d) P_WBP energy %d\n", i,l,WBP.get(i,l));
     }
 
     int min_energy = INF,temp=INF,best_row = -1,best_d=-1,best_e=-1;
@@ -4575,8 +4538,8 @@ void pseudo_loop::bt_WBP(int i, int l) {
             // Hosna, August 26, 2014
             // comparing calculation of WI in HFold and WPP in CCJ, I found that
             // in HFold we add another penalty called PPS_penalty for closed regions inside a pseudoloop or multiloop that spans a band
-            //int common = get_WB(i,d-1) + beta1P*(l-e);
-            int common = get_WB(i,d-1) + beta1P*(l-e)+PPS_penalty;
+            //int common = WB.get(i,d-1) + beta1P*(l-e);
+            int common = WB.get(i,d-1) + beta1P*(l-e)+PPS_penalty;
             temp = common + V->get_energy(d,e) +beta2P(e,d);
             if (temp < min_energy){
                 min_energy = temp;
@@ -4586,7 +4549,7 @@ void pseudo_loop::bt_WBP(int i, int l) {
             }
 
             //branch 2
-            temp = common + get_P(d,e) + gamma0m;
+            temp = common + calc_P(d,e) + gamma0m;
             if (temp < min_energy){
                 min_energy = temp;
                 best_row = 2;
@@ -4629,7 +4592,7 @@ void pseudo_loop::bt_WP(int i, int l) {
     }
 
     if (pl_debug) {
-        printf ("\t(%d,%d) P_WP energy %d\n", i,l,get_WP(i,l));
+        printf ("\t(%d,%d) P_WP energy %d\n", i,l,WP.get(i,l));
     }
 
     if (i>l){
@@ -4638,7 +4601,7 @@ void pseudo_loop::bt_WP(int i, int l) {
 
     int min_energy = INF,temp=INF,best_row = -1;
     //branch 1
-    temp = get_WPP(i,l);
+    temp = WPP.get(i,l);
     if (temp < min_energy){
         min_energy = temp;
         best_row=1;
@@ -4682,7 +4645,7 @@ void pseudo_loop::bt_WPP(int i, int l) {
     }
 
     if (pl_debug) {
-        printf ("\t(%d,%d) P_WPP energy %d\n", i,l,get_WPP(i,l));
+        printf ("\t(%d,%d) P_WPP energy %d\n", i,l,WPP.get(i,l));
     }
 
     int min_energy = INF,temp=INF,best_row = -1,best_d=-1,best_e=-1;
@@ -4692,8 +4655,8 @@ void pseudo_loop::bt_WPP(int i, int l) {
             // Hosna, August 26, 2014
             // comparing calculation of WI in HFold and WPP in CCJ, I found that
             // in HFold we add another penalty called PPS_penalty for closed regions inside a pseudoloop or multiloop that spans a band
-            //int common = get_WP(i,d-1) + gamma1*(l-e);
-            int common = get_WP(i,d-1) + gamma1*(l-e)+PPS_penalty;
+            //int common = WP.get(i,d-1) + gamma1*(l-e);
+            int common = WP.get(i,d-1) + gamma1*(l-e)+PPS_penalty;
             //branch 1
             temp = V->get_energy(d,e) + gamma2(e,d) + common;
             if (temp < min_energy){
@@ -4704,7 +4667,7 @@ void pseudo_loop::bt_WPP(int i, int l) {
             }
 
             //branch 2
-            temp = get_P(d,e) + gamma0P + common;
+            temp = calc_P(d,e) + gamma0P + common;
             if (temp < min_energy){
                 min_energy = temp;
                 best_row = 2;
@@ -4766,11 +4729,11 @@ void pseudo_loop::trace_PLmloop1(int i, int j, int k, int l, int e) {
     switch (best_branch_) {
     case CASE_12G2:
         bt_WBP(i, best_d_ - 1);
-        trace_continue(best_d_, l, j, k, P_PLmloop0, get_PLmloop0(best_d_, j, k, l) );
+        trace_continue(best_d_, l, j, k, P_PLmloop0, PLmloop0.get(best_d_, j, k, l) );
         break;
     case CASE_12G1:
         bt_WBP(best_d_ + 1, j);
-        trace_continue(i, l, best_d_, k, P_PLmloop0, get_PLmloop0(i, best_d_, k, l) );
+        trace_continue(i, l, best_d_, k, P_PLmloop0, PLmloop0.get(i, best_d_, k, l) );
         break;
     default: assert(false);
     }
@@ -4790,14 +4753,14 @@ void pseudo_loop::trace_PLmloop0(int i, int j, int k, int l, int e) {
     switch (best_branch_) {
     case CASE_12G2:
         bt_WB(i, best_d_ - 1);
-        trace_continue(best_d_, l, j, k, P_PLmloop0, get_PLmloop0(best_d_, j, k, l) );
+        trace_continue(best_d_, l, j, k, P_PLmloop0, PLmloop0.get(best_d_, j, k, l) );
         break;
     case CASE_12G1:
         bt_WB(best_d_ + 1, j);
-        trace_continue(i, l, best_d_, k, P_PLmloop0, get_PLmloop0(i, best_d_, k, l) );
+        trace_continue(i, l, best_d_, k, P_PLmloop0, PLmloop0.get(i, best_d_, k, l) );
         break;
     case CASE_PL:
-        trace_continue(i, l, j, k, P_PL, get_PLmloop0(i, j, k, l) );
+        trace_continue(i, l, j, k, P_PL, PLmloop0.get(i, j, k, l) );
         break;
     default: assert(false);
     }
@@ -4834,11 +4797,11 @@ void pseudo_loop::trace_PMmloop1(int i, int j, int k, int l, int e) {
     switch (best_branch_) {
     case CASE_12G1:
         bt_WBP(best_d_ + 1, j);
-        trace_continue(i, l, best_d_, k, P_PMmloop0, get_PMmloop0(i, best_d_, k, l) );
+        trace_continue(i, l, best_d_, k, P_PMmloop0, PMmloop0.get(i, best_d_, k, l) );
         break;
     case CASE_1G21:
         bt_WBP(best_d_ + 1, j);
-        trace_continue(i, l, j, best_d_, P_PMmloop0, get_PMmloop0(i, j, best_d_, l) );
+        trace_continue(i, l, j, best_d_, P_PMmloop0, PMmloop0.get(i, j, best_d_, l) );
         break;
     default: assert(false);
     }
@@ -4859,14 +4822,14 @@ void pseudo_loop::trace_PMmloop0(int i, int j, int k, int l, int e) {
     switch (best_branch_) {
     case CASE_12G1:
         bt_WBP(best_d_ + 1, j);
-        trace_continue(i, l, best_d_, k, P_PMmloop0, get_PMmloop0(i, best_d_, k, l) );
+        trace_continue(i, l, best_d_, k, P_PMmloop0, PMmloop0.get(i, best_d_, k, l) );
         break;
     case CASE_1G21:
         bt_WBP(best_d_ + 1, j);
-        trace_continue(i, l, j, best_d_, P_PMmloop0, get_PMmloop0(i, j, best_d_, l) );
+        trace_continue(i, l, j, best_d_, P_PMmloop0, PMmloop0.get(i, j, best_d_, l) );
         break;
     case CASE_PM:
-        trace_continue(i, l, j, k, P_PM, get_PMmloop0(i, j, k, l) );
+        trace_continue(i, l, j, k, P_PM, PMmloop0.get(i, j, k, l) );
         break;
     default: assert(false);
     }
@@ -4903,11 +4866,11 @@ void pseudo_loop::trace_PRmloop1(int i, int j, int k, int l, int e) {
     switch (best_branch_) {
     case CASE_1G21:
         bt_WBP(k, best_d_ - 1);
-        trace_continue(i, l, j, best_d_, P_PRmloop0, get_PRmloop0(i, j, best_d_, l) );
+        trace_continue(i, l, j, best_d_, P_PRmloop0, PRmloop0.get(i, j, best_d_, l) );
         break;
     case CASE_1G12:
         bt_WBP(best_d_ + 1, j);
-        trace_continue(i, best_d_, j, k, P_PRmloop0, get_PRmloop0(i, j, k, best_d_) );
+        trace_continue(i, best_d_, j, k, P_PRmloop0, PRmloop0.get(i, j, k, best_d_) );
         break;
     default: assert(false);
     }
@@ -4928,14 +4891,14 @@ void pseudo_loop::trace_PRmloop0(int i, int j, int k, int l, int e) {
     switch (best_branch_) {
     case CASE_1G21:
         bt_WBP(k, best_d_ - 1);
-        trace_continue(i, l, j, best_d_, P_PRmloop0, get_PRmloop0(i, j, best_d_, l) );
+        trace_continue(i, l, j, best_d_, P_PRmloop0, PRmloop0.get(i, j, best_d_, l) );
         break;
     case CASE_1G12:
         bt_WBP(best_d_ + 1, j);
-        trace_continue(i, best_d_, j, k, P_PRmloop0, get_PRmloop0(i, j, k, best_d_) );
+        trace_continue(i, best_d_, j, k, P_PRmloop0, PRmloop0.get(i, j, k, best_d_) );
         break;
     case CASE_PR:
-        trace_continue(i, l, j, k, P_PR, get_PRmloop0(i, j, k, l) );
+        trace_continue(i, l, j, k, P_PR, PRmloop0.get(i, j, k, l) );
         break;
     default: assert(false);
     }
@@ -4971,11 +4934,11 @@ void pseudo_loop::trace_POmloop1(int i, int j, int k, int l, int e) {
     switch (best_branch_) {
     case CASE_12G2:
         bt_WBP(i, best_d_ - 1);
-        trace_continue(best_d_, l, j, k, P_POmloop0, get_POmloop0(best_d_, j, k, l) );
+        trace_continue(best_d_, l, j, k, P_POmloop0, POmloop0.get(best_d_, j, k, l) );
         break;
     case CASE_1G12:
         bt_WBP(best_d_ + 1, j);
-        trace_continue(i, best_d_, j, k, P_POmloop0, get_POmloop0(i, j, k, best_d_) );
+        trace_continue(i, best_d_, j, k, P_POmloop0, POmloop0.get(i, j, k, best_d_) );
         break;
     default: assert(false);
     }
@@ -4995,14 +4958,14 @@ void pseudo_loop::trace_POmloop0(int i, int j, int k, int l, int e) {
     switch (best_branch_) {
     case CASE_12G2:
         bt_WB(i, best_d_ - 1);
-        trace_continue(best_d_, l, j, k, P_POmloop0, get_POmloop0(best_d_, j, k, l) );
+        trace_continue(best_d_, l, j, k, P_POmloop0, POmloop0.get(best_d_, j, k, l) );
         break;
     case CASE_1G12:
         bt_WB(best_d_ + 1, j);
-        trace_continue(i, best_d_, j, k, P_POmloop0, get_POmloop0(i, j, k, best_d_) );
+        trace_continue(i, best_d_, j, k, P_POmloop0, POmloop0.get(i, j, k, best_d_) );
         break;
     case CASE_PO:
-        trace_continue(i, l, j, k, P_PO, get_POmloop0(i, j, k, l) );
+        trace_continue(i, l, j, k, P_PO, POmloop0.get(i, j, k, l) );
         break;
     default: assert(false);
     }
@@ -5253,7 +5216,7 @@ void pseudo_loop::trace_candidate(int i, int j, int k, int l, char srctype, char
     /// not always ascending
     while (c != NULL) {
         // if one recreates e, continue trace from there and end while loop
-        int total = get_WP(i, c->d-1) + c->w;
+        int total = WP.get(i, c->d-1) + c->w;
 
                         // Cannot go to the exact same matrix and location
                         //&& (srctype != tgttype || c->d != i)
@@ -5273,7 +5236,7 @@ void pseudo_loop::trace_candidate(int i, int j, int k, int l, char srctype, char
             for(int d=i+1; d<j; ++d) {
                 c = CL->find_candidate(i,d,k,l);
                 if (c != nullptr) {
-                    int total = c->w+get_WP(d+1,j);
+                    int total = c->w+WP.get(d+1,j);
                     if (total == e) {
                         bt_WP(d+1,j);
                         trace_candidate_continue(i,j,k,l, c->d,d,k,l,srctype,tgttype,c);
@@ -5288,7 +5251,7 @@ void pseudo_loop::trace_candidate(int i, int j, int k, int l, char srctype, char
             for(int d=i+1; d<j; ++d) {
                 c = CL->find_candidate(i,d,k,l);
                 if (c != nullptr) {
-                    int total = c->w+get_WP(d+1,j);
+                    int total = c->w+WP.get(d+1,j);
                     if (total == e) {
                         bt_WP(d+1,j);
                         trace_candidate_continue(i,j,k,l, c->d,d,k,l,srctype,tgttype,c);
@@ -5299,7 +5262,7 @@ void pseudo_loop::trace_candidate(int i, int j, int k, int l, char srctype, char
             for(int d=k+1; d<l; ++d) {
                 c = CL->find_candidate(i,j,d,l);
                 if (c != nullptr) {
-                    int total = c->w+get_WP(k,d-1);
+                    int total = c->w+WP.get(k,d-1);
                     if (total == e) {
                         bt_WP(k,d-1);
                         trace_candidate_continue(i,j,k,l, i,j,d,l, srctype,tgttype,c);
@@ -5315,7 +5278,7 @@ void pseudo_loop::trace_candidate(int i, int j, int k, int l, char srctype, char
             for(int d=k+1; d<=l; ++d) {
                 c = CL->find_candidate(i,j,d,l);
                 if (c != nullptr) {
-                    int total = c->w+get_WP(k,d-1);
+                    int total = c->w+WP.get(k,d-1);
                     if (total == e) {
                         bt_WP(d+1,j);
                         trace_candidate_continue(i,j,k,l, i,j,d,l,srctype,tgttype,c);
@@ -5326,7 +5289,7 @@ void pseudo_loop::trace_candidate(int i, int j, int k, int l, char srctype, char
             for(int d=k+1; d<l; ++d) {
                 c = CL->find_candidate(i,j,k,d);
                 if (c != nullptr) {
-                    int total = c->w+get_WP(d+1,l);
+                    int total = c->w+WP.get(d+1,l);
                     if (total == e) {
                         bt_WP(d+1,l);
                         trace_candidate_continue(i,j,k,l, c->d,j,k,d,srctype,tgttype,c);
@@ -5340,7 +5303,7 @@ void pseudo_loop::trace_candidate(int i, int j, int k, int l, char srctype, char
             for(int d=k+1; d<l; ++d) {
                 c = CL->find_candidate(i,j,k,d);
                 if (c != nullptr) {
-                    int total = c->w+get_WP(d+1,l);
+                    int total = c->w+WP.get(d+1,l);
                     if (total == e) {
                         bt_WP(d+1,l);
                         trace_candidate_continue(i,j,k,l, c->d,j,k,d,srctype,tgttype,c);
@@ -5355,7 +5318,7 @@ void pseudo_loop::trace_candidate(int i, int j, int k, int l, char srctype, char
             for(int d=i; d<j; ++d) {
                 c = CL->find_candidate(i,d,k,l);
                 if (c != nullptr) {
-                    int total = c->w+get_WP(d+1,j);
+                    int total = c->w+WP.get(d+1,j);
                     if (total == e) {
                         bt_WP(d+1,j);
                         trace_candidate_continue(i,j,k,l, c->d,d,k,l,srctype,tgttype,c);
@@ -5371,7 +5334,7 @@ void pseudo_loop::trace_candidate(int i, int j, int k, int l, char srctype, char
             for(int d=k; d<l; ++d) {
                 c = CL->find_candidate(i,j,k,d);
                 if (c != nullptr) {
-                    int total = c->w+get_WP(d+1,l);
+                    int total = c->w+WP.get(d+1,l);
                     if (total == e) {
                         bt_WP(d+1,l);
                         trace_candidate_continue(i,j,k,l, c->d,j,k,d,srctype,tgttype,c);
@@ -5428,11 +5391,11 @@ void pseudo_loop::trace_candidate(int i, int j, int k, int l, char srctype, char
                             // Only certain ways PK can move
                             // ensure one of the following:
                             // 1. arrow points to a new matrix type ex. PK(i,j,k,l)->PM(i,j,k,l,) (branches 3,4,5,6) - can ignore (don't point to candidates)
-                            // 2. j is lesser and k is the same ex. PK(i,j,k,l)->PK(i,d,k,l) (branch 1) - uses get_WP(c.d+1,j)
-                            // 3. j is the same and k is greater ex. PK(i,j,k,l)->PK(i,j,d,l) (branch 2) - uses get_WP(k,c.k-1)
+                            // 2. j is lesser and k is the same ex. PK(i,j,k,l)->PK(i,d,k,l) (branch 1) - uses WP.get(c.d+1,j)
+                            // 3. j is the same and k is greater ex. PK(i,j,k,l)->PK(i,j,d,l) (branch 2) - uses WP.get(k,c.k-1)
 
-            //2. j is lesser and k is the same ex. PK(i,j,k,l)->PK(i,d,k,l) (branch 1) - uses get_WP(d+1,j)
-            int total = c.w() + get_WP(c.j()+1,j);
+            //2. j is lesser and k is the same ex. PK(i,j,k,l)->PK(i,d,k,l) (branch 1) - uses WP.get(d+1,j)
+            int total = c.w() + WP.get(c.j()+1,j);
             if (total == e && (c.j() < j && c.k() == k)) {
                 if (node_debug || pl_debug) {
                     printf("candidate   ");
@@ -5446,8 +5409,8 @@ void pseudo_loop::trace_candidate(int i, int j, int k, int l, char srctype, char
                 bt_WP(c.j()+1,j);
                 return;
             } else {
-                // 3. j is the same and k is greater ex. PK(i,j,k,l)->PK(i,j,d,l) (branch 2) - uses get_WP(k,c.k-1)
-                total = c.w() + get_WP(k,c.k()-1);
+                // 3. j is the same and k is greater ex. PK(i,j,k,l)->PK(i,j,d,l) (branch 2) - uses WP.get(k,c.k-1)
+                total = c.w() + WP.get(k,c.k()-1);
 
                 if (total == e && (c.j() == j && c.k() > k))  {
                     if (node_debug || pl_debug) {
@@ -5697,7 +5660,7 @@ void pseudo_loop::set_stack_interval(seq_interval *stack_interval){
 	this->stack_interval = stack_interval;
 }
 
-void pseudo_loop::get_PK_CL_size(int &candidates, int &empty_lists) {
+void pseudo_loop::calc_PK_CL_size(int &candidates, int &empty_lists) {
     int total_length = (nb_nucleotides *(nb_nucleotides+1))/2;
     const candidate_PK *c;
 
@@ -5712,7 +5675,7 @@ void pseudo_loop::get_PK_CL_size(int &candidates, int &empty_lists) {
 
 void pseudo_loop::print_PK_CL_size() {
     int candidates = 0, empty_lists = 0;
-    get_PK_CL_size(candidates, empty_lists);
+    calc_PK_CL_size(candidates, empty_lists);
 
     printf("\nPK\n");
 
