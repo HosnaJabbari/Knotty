@@ -4,6 +4,9 @@
 #include "base.h"
 #include "simple_map.h"
 #include "h_common.h"
+#include "index4D.h"
+
+
 /**
  * @brief Trace Arrow Key Pair
  * Used in TraceArrows
@@ -419,6 +422,15 @@ public:
     register_trace_arrow(size_t i, size_t j, size_t k, size_t l,
                          size_t m, size_t n, size_t o, size_t p,
                          energy_t e, size_t srctype, size_t tgttype);
+
+    void
+    register_trace_arrow(const Index4D &src_x,
+                         const Index4D &tgt_x,
+                         energy_t e, size_t srctype, size_t tgttype) {
+        register_trace_arrow(src_x.i(),src_x.j(),src_x.k(),src_x.l(),
+                             tgt_x.i(),tgt_x.j(),tgt_x.k(),tgt_x.l(),
+                             e, srctype, tgttype);
+    }
 
      /**
      * Register trace arrow

@@ -346,16 +346,10 @@ pseudo_loop::impossible_case(int i, int l) const {
 }
 
 bool
-pseudo_loop::impossible_case(int i, int j, int k, int l) const {
+pseudo_loop::impossible_case(const Index4D &x) const {
     // Hosna, April 3, 2014
     // adding impossible cases
-    if (i<0 ||j<0 || k<0 || l<0 || i>=nb_nucleotides || j>=nb_nucleotides || k>= nb_nucleotides || l>= nb_nucleotides){
-        return true;
-    }
-    if(!(i<=j && j< k-1 && k<=l)){
-        return true;
-    }
-    return false;
+    return !x.is_valid(nb_nucleotides);
 }
 
 void pseudo_loop::compute_WBP(int i, int l){
@@ -426,23 +420,16 @@ void pseudo_loop::compute_WP(int i, int l){
 
 void pseudo_loop::compute_P_sp(int i, int l){
     int min_energy = INF, temp=INF;
-    int best_j = -1, best_d = -1, best_k = -1, best_w = INF;
 
     if (impossible_case(i,l) || i==l) {return;}
 
-    int il = index[i]+l-i;
-
     for (const candidate_PK c : PK_CL[l]) {
-        int d = c.d(), j = c.j(), k = c.k(), w = c.w();
-
-        temp = PK.get(i, d-1, j+1, k-1) + w;
+        int w = c.w();
+        Index4D x(i,c.d(),c.j(),c.k());
+        temp = PK.get(x + Index4D(0, -1, 1, -1)) + w;
 
         if (temp < min_energy) {
             min_energy = temp;
-            best_j = j;
-            best_d = d;
-            best_k = k;
-            best_w = w;
         }
     }
 
@@ -451,10 +438,7 @@ void pseudo_loop::compute_P_sp(int i, int l){
     // saves only O(n^2) TAs)
 
     if (min_energy < INF/2){
-        if (pl_debug)
-            printf ("P(%d,%d) best_d = %d best_j = %d best_k = %d energy %d\n", i, l, best_d,best_j,best_k,min_energy);
-
-        P[il]=min_energy;
+        P.set(i,l) = min_energy;
     }
 }
 
@@ -491,7 +475,7 @@ void pseudo_loop::compute_PK(int i, int j, int k, int l){
     int min_energy = INF, temp = INF;
     int best_branch = 0;
 
-    if (impossible_case(i,j,k,l)) {return;}
+    if (impossible_case(Index4D(i,j,k,l))) {return;}
 
     int best_f = -1, best_b = -1, best_d = -1;
 
@@ -630,13 +614,13 @@ void pseudo_loop::compute_PK(int i, int j, int k, int l){
     }
 }
 
-void pseudo_loop::recompute_slice_PK(int i, int max_l) {
+void pseudo_loop::recompute_slice_PK(int i, int max_j, int min_k, int max_l) {
     // recomputes slice at i for ikl < max_l
 
     // initialize PK entries
-    for (int l=i+1; l<=max_l; l++) {
-        for (int j=i; j<l; j++) {
-            for (int k=j; k<l; k++) {
+    for (int l=min_k+1; l<=max_l; l++) {
+        for (int j=i; j<=max_j; j++) {
+            for (int k = std::max(min_k, j + 2); k < l; k++) {
                 PK.set(i,j,k,l) = INF+1;
             }
         }
@@ -646,17 +630,18 @@ void pseudo_loop::recompute_slice_PK(int i, int max_l) {
     for (int l=i+1; l<=max_l; l++) {
         for (const candidate_PK c : PK_CL[l]){
             int d=c.d();
-            if (d != i) continue;
             int j=c.j();
             int k=c.k();
+            if (d != i || j>max_j || k<min_k || l>max_l)
+                continue;
             assert(c.w() < INF/2);
             PK.set(i, j, k, l) = c.w();
         }
     }
 
     for (int l=i+1; l<=max_l; l++) {
-        for (int j=i; j<l; j++) {
-            for (int k=l; k>j; k--) {
+        for (int j=i; j<l && j<=max_j ; j++) {
+            for (int k=l; k>=min_k && k>j; k--) {
                 if (PK.get(i, j, k, l) >= INF/2) { // no init by candidate
                     int kl = index[k]+l-k;
 
@@ -667,7 +652,7 @@ void pseudo_loop::recompute_slice_PK(int i, int max_l) {
                         min_energy = std::min(min_energy, PK.get(i,d,k,l) + WP.get(d+1,j));  // 12G1
                     }
                     for(int d=k+1; d < l; d++) {
-                        min_energy = std::min(min_energy, PK.get(i,j,d,l) + WP.get(k,d-1));  //1G21
+                        min_energy = std::min(min_energy, PK.get(i,j,d,l) + WP.get(k,d-1));  // 1G21
                     }
 
                     PK.setI(i, j, k, l, min_energy);
@@ -884,12 +869,12 @@ void pseudo_loop::recompute_slice_POmloop1(int i, int max_j, int min_k, int max_
 }
 
 int
-pseudo_loop::generic_compute_PX(int i, int j, int k, int l, int type) {
+pseudo_loop::generic_compute_PX(int i, int j, int k, int l, matrix_type_t type) {
 
     int min_energy = INF, temp;
     best_branch_=-1;
 
-    if (impossible_case(i,j,k,l)) {return INF;}
+    if (impossible_case(Index4D(i,j,k,l))) {return INF;}
 
     // cases Xiloop
     switch(type) {
@@ -1381,7 +1366,7 @@ pseudo_loop::trace_PO(int i, int j, int k, int l, int e) {
 void
 pseudo_loop::compute_PfromL(int i, int j, int k, int l) {
 
-    if (impossible_case(i,j,k,l)) {return;}
+    if (impossible_case(Index4D(i,j,k,l))) {return;}
 
     int min_energy = generic_decomposition(i, j, k, l,
                                            CASE_L,
@@ -1464,7 +1449,7 @@ pseudo_loop::compute_PfromL(int i, int j, int k, int l) {
 
 void pseudo_loop::compute_PfromR(int i, int j, int k, int l){
 
-    if (impossible_case(i,j,k,l)) {return;}
+    if (impossible_case(Index4D(i,j,k,l))) {return;}
 
     int min_energy = generic_decomposition(i, j, k, l,
                                            CASE_R,
@@ -1528,7 +1513,7 @@ void pseudo_loop::compute_PfromR(int i, int j, int k, int l){
 
 void pseudo_loop::compute_PfromM(int i, int j, int k, int l){
 
-    if (impossible_case(i,j,k,l)) {return;}
+    if (impossible_case(Index4D(i,j,k,l))) {return;}
 
     int min_energy = generic_decomposition(i, j, k, l,
                                            CASE_M,
@@ -1600,7 +1585,7 @@ void pseudo_loop::compute_PfromM(int i, int j, int k, int l){
 
 void pseudo_loop::compute_PfromO(int i, int j, int k, int l){
 
-    if (impossible_case(i,j,k,l)) {return;}
+    if (impossible_case(Index4D(i,j,k,l))) {return;}
 
     int min_energy = generic_decomposition(i, j, k, l,
                                            CASE_O,
@@ -1679,7 +1664,7 @@ void pseudo_loop::compute_PfromO(int i, int j, int k, int l){
 void pseudo_loop::compute_PLmloop1(int i, int j, int k, int l){
     best_branch_ = -1, best_d_ = -1;
 
-    if (impossible_case(i,j,k,l)) {return;}
+    if (impossible_case(Index4D(i,j,k,l))) {return;}
 
     int min_energy = generic_decomposition(i, j, k, l, CASE_L, PLmloop0_CL,
                                            WBP, PLmloop0);
@@ -1691,7 +1676,7 @@ void pseudo_loop::compute_PLmloop1(int i, int j, int k, int l){
 
 void pseudo_loop::compute_PLmloop0(int i, int j, int k, int l){
 
-    if (impossible_case(i,j,k,l)) {return;}
+    if (impossible_case(Index4D(i,j,k,l))) {return;}
 
     int min_energy = generic_decomposition(i, j, k, l, CASE_L, PLmloop0_CL, WB,
                                            PLmloop0, 1, beta2P);
@@ -1718,7 +1703,7 @@ void pseudo_loop::compute_PLmloop0(int i, int j, int k, int l){
 }
 
 void pseudo_loop::compute_PRmloop1(int i, int j, int k, int l){
-    if (impossible_case(i,j,k,l)) {return;}
+    if (impossible_case(Index4D(i,j,k,l))) {return;}
 
     int min_energy =
         generic_decomposition(i, j, k, l, CASE_R, PRmloop0_CL, WBP, PRmloop0);
@@ -1740,7 +1725,7 @@ void pseudo_loop::compute_PRmloop1(int i, int j, int k, int l){
 }
 
 void pseudo_loop::compute_PRmloop0(int i, int j, int k, int l){
-    if (impossible_case(i,j,k,l)) {return;}
+    if (impossible_case(Index4D(i,j,k,l))) {return;}
 
     int min_energy = generic_decomposition(i, j, k, l, CASE_R, PRmloop0_CL, WB,
                                            PRmloop0, CASE_PR, beta2P);
@@ -1766,7 +1751,7 @@ void pseudo_loop::compute_PRmloop0(int i, int j, int k, int l){
 }
 
 void pseudo_loop::compute_PMmloop1(int i, int j, int k, int l){
-    if (impossible_case(i,j,k,l)) {return;}
+    if (impossible_case(Index4D(i,j,k,l))) {return;}
 
     int min_energy =
         generic_decomposition(i, j, k, l, CASE_M, PMmloop0_CL, WBP, PMmloop0);
@@ -1779,7 +1764,7 @@ void pseudo_loop::compute_PMmloop1(int i, int j, int k, int l){
 }
 
 void pseudo_loop::compute_PMmloop0(int i, int j, int k, int l){
-    if (impossible_case(i,j,k,l)) {return;}
+    if (impossible_case(Index4D(i,j,k,l))) {return;}
 
     int min_energy = generic_decomposition(i, j, k, l, CASE_M, PMmloop0_CL, WB,
                                            PMmloop0, CASE_PM, beta2P);
@@ -1809,7 +1794,7 @@ void pseudo_loop::compute_PMmloop0(int i, int j, int k, int l){
 void pseudo_loop::compute_POmloop1(int i, int j, int k, int l){
     best_branch_ = -1, best_d_ = -1;
 
-    if (impossible_case(i,j,k,l)) {return;}
+    if (impossible_case(Index4D(i,j,k,l))) {return;}
 
     int min_energy = generic_decomposition(i, j, k, l, CASE_O, POmloop0_CL,
                                            WBP, POmloop0);
@@ -1824,7 +1809,7 @@ void pseudo_loop::compute_POmloop1(int i, int j, int k, int l){
 
 void pseudo_loop::compute_POmloop0(int i, int j, int k, int l){
 
-    if (impossible_case(i,j,k,l)) {return;}
+    if (impossible_case(Index4D(i,j,k,l))) {return;}
 
     int min_energy = generic_decomposition(i, j, k, l, CASE_O, POmloop0_CL, WB,
                                            POmloop0, CASE_PO, beta2P);
@@ -4430,7 +4415,7 @@ void pseudo_loop::back_track_sp(minimum_fold *f, seq_interval *cur_interval)
     // --------------------------------------------------
     // trace back in P
 
-    recompute_slice_PK(i,l);
+    recompute_slice_PK(i,l,i,l);
 
     int min_energy = calc_P(i,l);
 
@@ -4456,11 +4441,8 @@ void pseudo_loop::back_track_sp(minimum_fold *f, seq_interval *cur_interval)
         }
     }
 
-    // std::cerr << std::distance(PK_CL[l].begin(),PK_CL[l].end()) << std::endl;
-
     // SW - this should never be reached
     printf("!!!!!!There's something wrong! P(%d,%d)=%d not reconstructed.\n",i,l,min_energy);   assert(false/*trace: fail from P*/);
-
 }
 
 void pseudo_loop::bt_WB(int i, int l) {
@@ -4974,6 +4956,7 @@ void pseudo_loop::trace_POmloop0(int i, int j, int k, int l, int e) {
 
 void pseudo_loop::trace_continue(int i, int j, int k, int l, char srctype, energy_t e)
 {
+    printf("trace_continue(%d,%d,%d,%d,%c,%d)\n",i,j,k,l,srctype,e);
     assert (i<=j && j<=k && k<=l);
 
     TraceArrows *src_ta = nullptr;

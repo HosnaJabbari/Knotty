@@ -4,6 +4,7 @@
 #include "simple_map.h"
 #include "h_struct.h"
 #include "h_common.h"
+#include "index4D.h"
 
 //#include <memory>
 
@@ -202,11 +203,19 @@ public:
      */
     const candidate* find_candidate(int i, int j, int k, int l) const;
 
+    const candidate* find_candidate(const Index4D &x) const {
+        find_candidate(x.i(),x.j(),x.k(),x.l());
+    }
+
     /**
     *  @returns whether there is a candidate at location (i,j,k,l)
     */
     const bool is_candidate(int i, int j, int k, int l) const {
         return (find_candidate(i,j,k,l) != NULL);
+    }
+
+    const bool is_candidate(const Index4D &x) const {
+        return (find_candidate(x) != NULL);
     }
 
     /** @brief if container capacity is too much larger than actual size, reallocates to make smaller

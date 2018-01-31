@@ -10,6 +10,7 @@
 #include "trace_arrow.h"
 #include "candidate_list.h"
 
+#include "index4D.h"
 #include "matrices.h"
 
 
@@ -55,11 +56,35 @@ public:
     // in order to be able to check the border values consistantly
     // I am adding these get functions
 
+    int calc_PX(const Index4D &x, matrix_type_t type);
+
     int calc_P(int i, int j);
     int calc_PL(int i,int j, int k, int l);
+    int calc_PL(const Index4D &x) {
+        return calc_PL(x.i(),x.j(),x.k(),x.l());
+    };
+
     int calc_PR(int i,int j, int k, int l);
+    int calc_PR(const Index4D &x) {
+        return calc_PR(x.i(),x.j(),x.k(),x.l());
+    };
+
     int calc_PM(int i,int j, int k, int l);
+    int calc_PM(const Index4D &x) {
+        return calc_PL(x.i(),x.j(),x.k(),x.l());
+    };
+
     int calc_PO(int i,int j, int k, int l);
+    int calc_PO(const Index4D &x) {
+        return calc_PL(x.i(),x.j(),x.k(),x.l());
+    };
+
+    int
+    calc_PfromX(const Index4D &x, matrix_type_t type);
+
+    template<class Penalty>
+    int
+    penalty(const Index4D &x, Penalty p, matrix_type_t type);
 
     int calc_PfromL(int i, int j, int k, int l);
     int calc_PfromR(int i, int j, int k, int l);
@@ -75,6 +100,11 @@ public:
     // the methods get_P?iloop return the best energy of the iloop case
     // and set best_d_ and best_dp_ to the inner base pair ends
     // on success (i.e. if returned energy <INF/2)
+
+    int
+    calc_PXiloop(const Index4D &x, matrix_type_t type);
+    int
+    calc_PXmloop(const Index4D &x, matrix_type_t type);
 
     int calc_PLiloop(int i,int j, int k, int l);
     //int calc_PLiloop5(int i,int j, int k, int l,int s);
@@ -326,7 +356,7 @@ private:
 
     bool impossible_case(int i, int l) const;
 
-    bool impossible_case(int i, int j, int k, int l) const;
+    bool impossible_case(const Index4D &x) const;
 
     // output parameters of generic_decomposition function
     // and recompute PL functions
@@ -378,7 +408,8 @@ private:
 
     //! @brief generic computation of PL/M/R/O functions
     int
-    generic_compute_PX(int i, int j, int k, int l, int type);
+    generic_compute_PX(int i, int j, int k, int l, matrix_type_t type);
+
 
     //void compute_WM(int i, int j); // in base pair maximization, there is no difference between the two
     //void compute_WMP(int i, int l);
@@ -414,8 +445,7 @@ private:
 
     // recompute all PK entries i,j,k,l for fixed i and all j,k,l: i<=j<k<=max_l
     // fill matrix slice at i, copy candidate energies, recompute non-candidates
-    void recompute_slice_PK(int i, int max_l);
-
+    void recompute_slice_PK(int i, int max_j, int min_k, int max_l);
 
     void
     generic_recompute_slice_mloop0(int i, int max_j, int min_k, int max_l,
