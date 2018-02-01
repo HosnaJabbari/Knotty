@@ -253,6 +253,11 @@ public:
             return nullptr;
     }
 
+    const TraceArrow *
+    trace_arrow_from(const Index4D &x) const {
+        return trace_arrow_from(x.i(), x.j(), x.k(), x.l());
+    }
+
     /**
      * Get target of trace arrow by source (non-const)
      *
@@ -378,13 +383,6 @@ public:
     // A seperate TraceArrows for each matrix source type
     // Explanation in comments by ta_replace in TraceArrows
     // PLiloop -> PL  PRiloop -> PR  PMiloop -> PM  POiloop -> PO
-
-    TraceArrows PK;
-
-    TraceArrows PfromL;
-    TraceArrows PfromR;
-    TraceArrows PfromM;
-    TraceArrows PfromO;
 
     TraceArrows PL;
     TraceArrows PR;

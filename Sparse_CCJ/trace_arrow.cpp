@@ -354,13 +354,6 @@ MasterTraceArrows::gc_to_target(size_t i, size_t j, size_t k, size_t l, TraceArr
 MasterTraceArrows::MasterTraceArrows(size_t n)
     : n_(n),
 
-    PK(n,P_PK),
-
-    PfromL(n,P_PfromL),
-    PfromR(n,P_PfromR),
-    PfromM(n,P_PfromM),
-    PfromO(n,P_PfromO),
-
     PL(n,P_PL),
     PR(n,P_PR),
     PM(n,P_PM),
@@ -372,13 +365,6 @@ MasterTraceArrows::MasterTraceArrows(size_t n)
 void
 MasterTraceArrows::garbage_collect(size_t i) {
     //printf("MasterTraceArrows::garbage_collect(%d)\n",i);
-    gc_row(i, PK);
-
-    gc_row(i, PfromL);
-    gc_row(i, PfromR);
-    gc_row(i, PfromM);
-    gc_row(i, PfromO);
-
     gc_row(i, PL);
     gc_row(i, PR);
     gc_row(i, PM);
@@ -388,13 +374,6 @@ MasterTraceArrows::garbage_collect(size_t i) {
 void
 MasterTraceArrows::resize(size_t n) {
     int total_length = (n *(n+1))/2;
-
-    PK.resize(n);
-
-    PfromL.resize(n);
-    PfromR.resize(n);
-    PfromM.resize(n);
-    PfromO.resize(n);
 
     PL.resize(n);
     PR.resize(n);
@@ -406,13 +385,6 @@ MasterTraceArrows::resize(size_t n) {
 void
 MasterTraceArrows::set_index(const int *index){
     index_ = index;
-
-    PK.set_index(index);
-
-    PfromL.set_index(index);
-    PfromR.set_index(index);
-    PfromM.set_index(index);
-    PfromO.set_index(index);
 
     PL.set_index(index);
     PR.set_index(index);
@@ -427,13 +399,6 @@ TraceArrows*
 MasterTraceArrows::get_arrows_by_type(char type) {
     TraceArrows *target = nullptr;
     switch(type) {
-        case P_PK: target = &PK; break;
-
-        case P_PfromL: target = &PfromL; break;
-        case P_PfromR: target = &PfromR; break;
-        case P_PfromM: target = &PfromM; break;
-        case P_PfromO: target = &PfromO; break;
-
         case P_PL: target = &PL; break;
         case P_PR: target = &PR; break;
         case P_PM: target = &PM; break;
@@ -447,13 +412,6 @@ MasterTraceArrows::get_arrows_by_type(char type) {
 
 void
 MasterTraceArrows::compactify() {
-    PK.compactify();
-
-    PfromL.compactify();
-    PfromR.compactify();
-    PfromM.compactify();
-    PfromO.compactify();
-
     PL.compactify();
     PR.compactify();
     PM.compactify();
@@ -462,23 +420,21 @@ MasterTraceArrows::compactify() {
 
 void
 MasterTraceArrows::print_ta_sizes(){
-    unsigned long long size = PK.size() + PfromL.size() + PfromM.size() + PfromO.size() + PfromR.size()
-    + PL.size() + PR.size() + PM.size() + PO.size();
+    unsigned long long size = PL.size() + PR.size() + PM.size() + PO.size();
 
-    unsigned long long erased = PK.erased() + PfromL.erased() + PfromM.erased() + PfromO.erased() + PfromR.erased()
-    + PL.erased() + PR.erased() + PM.erased() + PO.erased();
+    unsigned long long erased =
+        PL.erased() + PR.erased() + PM.erased() + PO.erased();
 
-    unsigned long long avoided = PK.avoided() + PfromL.avoided() + PfromM.avoided() + PfromO.avoided() + PfromR.avoided()
-    + PL.avoided() + PR.avoided() + PM.avoided() + PO.avoided();
+    unsigned long long avoided =
+        PL.avoided() + PR.avoided() + PM.avoided() + PO.avoided();
 
-    unsigned long long shortcut = PK.shortcut() + PfromL.shortcut() + PfromM.shortcut() + PfromO.shortcut() + PfromR.shortcut()
-    + PL.shortcut() + PR.shortcut() + PM.shortcut() + PO.shortcut();
+    unsigned long long shortcut =
+        PL.shortcut() + PR.shortcut() + PM.shortcut() + PO.shortcut();
 
-    unsigned long long replaced = PK.replaced() + PfromL.replaced() + PfromM.replaced() + PfromO.replaced() + PfromR.replaced()
-    + PL.replaced() + PR.replaced() + PM.replaced() + PO.replaced();
+    unsigned long long replaced =
+        PL.replaced() + PR.replaced() + PM.replaced() + PO.replaced();
 
-    unsigned long long max = PK.max() + PfromL.max() + PfromM.max() + PfromO.max() + PfromR.max()
-    + PL.max() + PR.max() + PM.max() + PO.max();
+    unsigned long long max = PL.max() + PR.max() + PM.max() + PO.max();
 
     std::cout << "Trace Arrows Size: "<<size
               <<" Avoided: "<<avoided
@@ -491,13 +447,6 @@ MasterTraceArrows::print_ta_sizes(){
 
 void
 MasterTraceArrows::print_ta_sizes_verbose(){
-    printf("PK: "); PK.print_ta_size();
-
-    printf("PfromL: "); PfromL.print_ta_size();
-    printf("PfromR: "); PfromR.print_ta_size();
-    printf("PfromM: "); PfromM.print_ta_size();
-    printf("PfromO: "); PfromO.print_ta_size();
-
     printf("PL: "); PL.print_ta_size();
     printf("PR: "); PR.print_ta_size();
     printf("PM: "); PM.print_ta_size();

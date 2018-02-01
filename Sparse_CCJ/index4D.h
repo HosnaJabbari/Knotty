@@ -3,63 +3,86 @@
 
 #include <tuple>
 
+//! type of 4D matrix -- left, middle, right, outer
+enum class MType { L, M, R, O };
 
 //! @brief Four-dimensional index for the gap matrices
-class Index4D : public std::tuple<int,int,int,int> {
+class Index4D : public std::array<int,4> {
  public:
     Index4D(int i, int j, int k, int l)
-     :std::tuple<int,int,int,int>{i,j,k,l} {}
+     :std::array<int,4>{i,j,k,l} {}
 
-    int i() const { return std::get<0>(*this); }
-    int j() const { return std::get<1>(*this); }
-    int k() const { return std::get<2>(*this); }
-    int l() const { return std::get<3>(*this); }
+    int i() const { return (*this)[0]; }
+    int j() const { return (*this)[1]; }
+    int k() const { return (*this)[2]; }
+    int l() const { return (*this)[3]; }
+
+    int &i() { return (*this)[0]; }
+    int &j() { return (*this)[1]; }
+    int &k() { return (*this)[2]; }
+    int &l() { return (*this)[3]; }
+
+    //! @brief left end for type
+    int lend(MType type) const {
+        static std::array<int,4> end {0,1,2,0};
+        return (*this)[end[static_cast<int>(type)]];
+    }
+
+    //! @brief left end for type
+    int rend(MType type) const {
+        static std::array<int,4> end {1,2,3,3};
+        return (*this)[end[static_cast<int>(type)]];
+    }
+
+    //! @brief left end for type
+    int &lend(MType type) {
+        static std::array<int,4> end {0,1,2,0};
+        return (*this)[end[static_cast<int>(type)]];
+    }
+
+    //! @brief left end for type
+    int &rend(MType type) {
+        static std::array<int,4> end {1,2,3,3};
+        return (*this)[end[static_cast<int>(type)]];
+    }
 
     //! @brief set left and right indices for type
     void
-    set(int d, int dp, int type) {
-        switch(type) {
-        case P_PL: i()=d;j()=dp;break;
-        case P_PM: j()=d;k()=dp;break;
-        case P_PR: k()=d;l()=dp;break;
-        case P_PO: i()=d;l()=dp;break;
-        default: assert(false);
-        }
+    set(int d, int dp, MType type) {
+        lend(type)=d;
+        rend(type)=dp;
     }
 
     //! @brief difference between left and right index corresponding to type
     int
-    difference(matrix_type_t type) const {
-        switch(type) {
-        case P_PL: return j()-i();
-        case P_PM: return k()-j();
-        case P_PR: return l()-k();
-        case P_PO: return l()-i();
-        }
+    difference(MType type) const {
+        return rend(type)-lend(type);
     }
 
     void
-    add(int d, int dp, int type) {
-        switch(type) {
-        case P_PL: i()+=d;j()+=dp;break;
-        case P_PM: j()+=d;k()+=dp;break;
-        case P_PR: k()+=d;l()+=dp;break;
-        case P_PO: i()+=d;l()+=dp;break;
-        default: assert(false);
-        }
+    add(int d, int dp, MType type) {
+        lend(type)+=d;
+        rend(type)+=dp;
     }
 
     //!@ shrink fragment at position of type
     void
-    shrink(int d, int dp, int type) {
+    shrink(int d, int dp, MType type) {
         switch(type) {
-        case P_PL: i()+=d;j()-=dp;break;
-        case P_PM: j()-=d;k()+=dp;break;
-        case P_PR: k()+=d;l()-=dp;break;
-        case P_PO: i()+=d;l()-=dp;break;
+        case MType::L: i()+=d;j()-=dp;break;
+        case MType::M: j()-=d;k()+=dp;break;
+        case MType::R: k()+=d;l()-=dp;break;
+        case MType::O: i()+=d;l()-=dp;break;
         default: assert(false);
         }
     }
+
+    //!@ shrink fragment at position of type by 1
+    void
+    shrink(MType type) {
+        shrink(1,1,type);
+    }
+
 
     Index4D &
     operator +=(const Index4D &x);
@@ -81,12 +104,6 @@ class Index4D : public std::tuple<int,int,int,int> {
         return is_valid() && l()<n;
     }
 
- private:
-
-    int &i() { return std::get<0>(*this); }
-    int &j() { return std::get<1>(*this); }
-    int &k() { return std::get<2>(*this); }
-    int &l() { return std::get<3>(*this); }
 };
 
 inline

@@ -14,6 +14,22 @@ void candidate_list::print_type() const {
             printf("PfromL_CL");
             break;
 
+        case P_PRmloop0:
+            printf("PRmloop_CL");
+            break;
+
+        case P_PfromR:
+            printf("PfromR_CL");
+            break;
+
+        case P_PMmloop0:
+            printf("PMmloop_CL");
+            break;
+
+        case P_PfromM:
+            printf("PfromM_CL");
+            break;
+
         case P_POmloop0:
             printf("POmloop_CL");
             break;
@@ -28,11 +44,11 @@ void candidate_list::print_type() const {
  *  @brief push candidate with information w, i, to front of CL
  */
 void candidate_list::push_candidate(int i, int j, int k, int l, int w, int best_branch) {
-    if (cl_debug) {
-        printf("pushing candidate ");
-        print_type();
-        printf("(%d,%d,%d,%d) w:%d branch:%d\n",i,j,k,l,w,best_branch);
-    }
+    // if (cl_debug) {
+    //     printf("pushing candidate ");
+    //     print_type();
+    //     printf("(%d,%d,%d,%d) w:%d branch:%d\n",i,j,k,l,w,best_branch);
+    // }
 
     int key = get_key(k,l);
 
