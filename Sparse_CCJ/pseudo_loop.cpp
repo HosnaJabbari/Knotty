@@ -1249,17 +1249,15 @@ pseudo_loop::trace_PL(int i, int j, int k, int l, int e) {
         best_dp=j;
     }
 
-    // from case
-    temp = calc_PfromL(i+1, j-1, k, l) + gamma2(j,i);
-    if (temp < min_energy) {
-        min_energy = temp;
-        target_energy = calc_PfromL(i+1, j-1, k, l);
+    // from case -- if we didn't find the
+    // energy e yet, fromX must be the best case
+    if (min_energy != e) {
+        target_energy = e - gamma2(j,i);
         target_type= P_PfromL;
         best_d=i+1;
         best_dp=j-1;
     }
 
-    assert(min_energy == e);
     trace_update_f_with_target(i,j,k,l, P_PL, target_type);
     trace_continue(best_d, best_dp, j, k, target_type, target_energy);
 }
@@ -1332,23 +1330,12 @@ pseudo_loop::trace_PM(int i, int j, int k, int l, int e) {
     }
 
     // from case
-    temp = calc_PfromM(i, j-1, k+1, l) + gamma2(j,k);
-    if (temp < min_energy) {
-        min_energy = temp;
-        target_energy = calc_PfromM(i, j-1, k+1, l);
+    if (min_energy != e) {
+        target_energy = e - gamma2(j,k);
         target_type= P_PfromM;
         best_d=j-1;
         best_dp=k+1;
     }
-
-    if (min_energy != e) {
-        std::cerr << i<<" "<<j<<" "<<k<<" "<<l<<" "<<min_energy<<" "<<e<<std::endl;
-        std::cerr << best_d << " " << best_dp <<" " << target_type << " " << target_energy
-                  <<" "
-                  << calc_e_intP(best_d,j,k,best_dp) <<std::endl;
-    }
-
-    assert(min_energy == e);
 
     trace_update_f_with_target(i, j, k, l, P_PM, target_type);
     trace_continue(i, best_d, best_dp, l, target_type, target_energy);
@@ -1416,16 +1403,13 @@ pseudo_loop::trace_PR(int i, int j, int k, int l, int e) {
     }
 
     // from case
-    temp = calc_PfromR(i, j, k+1, l-1) + gamma2(l,k);
-    if (temp < min_energy) {
-        min_energy = temp;
-        best_d = k+1;
-        best_dp = l-1;
-        target_energy = calc_PfromR(i, j, best_d, best_dp);
+    if (min_energy != e) {
+        target_energy = e - gamma2(l,k);
         target_type= P_PfromR;
+        best_d=k+1;
+        best_dp=l-1;
     }
 
-    assert(min_energy == e);
     trace_update_f_with_target(i,j,k,l, P_PR, target_type);
     trace_continue(i, j, best_d, best_dp, target_type, target_energy);
 }
@@ -1493,16 +1477,14 @@ pseudo_loop::trace_PO(int i, int j, int k, int l, int e) {
     }
 
     // from case
-    temp = calc_PfromO(i+1, j, k, l-1) + gamma2(l,i);
-    if (temp < min_energy) {
-        min_energy = temp;
-        target_energy = calc_PfromO(i+1, j, k, l-1);
+    if (min_energy != e) {
+        target_energy = e - gamma2(l,i);
         target_type= P_PfromO;
         best_d=i+1;
         best_dp=l-1;
     }
+    // from case
 
-    assert(min_energy == e);
     trace_update_f_with_target(i,j,k,l, P_PO, target_type);
     trace_continue(best_d, best_dp, j, k, target_type, target_energy);
 }
@@ -4572,13 +4554,13 @@ void pseudo_loop::back_track_sp(minimum_fold *f, seq_interval *cur_interval)
         int e2 = c.w();
 
         if ( e1+e2 == min_energy ) {
-            if (node_debug || pl_debug) {
+            //if (node_debug || pl_debug) {
                 printf(
                     "P(%d,%d): tracing PK(%d,%d,%d,%d) e:%d and "
                     "PK(%d,%d,%d,%d) e:%d\n",
                     i, l, i, c.d() - 1, c.j() + 1, c.k() - 1, e1, c.d(), c.j(),
                     c.k(), l, e2);
-            }
+            //}
 
             trace_continue(i,c.d()-1,c.j()+1,c.k()-1,P_PK,e1);
             trace_continue(c.d(),c.j(),c.k(),l,P_PK,e2);
@@ -5610,6 +5592,8 @@ void pseudo_loop::trace_update_f(int i, int j, int k, int l, char srctype) {
 }
 
 void pseudo_loop::trace_update_f_with_target(int i, int j, int k, int l, char srctype, char tgttype) {
+
+    //printf("trace_update_f_with_target(%d %d %d %d %c %c)\n", i,  j,  k,  l, srctype, tgttype);
     switch (srctype) {
         case P_PL:
             if (tgttype == P_PfromL) {
