@@ -319,8 +319,8 @@ int W_final::compute_W_br3(int j){
 
 	int min_energy = INF, tmp, energy_ij = INF, acc=INF;
     int i=-1;
-    int chosen = 0;
-    int best_i = 0;
+    // int chosen = 0;
+    // int best_i = 0;
 
     for (i=0; i<=j-1; i++)    // TURN shouldn't be there
     {
@@ -339,23 +339,23 @@ int W_final::compute_W_br3(int j){
 	            if (tmp < min_energy)
 	            {
 	                min_energy = tmp;
-	                chosen = 31;
-	                best_i = i;
+	                // chosen = 31;
+	                // best_i = i;
 	            }
 	        }
 
 	        energy_ij = P->get_energy(i+1,j);
 			if (energy_ij < INF)
 			{
-				tmp = energy_ij + acc; + PS_penalty;
+				tmp = energy_ij + acc + PS_penalty;
 				//tmp += dangle_bot [int_sequence[j]]
 	            //                   [int_sequence[i+1]]
 	            //                   [int_sequence[i]];
 				if (tmp < min_energy)
 				{
 					min_energy = tmp;
-					chosen = 32;
-					best_i = i;
+					// chosen = 32;
+					// best_i = i;
 				}
 			}
 
@@ -372,8 +372,8 @@ int W_final::compute_W_br3(int j){
 				if (tmp < min_energy)
 				{
 					min_energy = tmp;
-					chosen = 33;
-					best_i = i;
+					// chosen = 33;
+					// best_i = i;
 				}
 			}
 
@@ -392,8 +392,8 @@ int W_final::compute_W_br3(int j){
 				if (tmp < min_energy)
 				{
 					min_energy = tmp;
-					chosen = 34;
-					best_i = i;
+					// chosen = 34;
+					// best_i = i;
 				}
 			}
 		//}
@@ -805,7 +805,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 			int i = cur_interval->i;
 			int j = cur_interval->j;
 			int tmp, min_energy = INF;
-			int best_k, best_row;
+			int best_k=-1, best_row;
 
 			if (debug)
 				printf ("\t (%d,%d) M_WM\n", i,j);

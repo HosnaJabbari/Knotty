@@ -19,6 +19,8 @@ class V_final;
 class pseudo_loop{
 
 public:
+    using candidate = candidate_lists::candidate;
+
     // constructor
     pseudo_loop(char *seq, V_final *V, s_hairpin_loop *H, s_stacked_pair *S, s_internal_loop *VBI, VM_final *VM);
 
@@ -51,6 +53,9 @@ public:
     int get_energy(int i, int j);
     // in order to be able to check the border values consistantly
     // I am adding these get functions
+
+    template<MType type>
+    int calc_PX(const Index4D &x);
 
     int calc_PX(const Index4D &x, MType type);
 
@@ -186,94 +191,117 @@ private:
     // Candidate Lists (candidate type is in h_struct.h)
     // 3D arrays pointing to linked lists where candidates point to the next in the list
     // Actually implemented as 2D arrays accessed by [j][kl]
-    candidate_list *PLmloop0_CL;
-    candidate_list *POmloop0_CL;
-    candidate_list *PfromL_CL;
-    candidate_list *PfromO_CL;
+    candidate_lists *PLmloop0_CL;
+    candidate_lists *POmloop0_CL;
+    candidate_lists *PfromL_CL;
+    candidate_lists *PfromO_CL;
 
     // SW - add candidate lists for M and R mloops
-    candidate_list *PMmloop0_CL;
-    candidate_list *PRmloop0_CL;
+    candidate_lists *PMmloop0_CL;
+    candidate_lists *PRmloop0_CL;
 
     // SW - add candidate lists for fromM and fromR
-    candidate_list *PfromM_CL;
-    candidate_list *PfromR_CL;
+    candidate_lists *PfromM_CL;
+    candidate_lists *PfromR_CL;
+
+    CandidateListsPK PK_CL;
+
+    // /**
+    // * Looks through candidate list CL for energy value e
+    // *
+    // * @param i
+    // * @param j
+    // * @param k
+    // * @param l
+    // * @param srctype - type of source matrix (P_PL, P_PfromL, etc.)
+    // * @param tgttype - type of target matrix (P_PL, P_PfromL, etc.)
+    // * @param e - energy value
+    // * @param CL - candidate list to look through
+    // */
+    // void trace_candidate(int i, int j, int k, int l, char srctype, char tgttype, int e, candidate_lists *CL);
+    // void trace_candidate_continue(int i, int j, int k, int l, int m, int n, int o, int p, char srctype, char tgttype, const candidate *c);
 
 
-    // This is an array of [nb_nucleotides] forward lists
-    std::forward_list<candidate_PK> *PK_CL;
-
-    void push_candidate_PK(int d, int j, int k, int l, int w)
-    {
-        PK_CL[l].push_front(candidate_PK(d,j,k,w));
-    }
-
-    // returns whether there is a candidate in that list at that location
-    bool is_candidate(int i, int j, int k, int l, std::forward_list<candidate_PK>* CL) const
-    {
-        return (find_candidate(i,j,k,l,CL) != nullptr);
-    }
-
-    /**
-     * Find candidate in PK candidate list CL
-     *
-     * @param i
-     * @param j
-     * @param k
-     * @param l
-     * @returns if failure returns nullptr, else candidate_PK
-     */
-    const candidate_PK* find_candidate(int i, int j, int k, int l, std::forward_list<candidate_PK>* CL) const {
-        int prev_j = 0, prev_d = 0, prev_k = 0;
-
-        // j is always ascending (or equal)
-        // d is always descending (or equal)
-        // k is always ascending (or equal
-        for (const candidate_PK &c : PK_CL[l]) {
-        //while (c != NULL && (c->j() <= i || c->d() >= j || c->k() <= k)) {
-            //assert(c->j() > prev_j || c->d() < prev_d || c->k() > prev_k);
-            //prev_j = c->j(); prev_d = c->d(); prev_k = c->k();
-
-            if (c.d() == i && c.j() == j && c.k() == k) { return &c; }
-        }
-        // No candidate found in CL with that l
-        return nullptr;
-    }
-
-    /**
-    * Looks through candidate list CL for energy value e
-    *
-    * @param i
-    * @param j
-    * @param k
-    * @param l
-    * @param srctype - type of source matrix (P_PL, P_PfromL, etc.)
-    * @param tgttype - type of target matrix (P_PL, P_PfromL, etc.)
-    * @param e - energy value
-    * @param CL - candidate list to look through
-    */
-    void trace_candidate(int i, int j, int k, int l, char srctype, char tgttype, int e, candidate_list *CL);
-    void trace_candidate_continue(int i, int j, int k, int l, int m, int n, int o, int p, char srctype, char tgttype, const candidate *c);
-
-
-    /**
-    * Looks through candidate list CL for energy value e
-    *
-    * @param i
-    * @param j
-    * @param k
-    * @param l
-    * @param srctype - type of source matrix (P_P, P_PK, etc.)
-    * @param tgttype - type of target matrix (P_P, P_PK, etc.)
-    * @param e - energy value
-    * @param CL - candidate list to look through
-    */
-    void trace_candidate(int i, int j, int k, int l, char srctype, char tgttype, int e, std::forward_list<candidate_PK> *CL);
+    // /**
+    // * Looks through candidate list CL for energy value e
+    // *
+    // * @param i
+    // * @param j
+    // * @param k
+    // * @param l
+    // * @param srctype - type of source matrix (P_P, P_PK, etc.)
+    // * @param tgttype - type of target matrix (P_P, P_PK, etc.)
+    // * @param e - energy value
+    // * @param CL - candidate list to look through
+    // */
+    // void trace_candidate(int i, int j, int k, int l, char srctype, char tgttype, int e, std::forward_list<candidate_PK> *CL);
 
 
     // Ian Wark Feb 8, 2017
     // Trace arrows
     MasterTraceArrows *ta;
+
+    // SW some precomputation for optimization
+    // caching can_pair saves almost 3% runtime (still only demonstrating
+    // potentials)
+    std::vector<bool> can_pair_;
+    void
+    init_can_pair() {
+        can_pair_.resize(nb_nucleotides*(nb_nucleotides+1)/2);
+        for (int i=0; i<nb_nucleotides; i++) {
+            for (int j=i+1; j<nb_nucleotides; j++) {
+                int ij = index[i]+j-i;
+                can_pair_[ij] = ::can_pair(int_sequence[i],int_sequence[j]);
+            }
+        }
+    }
+
+    int can_pair(int i, int j) const {
+        return can_pair_[index[i]+j-i];
+    }
+
+    //! @brief array for pre-computed e_intP interior loop energies
+    //! SW precomputing internal loop energy yields tremendous speedup
+    std::vector<std::vector<int>> eIntP_;
+
+    //! precompute e_intP
+    void
+    init_eIntP() {
+        eIntP_.resize( nb_nucleotides*(nb_nucleotides+1)/2 );
+        for (int i=0; i<nb_nucleotides; i++) {
+            for (int j=i+1; j<nb_nucleotides; j++) {
+                int ij = index[i]+j-i;
+                eIntP_[ij].resize(MAXLOOP*MAXLOOP);
+                for (int x = 0; x < MAXLOOP; x++) {
+                    for (int xp = 0; xp < MAXLOOP && i+x+1+TURN < j-xp-1 ; xp++) {
+                        int xxp = x*MAXLOOP+xp;
+                        eIntP_[ij][xxp] = calc_e_intP(i,i+x+1,j-xp-1,j);
+                    }
+                }
+            }
+        }
+    }
+
+    //! @get e_intP from array
+    //! @see calc_e_intP()
+    int get_e_intP(int i, int d, int dp, int j) const {
+        int x = d-i-1;
+        int xp = j-dp-1;
+        assert(i<d && dp<j);
+        assert(x<MAXLOOP);
+        assert(xp<MAXLOOP);
+
+        if (! ( d + TURN < dp ) ) {
+            std::cerr << "get_e_intP "<<i<< " "<<d<<" "<<dp<< " "<<j<<" "<<std::endl;
+        }
+        assert(d + TURN < dp);
+
+        int ij = index[i]+j-i;
+        int xxp = x*MAXLOOP+xp;
+
+        return
+            eIntP_[ ij ][ xxp ];
+    }
 
 public:
     void print_PK_CL_size();
@@ -282,7 +310,7 @@ public:
     // prints infromation on candidate lists for each list
     void print_CL_sizes_verbose();
 
-    void gc_trace_arrows(size_t i) {
+    void gc_trace_arrows(int i) {
         //printf("gc_trace_arrows(%d)\n",i);
         if ( sparsify && use_garbage_collection && i+MAXLOOP+1 <= nb_nucleotides) {
             ta->garbage_collect(i + MAXLOOP + 1);
@@ -293,16 +321,19 @@ public:
 
     // how useful is compactify for anything other than trace arrows?
     // moderately. Space gain is not huge but neither is slow down
+    // SW: (unlike tas) the candidate lists never shrink; therefore compactify should not be
+    // used for candidate lists
+    //
     void compactify() {
         if (sparsify && use_compactify) {
-            PfromL_CL->compactify();
-            PfromM_CL->compactify();
-            PfromR_CL->compactify();
-            PfromO_CL->compactify();
-            PLmloop0_CL->compactify();
-            PMmloop0_CL->compactify();
-            PRmloop0_CL->compactify();
-            POmloop0_CL->compactify();
+            // PfromL_CL->compactify();
+            // PfromM_CL->compactify();
+            // PfromR_CL->compactify();
+            // PfromO_CL->compactify();
+            // PLmloop0_CL->compactify();
+            // PMmloop0_CL->compactify();
+            // PRmloop0_CL->compactify();
+            // POmloop0_CL->compactify();
 
             if (!use_garbage_collection)
                 ta->compactify();
@@ -378,7 +409,7 @@ private:
     int
     generic_decomposition(int i, int j, int k, int l,
                           int decomp_cases,
-                          candidate_list *CL,
+                          candidate_lists *CL,
                           const TriangleMatrix &w,
                           const MatrixSlices3D &PX,
                           int LMRO_cases = 0,
@@ -426,10 +457,10 @@ private:
     MatrixSlices3D &
     PXmloop1_by_mtype(MType type);
 
-    candidate_list *
+    candidate_lists *
     mloop0_cl_by_mtype(MType type);
 
-    candidate_list *
+    candidate_lists *
     from_cl_by_mtype(MType type);
 
     TraceArrows &
@@ -474,6 +505,18 @@ private:
     void compute_POmloop0(int i,int j, int k, int l);
 
     int
+    Liloop_energy(const Index4D &x, int d, int dp);
+    int
+    Miloop_energy(const Index4D &x, int d, int dp);
+    int
+    Riloop_energy(const Index4D &x, int d, int dp);
+    int
+    Oiloop_energy(const Index4D &x, int d, int dp);
+    int
+    iloop_energy(const Index4D &x, int d, int dp, MType type);
+
+
+    int
     recompute_PX(const Index4D &x, MType type);
 
     // recompute all PK entries i,j,k,l for fixed i and all j,k,l: i<=j<k<=max_l
@@ -483,7 +526,7 @@ private:
     void
     recompute_slice_PXdecomp(const Index4D &x,
                              int decomp_cases,
-                             candidate_list *CL,
+                             candidate_lists *CL,
                              const TriangleMatrix &w,
                              MatrixSlices3D &PX
                              );

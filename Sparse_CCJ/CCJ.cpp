@@ -22,10 +22,7 @@ int main (int argc, char *argv[])
 {
     char sequence[MAXSLEN];
     char structure[MAXSLEN];
-   // char restricted[MAXSLEN];
     double energy;
-    char structures[MAXSUBSTR][MAXSLEN];
-    double energies[MAXSUBSTR];
 
     bool cmd_line_error = false;
     bool w = false;
@@ -49,12 +46,12 @@ int main (int argc, char *argv[])
                 if (!strcmp(arg, "-ns"))
                     cmd_line_options.set_use_sparse(false);
                 else
-		
+
 		// ** The following arguments are primarily debug options **
 		// -ngc does not use garbage collection (sparse version only)
                 if (!strcmp(arg, "-ngc"))
                     cmd_line_options.set_use_garbage_collection(false);
-                else	
+                else
 		// -w for web printing (used for web server)
                 if (!strcmp(arg, "-w"))
                     w = true;
@@ -140,6 +137,3 @@ int main (int argc, char *argv[])
 
     return 0;
 }
-
-
-

@@ -55,8 +55,8 @@ typedef struct band_elem
 	band_elem *next;
 	char open;
 	char close;
-	int outer_end;
 	int outer_start;
+	int outer_end;
 	int inner_start;
 	int inner_end;
 	void copy(band_elem *other){

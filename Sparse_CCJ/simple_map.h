@@ -4,21 +4,27 @@
 #include <vector>
 #include <algorithm>
 #include <cassert>
+#include <iostream>
 
 template <class key_t, class val_t>
-class SimpleMapPair {
+class SimpleMapPair: public std::pair<key_t, val_t> {
 public:
     /// TODO should only be used during simplemap reallocation
     /// how do I enforce this?
     SimpleMapPair() {}
 
-    SimpleMapPair(key_t key, val_t val)
-    : first(key), second(val)
-    {}
-
-    key_t first;
-    val_t second;
+    SimpleMapPair(key_t key, val_t val) : std::pair<key_t, val_t>(key, val) {}
 };
+
+
+template <class key_t, class val_t>
+std::ostream &
+operator << (std::ostream &out, const SimpleMapPair<key_t,val_t> &p) {
+    return
+        out << "("<<p.first<<","<<p.second<<")";
+}
+
+
 
 /**
  * @brief Space saving replacement for map of trace arrows in rows
@@ -28,31 +34,42 @@ public:
  * supported, but takes linear time.  Still, this data structure seems
  * to be a good compromise, since e.g. balanced trees or hashs require
  * a lot of space.
+ *
+ * KeyCompare compares the element keys; e.g. use less for ascending lists and greater
+ * for descending lists over comparable keys
  */
-template<class key_t, class val_t>
+template< class key_t, class val_t, class KeyCompare=std::less<key_t> >
 class SimpleMap: std::vector<SimpleMapPair<key_t, val_t> > {
 public:
     typedef SimpleMapPair<key_t, val_t> key_val_t;
     typedef std::vector<key_val_t> key_val_vec_t;
     typedef typename key_val_vec_t::iterator iterator;
     typedef typename key_val_vec_t::const_iterator const_iterator;
+
 private:
 
-    class  {
+    class Compare {
     public:
-	bool
-	operator () (const key_val_t &x,
-		     const key_t &y) const {
-	    return x.first < y;
-	}
-    } comp;
+        KeyCompare elem_comp_;
+
+        Compare(KeyCompare elem_comp) : elem_comp_(elem_comp)
+        {}
+
+        typedef SimpleMapPair<key_t, val_t> key_val_t;
+        bool
+        operator () (const key_val_t &x,
+                     const key_t &y) const {
+            return elem_comp_(x.first, y);
+        }
+    };
+    Compare comp_;
 
     iterator
     binsearch (iterator first, iterator last, const key_t& key)
     {
-        first = std::lower_bound(first,last,key,comp);
-
-        if (first==last || key < first->first) {
+        first = std::lower_bound(first, last, key, comp_);
+        if (first == last ||
+            comp_(key_val_t(key, first->second), first->first)) {
             return last;
         }
         return first;
@@ -61,30 +78,25 @@ private:
     const_iterator
     binsearch (const_iterator first, const_iterator last, const key_t& key) const
     {
-        first = std::lower_bound(first,last,key,comp);
-
-        if (first==last || key < first->first) {
+        first = std::lower_bound(first, last, key, comp_);
+        if (first == last ||
+            comp_(key_val_t(key, first->second), first->first)) {
             return last;
         }
         return first;
     }
 
 public:
-    SimpleMap() {}
+    SimpleMap(const KeyCompare &comp=KeyCompare()): comp_(comp) {}
 
     iterator
-    front() {
+    begin() {
         return key_val_vec_t::begin();
     }
 
     const_iterator
-    front() const {
+    begin() const {
         return key_val_vec_t::begin();
-    }
-
-    iterator
-    next(iterator it) {
-        return std::next(it,1);
     }
 
     iterator
@@ -99,42 +111,53 @@ public:
 
     const_iterator
     find(const key_t &key) const {
-        auto it = std::lower_bound(key_val_vec_t::begin(), key_val_vec_t::end(), key, comp);
-        if (it == key_val_vec_t::end() || key < it->first) { it = key_val_vec_t::end(); }
-
-        assert(it == key_val_vec_t::end() || it->first == key);
-        return it;
-    };
+	auto it= binsearch(key_val_vec_t::begin(), key_val_vec_t::end(), key);
+	assert(it == key_val_vec_t::end() || it->first == key);
+	return it;
+    }
 
     iterator
     find(const key_t &key) {
-        auto it = std::lower_bound(key_val_vec_t::begin(), key_val_vec_t::end(), key, comp);
-        if (it == key_val_vec_t::end() || key < it->first) { it = key_val_vec_t::end(); }
-
-        assert(it == key_val_vec_t::end() || it->first == key);
-        return it;
-    };
+	auto it= binsearch(key_val_vec_t::begin(), key_val_vec_t::end(), key);
+	assert(it == key_val_vec_t::end() || it->first == key);
+	return it;
+    }
 
     bool
     exists(const key_t &key) const {
-        auto end = key_val_vec_t::end();
         return find(key) != key_val_vec_t::end();
     }
 
     /**
-     * @brief insert in ascending order of keys
+     * @brief insert maintaining order of keys
      * @param key
      * @param val
      *
-     * inserts into ensure vector remains sorted
+     * inserts into ensure vector remains sorted;
+     * inserting already contained keys is illegal
+     * @note this is an expensive operation (linear time in size of map)
+     *
      */
     void
-    add( const key_t key, const val_t &val) {
-        auto it = std::lower_bound(key_val_vec_t::begin(), key_val_vec_t::end(), key, comp);
+    insert( const key_t key, const val_t &val) {
+        //std::cerr << "SimpleMap::add (" << key <<" "<< val <<")"<< std::endl;
+        auto it = std::lower_bound(key_val_vec_t::begin(), key_val_vec_t::end(),
+                                   key, comp_);
+        assert(it==key_val_vec_t::end() || (! (it->first == key)));
         key_val_vec_t::insert(it, key_val_t(key,val));
     }
 
-    const key_t get_last() {
+    val_t &
+    operator [] (const key_t key) {
+        auto it = std::lower_bound(key_val_vec_t::begin(), key_val_vec_t::end(),
+                                   key, comp_);
+        if (it == key_val_vec_t::end() ||  (! (it->first == key)) ) {
+            it = key_val_vec_t::insert(it, key_val_t(key,val_t()));
+        }
+        return it->second;
+    }
+
+    const key_t last_key() {
         return key_val_vec_t::operator[](size()-1).first;
     }
 
@@ -143,14 +166,17 @@ public:
      * @param key
      * @param val
      *
-     * successive push_ascending must be in ascending order of the key type
+     * successive push_sorted must be in ascending order of the key type
      */
     void
-    push_ascending( const key_t &key, const val_t &val ) {
-        //if (!(size()==0))
-        //    printf("size:%d key:%d last:%d\n",size(),key,get_last());
-        assert(size()==0||key > get_last());
-        key_val_vec_t::push_back(key_val_t(key,val));
+    push_sorted( const key_t &key, const val_t &val ) {
+        //printf("size:%ld key:%d last:%d\n",size(),key, size()>0?last_key():-1);
+        if(!( size()==0 || comp_.elem_comp_( last_key(), key ) ) ) {
+            std::cout << last_key() << " " << key << std::endl;
+        }
+
+        assert( size()==0 || comp_.elem_comp_( last_key(), key ) );
+        key_val_vec_t::push_back(key_val_t(key, val));
     }
 
 /*

@@ -3,9 +3,7 @@
 static size_t ta_n;
 
 ta_key_pair::ta_key_pair(index_t k, index_t l) {
-    first = k;
-    second = l;
-    value_ = first*ta_n - second;
+    value_ = k*ta_n - l;
 
     assert(value_ > 0 && value_ < 4294967295);
 }
@@ -69,9 +67,9 @@ TraceArrows::capacity() const {
  * @param target energy e
  */
 void
-MasterTraceArrows::register_trace_arrow(size_t i, size_t j, size_t k, size_t l,
-                     size_t m, size_t n, size_t o, size_t p,
-                     energy_t e, size_t srctype, size_t tgttype) {
+MasterTraceArrows::register_trace_arrow(int i, int j, int k, int l,
+                     int m, int n, int o, int p,
+                     energy_t e, int srctype, int tgttype) {
     TraceArrows *source = get_arrows_by_type(srctype);
     assert(i <= j && j <= k && k <= l);
     assert(m <= n && n <= o && o <= p);
@@ -82,6 +80,7 @@ MasterTraceArrows::register_trace_arrow(size_t i, size_t j, size_t k, size_t l,
     if (source->use_replace() && old != nullptr) {
 
         if (e < old->target_energy()) {
+            assert(false); // SW - why should this ever happen?
             /*
             if (ta_debug) {
                 printf("Replace trace arrow: \n old trace arrow: ");
@@ -100,13 +99,11 @@ MasterTraceArrows::register_trace_arrow(size_t i, size_t j, size_t k, size_t l,
         }
     } else {
         // Just add new trace arrow
-        /*
         if (ta_debug) {
             printf("Register Trace Arrow ");
             source->print_type(srctype); printf("(%d,%d,%d,%d)->",i,j,k,l);
             source->print_type(tgttype); printf("(%d,%d,%d,%d) e: %d \n",m,n,o,p, e);
         }
-        */
 
         assert(!source->exists_trace_arrow_from(i,j,k,l));
         source->trace_arrow_add(i,j,k,l,m,n,o,p,e,srctype,tgttype);
@@ -189,8 +186,8 @@ MasterTraceArrows::gc_row( size_t i, TraceArrows &source ) {
 
         bool at_front = true;
 
-        SimpleMap<ta_key_pair, TraceArrow>::iterator it = source.trace_arrow_[ij].front();
-        SimpleMap<ta_key_pair, TraceArrow>::iterator prev = source.trace_arrow_[ij].front();
+        SimpleMap<ta_key_pair, TraceArrow>::iterator it = source.trace_arrow_[ij].begin();
+        SimpleMap<ta_key_pair, TraceArrow>::iterator prev = source.trace_arrow_[ij].begin();
 
         // Call garbage collection on all the trace arrows at ij
         while (it != source.trace_arrow_[ij].end()) {
@@ -200,14 +197,14 @@ MasterTraceArrows::gc_row( size_t i, TraceArrows &source ) {
             if(gc_trace_arrow(i,j,it,source)) {
                 if (at_front) {
                     // if we just deleted the front get the new front
-                    it = source.trace_arrow_[ij].front();
-                    prev = source.trace_arrow_[ij].front();
+                    it = source.trace_arrow_[ij].begin();
+                    prev = source.trace_arrow_[ij].begin();
                 } else {
                     // return to safe fallback point before continuing to delete
                     it = prev;
 
-                    if (it == source.trace_arrow_[ij].front())
-                        at_front == true;
+                    if (it == source.trace_arrow_[ij].begin())
+                        at_front = true;
                 }
             } else {
                 // if trace arrow not erased, save it as a fallback point and continue
@@ -231,7 +228,7 @@ MasterTraceArrows::gc_row( size_t i, TraceArrows &source ) {
 bool
 MasterTraceArrows::gc_trace_arrow(int i, int j, SimpleMap<ta_key_pair, TraceArrow>::iterator &col, TraceArrows &source) {
     //     col->first.first is k   col->first.second is L
-    assert(col->first.first > 0 && col->first.second > 0);
+    // assert(col->first.first > 0 && col->first.second > 0);
     // get source trace arrow
     const TraceArrow ta = col->second;
 
@@ -280,12 +277,11 @@ MasterTraceArrows::gc_trace_arrow(int i, int j, SimpleMap<ta_key_pair, TraceArro
 bool
 MasterTraceArrows::gc_trace_arrow(size_t i, size_t j, size_t k, size_t l, TraceArrows &source){
     int ij = index_[i]+j-i;
-    int kl = index_[k]+l-k;
 
     assert( source.trace_arrow_[ij].exists(ta_key_pair(k,l)) );
     SimpleMap<ta_key_pair, TraceArrow>::iterator col = source.trace_arrow_[ij].find(ta_key_pair(k,l));
 
-    assert(col->first.first == k && col->first.second == l);
+    //assert(col->first.first == k && col->first.second == l);
 
     return gc_trace_arrow(i, j, col, source);
 }
@@ -328,8 +324,6 @@ MasterTraceArrows::garbage_collect(size_t i) {
 
 void
 MasterTraceArrows::resize(size_t n) {
-    int total_length = (n *(n+1))/2;
-
     PL.resize(n);
     PR.resize(n);
     PM.resize(n);

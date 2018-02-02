@@ -12,15 +12,15 @@
  * Used in TraceArrows
  * simply a pair of integers to keep track of k,l for a trace arrows source
  **/
-typedef struct ta_key_pair
+struct ta_key_pair
 {
     // should only be used during simplemap reallocation
     ta_key_pair() {}
 
     ta_key_pair(index_t k, index_t l);
 
-    index_t first;
-    index_t second;
+    /* index_t first; */
+    /* index_t second; */
     // value is first*ta_n - second
     unsigned int value_;
 
@@ -35,8 +35,16 @@ typedef struct ta_key_pair
     bool operator==(const ta_key_pair& right) const {
         return value() == right.value();
     }
+};
 
-} ta_key_pair;
+inline
+std::ostream &
+operator << (std::ostream &out, const ta_key_pair &p) {
+    return
+//        out << "("<<p.first<<","<<p.second<<","<<p.value_<<")";
+        out << "(" <<p.value_<<")";
+}
+
 
 /**
  * @brief Trace arrow
@@ -74,8 +82,8 @@ public:
     TraceArrow(index_t src_i, index_t src_j, index_t src_k, index_t src_l,
     index_t i,index_t j,index_t k,index_t l,
     energy_t e, unsigned char srctype, unsigned char tgttype)
-	: energy_(e),ref_count(0), srctype_(srctype), tgttype_(tgttype),
-      i_(i), j_(j), k_(k), l_(l)
+	:  srctype_(srctype), tgttype_(tgttype), ref_count(0),
+           i_(i), j_(j), k_(k), l_(l), energy_(e)
     {
     }
 
@@ -133,6 +141,10 @@ class TraceArrows {
 
 public:
     typedef SimpleMap< ta_key_pair, TraceArrow >  trace_arrow_row_map_t;
+
+    //! type of data structure for the trace arrows; the single arrows
+    //! are accessed as trace_arrow_[ij][ta_key_pair(k,l)],
+    //! where ij is the 'triangle matrix' index for (i,j)
     typedef std::vector< trace_arrow_row_map_t >  trace_arrow_map_t;
 
 private:
@@ -155,9 +167,6 @@ private:
     unsigned long long ta_max_; // keep track of maximum number of tas, existing simultaneously
 
     char srctype_;
-
-    TraceArrows(TraceArrows const&) {}
-    TraceArrows& operator=(TraceArrows const&) {}
 
     bool use_replace_ = true;   // if false, will keep extra useless trace arrows that should have been replaced, but may help debug replace function.
 
@@ -194,7 +203,8 @@ public:
                     size_t m, size_t n, size_t o, size_t p,
                     energy_t e, char srctype, char tgttype) {
         int ij = index_[i]+j-i;
-        trace_arrow_[ij].add( ta_key_pair(k,l), TraceArrow(i,j,k,l, m,n,o,p, e,srctype,tgttype));
+        trace_arrow_[ij].insert(ta_key_pair(k, l),
+                                TraceArrow(i, j, k, l, m, n, o, p, e, srctype, tgttype));
     }
 
 
@@ -383,9 +393,9 @@ public:
      * @param target energy e
      */
     void
-    register_trace_arrow(size_t i, size_t j, size_t k, size_t l,
-                         size_t m, size_t n, size_t o, size_t p,
-                         energy_t e, size_t srctype, size_t tgttype);
+    register_trace_arrow(int i, int j, int k, int l,
+                         int m, int n, int o, int p,
+                         energy_t e, int srctype, int tgttype);
 
     void
     register_trace_arrow(const Index4D &src_x,
@@ -487,5 +497,11 @@ private:
 };
 
 
+inline
+std::ostream &
+operator << (std::ostream &out, const TraceArrow &a) {
+    return
+        out << "( TraceArrow )";
+}
 
 #endif // TRACE_ARROW_HH

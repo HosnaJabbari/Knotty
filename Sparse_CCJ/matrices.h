@@ -83,11 +83,18 @@ private:
 };
 
 
+
+template <int>
+class ccj_get_policy {
+};
+
+
 //! @brief triangular matrix slices
 //! @note supports 'modulo' access for the first index i; all 3D slices for different
 //! indices i have the same size. The way of rotating the matrix could be
 //! further optimized to get space savings from j>=i!
 //! This would save significant space for the non-sparse algorithm!
+
 class MatrixSlices3D {
 public:
     //! construct empty
@@ -98,7 +105,7 @@ public:
         n_=n;
         nb_slices_=nb_slices;
 
-        construct_index();
+        construct_index(offset_,n);
         slice_size_ = offset_[n_-1][n_-1] + n_;
         assert( slice_size_ == n_*(n_+1)*(n_+2)/6 );
         try {
@@ -126,7 +133,7 @@ public:
     }
 
     int get(const Index4D &x) const {
-        get(x.i(),x.j(),x.k(),x.l());
+        return get(x.i(),x.j(),x.k(),x.l());
     }
 
     int& set(int i, int j, int k, int l) {
@@ -136,7 +143,6 @@ public:
     int& set(const Index4D &x) {
         return set(x.i(),x.j(),x.k(),x.l());
     }
-
 
     //! set and take care of infinite energy
     void
@@ -167,6 +173,33 @@ public:
         }
     }
 
+    using index_offset_t = std::vector<std::vector<int>>;
+
+    static int
+    index3D(int j, int k, int l,
+            const index_offset_t & offset) {
+        return offset[j][k] + l;
+    }
+
+
+    static
+    void construct_index(index_offset_t & offset, int n) {
+        // construct for j<=k<=l (even if j<k-1)
+        offset.resize(n);
+
+        int idx=-n;
+        for (int j=0; j<n; j++) {
+            offset[j].resize(n);
+
+            offset[j][j] = idx+(n-j);
+
+            for (int k=j+1; k<n; k++) {
+                offset[j][k] = offset[j][k-1] + (n-k);
+            }
+            idx=offset[j][n-1];
+        }
+    }
+
 private:
     int n_;
     int nb_slices_;
@@ -174,10 +207,9 @@ private:
     //! size of one 3D slice
     int slice_size_;
 
-    std::vector<std::vector<int>> offset_;
+    index_offset_t offset_;
 
     std::vector<int> m_;
-
 
     size_t
     index(int i, int j, int k, int l) const {
@@ -189,22 +221,6 @@ private:
         return idx;
     }
 
-    void construct_index() {
-        // construct for j<=k<=l (even if j<k-1)
-        offset_.resize(n_);
-
-        int idx=-n_;
-        for (int j=0; j<n_; j++) {
-            offset_[j].resize(n_);
-
-            offset_[j][j] = idx+(n_-j);
-
-            for (int k=j+1; k<n_; k++) {
-                offset_[j][k] = offset_[j][k-1] + (n_-k);
-            }
-            idx=offset_[j][n_-1];
-        }
-    }
 };
 
 #endif // MATRICES_H
