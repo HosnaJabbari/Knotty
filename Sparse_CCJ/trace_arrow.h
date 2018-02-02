@@ -51,7 +51,8 @@ private:
     /// TODO don't need srctype (won't save space with 3 chars vs. 2 though)
     char srctype_;
     char tgttype_;
-    char W_type_;
+
+    unsigned short ref_count; //!< counts how many trace arrows point to the source
 
     // The indices of the location the trace arrow points to.
     // The source i,j,k,l will always be available because that is where the trace arrow is stored (TraceArrows[ij].find(kl))
@@ -60,16 +61,7 @@ private:
     index_t k_;
     index_t l_;
 
-    // If a source also has a trace arrow to WB, WBP, WP, or WPP
-    // I don't like this, but doing something like having a pointer would just
-    // take up nearly the same space with a possible loss of space due to alignment of chars
-    // (just one char takes up 8 bytes, whereas 3 chars still take up 8 bytes)
-    index_t W_i_;
-    index_t W_l_;
-
     energy_t energy_; //!<target energy
-
-    unsigned short ref_count; //!< counts how many trace arrows point to the source
 
 public:
 
@@ -83,17 +75,7 @@ public:
     index_t i,index_t j,index_t k,index_t l,
     energy_t e, unsigned char srctype, unsigned char tgttype)
 	: energy_(e),ref_count(0), srctype_(srctype), tgttype_(tgttype),
-      i_(i), j_(j), k_(k), l_(l), W_type_(-1), W_i_(-1), W_l_(-1)
-    {
-    }
-
-    // Other things are for when it also has a WB, WBP, WP, or WPP
-    TraceArrow(index_t src_i, index_t src_j, index_t src_k, index_t src_l,
-    index_t i,index_t j,index_t k,index_t l,
-    energy_t e, unsigned char srctype, unsigned char tgttype,
-    index_t W_type, index_t W_i, index_t W_l)
-	: energy_(e),ref_count(0), srctype_(srctype), tgttype_(tgttype),
-	  i_(i), j_(j), k_(k), l_(l), W_type_(W_type), W_i_(W_i), W_l_(W_l)
+      i_(i), j_(j), k_(k), l_(l)
     {
     }
 
@@ -114,21 +96,14 @@ public:
      */
     TraceArrow() {}
 
-    //TraceArrow(TraceArrow const&) {}
-    //TraceArrow& operator=(TraceArrow const&) {}
-
     // Getters
     unsigned char source_type() const { return srctype_;}
     unsigned char target_type() const { return tgttype_;}
-    unsigned char W_type() const { return W_type_;}
 
     index_t i() const {return i_;}
     index_t j() const {return j_;}
     index_t k() const {return k_;}
     index_t l() const {return l_;}
-
-    index_t W_i() const { return W_i_;}
-    index_t W_l() const { return W_l_;}
 
     energy_t target_energy() const {return energy_;}
     index_t source_ref_count() const {return ref_count;}
@@ -222,15 +197,6 @@ public:
         trace_arrow_[ij].add( ta_key_pair(k,l), TraceArrow(i,j,k,l, m,n,o,p, e,srctype,tgttype));
     }
 
-    // Add trace arrow with extra WP, WB, WPP, WBP information
-    void
-    trace_arrow_add(size_t i, size_t j, size_t k, size_t l,
-                    size_t m, size_t n, size_t o, size_t p,
-                    energy_t e, char srctype, char tgttype,
-                    char othertype, size_t other_i, size_t other_l) {
-        int ij = index_[i]+j-i;
-        trace_arrow_[ij].add( ta_key_pair(k,l), TraceArrow(i,j,k,l, m,n,o,p, e,srctype,tgttype, othertype, other_i, other_l));
-    }
 
     /**
      * @brief Get target of trace arrow by source (const)
@@ -429,32 +395,6 @@ public:
                              tgt_x.i(),tgt_x.j(),tgt_x.k(),tgt_x.l(),
                              e, srctype, tgttype);
     }
-
-     /**
-     * Register trace arrow
-     *
-     * @param srctype source matrix type
-     * @param i source i
-     * @param j source j
-     * @param k source k
-     * @param l source l
-     * @param tgttype target matrix type
-     * @param m target i
-     * @param n target j
-     * @param o target k
-     * @param p target l
-     * @param target energy e
-     *
-     * Next params are for when a trace arrow actually also points to WB, WBP, WP, or WPP. Explanation is in TraceArrow class.
-     * @param other_i start point
-     * @param other_l end point
-     * @param othertype other target matrix type
-     */
-    void
-    register_trace_arrow(size_t i, size_t j, size_t k, size_t l,
-                         size_t m, size_t n, size_t o, size_t p,
-                         energy_t e, size_t srctype, size_t tgttype,
-                         size_t othertype, size_t other_i, size_t other_l);
 
     /**
      * Increment the reference count of the source

@@ -120,51 +120,6 @@ MasterTraceArrows::register_trace_arrow(size_t i, size_t j, size_t k, size_t l,
 }
 
 /**
- * Register trace arrow
- *
- * @param srctype source matrix type
- * @param i source i
- * @param j source j
- * @param k source k
- * @param l source l
- * @param tgttype target matrix type
- * @param m target i
- * @param n target j
- * @param o target k
- * @param p target l
- * @param target energy e
- *
- * Next params are for when a trace arrow actually also points to WB, WBP, WP, or WPP. Explanation is in TraceArrow class.
- * @param other_i start point
- * @param other_l end point
- * @param othertype other target matrix type
- */
-void
-MasterTraceArrows::register_trace_arrow(size_t i, size_t j, size_t k, size_t l,
-                     size_t m, size_t n, size_t o, size_t p,
-                     energy_t e, size_t srctype, size_t tgttype,
-                     size_t othertype, size_t other_i, size_t other_l) {
-    TraceArrows *source = get_arrows_by_type(srctype);
-    assert(i <= j && j <= k && k <= l);
-    assert(m <= n && n <= o && o <= p);
-
-    //if (ta_debug) {
-    //    printf("Register Trace Arrow ");
-    //    source->print_type(srctype); printf("(%d,%d,%d,%d)->",i,j,k,l);
-    //    source->print_type(tgttype); printf("(%d,%d,%d,%d) e: %d \n",m,n,o,p, e);
-    //}
-
-    assert(!source->exists_trace_arrow_from(i,j,k,l));
-    source->trace_arrow_add(i,j,k,l,m,n,o,p,e,srctype,tgttype,
-                            othertype,other_i,other_l);
-
-    inc_source_ref_count(m,n,o,p, tgttype);
-
-    source->inc_count();
-    source->set_max();
-}
-
-/**
  * Increment the reference count of the source
  *
  * @param source i
