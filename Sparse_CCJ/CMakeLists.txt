@@ -15,8 +15,12 @@ SET(SOURCE
 )
 
 # pass SIMFOLD_HOME to binary
-add_definitions("-DSIMFOLD_HOME=\"${SIMFOLD_HOME}\"")
+add_definitions(-DSIMFOLD_HOME=\"${SIMFOLD_HOME}\")
 
+# SW - deactivate asserts; use for 'production' compile
+# add_definitions(-DNDEBUG -Wno-unused-variable)
+
+# SW - activate warnings and optimization
 set(CMAKE_CXX_FLAGS "-Wall -g -O2")
 
 # set path for executable to be created
