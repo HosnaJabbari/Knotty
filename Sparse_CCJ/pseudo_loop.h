@@ -312,7 +312,7 @@ public:
 
     void gc_trace_arrows(int i) {
         //printf("gc_trace_arrows(%d)\n",i);
-        if ( sparsify && use_garbage_collection && i+MAXLOOP+1 <= nb_nucleotides) {
+        if ( sparsify && use_garbage_collection && i+MAXLOOP+1 < nb_nucleotides) {
             ta->garbage_collect(i + MAXLOOP + 1);
             // compactify is needed to get any bonus from garbage collection
             ta->compactify();
@@ -418,13 +418,39 @@ private:
 
     //! decomposition case by type
     int
-    case_by_mtype(MType type);
+    decomp_cases_by_mtype(MType type);
+
+    //! non-decomposing cases in the from recursions by type
+    //! @param type
+    int
+    lmro_cases_in_fromX_by_mtype(MType type) const {
+        static std::array<int, 4> lrmo{
+            CASE_PM | CASE_PR | CASE_PO, // fromL
+            CASE_PL | CASE_PR,           // fromM
+            CASE_PM | CASE_PO,           // fromR
+            CASE_PL | CASE_PR            // fromO
+        };
+        return lrmo[static_cast<int>(type)];
+    }
 
     //! char P_ matrix identifier by type
     char
     pid_by_mtype(MType type) {
         static std::array<char,4> pid{P_PL,P_PM,P_PR,P_PO};
         return pid[static_cast<int>(type)];
+    }
+
+    //! char P_ matrix identifier by type
+    MType
+    mtype_by_pid(char pid) {
+        switch(pid) {
+            case P_PL: return MType::L;
+            case P_PM: return MType::M;
+            case P_PR: return MType::R;
+            case P_PO: return MType::O;
+        }
+        assert(false);
+        return MType::L;
     }
 
     //! char P_ matrix identifier by type

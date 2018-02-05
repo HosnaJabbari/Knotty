@@ -128,24 +128,24 @@ public:
         return find(key) != key_val_vec_t::end();
     }
 
-    /**
-     * @brief insert maintaining order of keys
-     * @param key
-     * @param val
-     *
-     * inserts into ensure vector remains sorted;
-     * inserting already contained keys is illegal
-     * @note this is an expensive operation (linear time in size of map)
-     *
-     */
-    void
-    insert( const key_t key, const val_t &val) {
-        //std::cerr << "SimpleMap::add (" << key <<" "<< val <<")"<< std::endl;
-        auto it = std::lower_bound(key_val_vec_t::begin(), key_val_vec_t::end(),
-                                   key, comp_);
-        assert(it==key_val_vec_t::end() || (! (it->first == key)));
-        key_val_vec_t::insert(it, key_val_t(key,val));
-    }
+    // /**
+    //  * @brief insert maintaining order of keys
+    //  * @param key
+    //  * @param val
+    //  *
+    //  * inserts into ensure vector remains sorted;
+    //  * inserting already contained keys is illegal
+    //  * @note this is an expensive operation (linear time in size of map)
+    //  *
+    //  */
+    // void
+    // insert( const key_t key, const val_t &val) {
+    //     //std::cerr << "SimpleMap::add (" << key <<" "<< val <<")"<< std::endl;
+    //     auto it = std::lower_bound(key_val_vec_t::begin(), key_val_vec_t::end(),
+    //                                key, comp_);
+    //     assert(it==key_val_vec_t::end() || (! (it->first == key)));
+    //     key_val_vec_t::insert(it, key_val_t(key,val));
+    // }
 
     val_t &
     operator [] (const key_t key) {

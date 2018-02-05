@@ -160,11 +160,14 @@ public:
     void
     print_slice(int i, int max_j, int min_k, int max_l) const {
         std::cerr << "SLICE "<<i<<"-"<<max_j<<"; "<<min_k<<"-"<<max_l<<std::endl;
-        for (int l=i+1; l<=max_l; l++) {
-            std::cerr << "l: " << l << std::endl;
-            for (int j=i; j<l; j++) {
+        for (int l=min_k; l<=max_l; l++) {
+            std::cerr << "l: " << l
+                      << "  j: "<< i<<".."<<max_j
+                      << "  k: "<< std::max(i+1,min_k)<<".."<<l
+                      << "  k>j" << std::endl;
+            for (int j=i; j<=max_j; j++) {
                 std::cerr << "  " << j << ": ";
-                for (int k=j; k<l; k++) {
+                for (int k=std::max(j+1,min_k); k<=l; k++) {
                     std::cerr << get(Index4D(i,j,k,l)) <<" ";
                 }
                 std::cerr << std::endl;

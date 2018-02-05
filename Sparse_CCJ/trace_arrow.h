@@ -1,49 +1,14 @@
 #ifndef TRACE_ARROW_H
 #define TRACE_ARROW_H
 
+#include <unordered_map>
 #include "base.h"
 #include "simple_map.h"
 #include "h_common.h"
 #include "index4D.h"
 
 
-/**
- * @brief Trace Arrow Key Pair
- * Used in TraceArrows
- * simply a pair of integers to keep track of k,l for a trace arrows source
- **/
-struct ta_key_pair
-{
-    // should only be used during simplemap reallocation
-    ta_key_pair() {}
-
-    ta_key_pair(index_t k, index_t l);
-
-    /* index_t first; */
-    /* index_t second; */
-    // value is first*ta_n - second
-    unsigned int value_;
-
-    int value() const {
-        return value_;
-    }
-
-    bool operator< (const ta_key_pair& right) const {
-        return value() < right.value();
-    }
-
-    bool operator==(const ta_key_pair& right) const {
-        return value() == right.value();
-    }
-};
-
-inline
-std::ostream &
-operator << (std::ostream &out, const ta_key_pair &p) {
-    return
-//        out << "("<<p.first<<","<<p.second<<","<<p.value_<<")";
-        out << "(" <<p.value_<<")";
-}
+using ta_key_t=int;
 
 
 /**
@@ -129,6 +94,8 @@ public:
 
 
 
+class MasterTraceArrows;
+
 /**
  * @brief Collection of trace arrows
  *
@@ -138,16 +105,19 @@ public:
  * several statistics on TAs.
  */
 class TraceArrows {
-
 public:
-    typedef SimpleMap< ta_key_pair, TraceArrow >  trace_arrow_row_map_t;
+    friend class MasterTraceArrows;
+
+    typedef SimpleMap< ta_key_t, TraceArrow >  trace_arrow_row_map_t;
+    //typedef std::unordered_map< ta_key_t, TraceArrow >  trace_arrow_row_map_t;
 
     //! type of data structure for the trace arrows; the single arrows
-    //! are accessed as trace_arrow_[ij][ta_key_pair(k,l)],
+    //! are accessed as trace_arrow_[ij][ta_key(k,l)],
     //! where ij is the 'triangle matrix' index for (i,j)
     typedef std::vector< trace_arrow_row_map_t >  trace_arrow_map_t;
 
 private:
+
     size_t n_; //!< sequence length
     const int *index_;
 
@@ -170,20 +140,29 @@ private:
 
     bool use_replace_ = true;   // if false, will keep extra useless trace arrows that should have been replaced, but may help debug replace function.
 
-public:
     trace_arrow_map_t trace_arrow_;
+
+public:
+
+    ta_key_t
+    ta_key(index_t k, index_t l) const {
+        ta_key_t value = k*n_ - l;
+        assert(value > 0 && value < 4294967295);
+        return value;
+    }
+
 
     /**
      * @brief Construct for sequence of specific length
      * @param n sequence length
      */
-    TraceArrows(size_t n, char srctype);
+    TraceArrows(size_t n, char srctype, const int *index);
 
-    void
-    resize(size_t n);
+    // void
+    // resize(size_t n);
 
-    void
-    set_index(const int *index) { index_ = index; }
+    // void
+    // set_index(const int *index) { index_ = index; }
 
     void
     set_max() { ta_max_ = std::max(ta_max_,ta_count_); }
@@ -203,8 +182,8 @@ public:
                     size_t m, size_t n, size_t o, size_t p,
                     energy_t e, char srctype, char tgttype) {
         int ij = index_[i]+j-i;
-        trace_arrow_[ij].insert(ta_key_pair(k, l),
-                                TraceArrow(i, j, k, l, m, n, o, p, e, srctype, tgttype));
+        trace_arrow_[ij][ta_key(k, l)] =
+            TraceArrow(i, j, k, l, m, n, o, p, e, srctype, tgttype);
     }
 
 
@@ -221,7 +200,7 @@ public:
     const TraceArrow *
     trace_arrow_from(size_t i, size_t j, size_t k, size_t l) const {
         int ij = index_[i]+j-i;
-        auto iter = trace_arrow_[ij].find(ta_key_pair(k,l));
+        auto iter = trace_arrow_[ij].find(ta_key(k,l));
 
         if (iter != trace_arrow_[ij].end())
             return &iter->second;
@@ -247,7 +226,7 @@ public:
     TraceArrow *
     trace_arrow_from(size_t i, size_t j, size_t k, size_t l) {
         int ij = index_[i]+j-i;
-        auto iter = trace_arrow_[ij].find(ta_key_pair(k,l));
+        auto iter = trace_arrow_[ij].find(ta_key(k,l));
 
         if (iter != trace_arrow_[ij].end())
             return &iter->second;
@@ -267,18 +246,18 @@ public:
     bool
     exists_trace_arrow_from(size_t i, size_t j, size_t k, size_t l) const {
         int ij = index_[i]+j-i;
-        return trace_arrow_[ij].exists(ta_key_pair(k,l));
+        return trace_arrow_[ij].find(ta_key(k,l)) != trace_arrow_[ij].end();
     }
 
     void
     delete_trace_arrow(size_t i, size_t j, size_t k, size_t l) {
         int ij = index_[i]+j-i;
-        auto iter = trace_arrow_[ij].find(ta_key_pair(k,l));
+        auto iter = trace_arrow_[ij].find(ta_key(k,l));
 
         if (iter != trace_arrow_[ij].end())
             trace_arrow_[ij].erase(iter);
 
-        //trace_arrow_[ij].erase(ta_key_pair(k,l));
+        //trace_arrow_[ij].erase(ta_key(k,l));
     }
 
     /**
@@ -369,13 +348,13 @@ public:
      * @brief Construct for sequence of specific length
      * @param n sequence length
      */
-    MasterTraceArrows(size_t n);
+    MasterTraceArrows(size_t n, const int *index);
 
-    void
-    resize(size_t n);
+    // void
+    // resize(size_t n);
 
-    void
-    set_index(const int *index);
+    // void
+    // set_index(const int *index);
 
     /**
      * Register trace arrow
@@ -481,7 +460,10 @@ private:
      *  @return true if that trace arrow was erased
      */
     bool
-    gc_trace_arrow(int i, int j, SimpleMap<ta_key_pair, TraceArrow>::iterator &col, TraceArrows &source);
+    gc_trace_arrow(int i,
+                   int j,
+                   TraceArrows::trace_arrow_row_map_t::iterator &col,
+                   TraceArrows &source);
 
     /** @brief Get trace arrow from the target if one exists and call gc_trace_arrow on it
     *   @param i,j,k,l - location of trace arrow

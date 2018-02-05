@@ -1,27 +1,26 @@
 #include "trace_arrow.h"
 
-static size_t ta_n;
-
-ta_key_pair::ta_key_pair(index_t k, index_t l) {
-    value_ = k*ta_n - l;
-
-    assert(value_ > 0 && value_ < 4294967295);
-}
-
-TraceArrows::TraceArrows(size_t n, char srctype)
+TraceArrows::TraceArrows(size_t n, char srctype, const int *index)
     : n_(n),
+      index_(index),
       ta_count_(0),
       ta_avoid_(0),
       ta_erase_(0),
+      ta_shortcut_(0),
+      ta_replace_(0),
       ta_max_(0),
-      srctype_(srctype)
-{}
-
-void
-TraceArrows::resize(size_t n) {
-    int total_length = (n *(n+1))/2;
-    trace_arrow_.resize(total_length);
+      srctype_(srctype),
+      trace_arrow_(n * (n + 1) / 2)
+{
+    assert(index!=nullptr);
 }
+
+// void
+// TraceArrows::resize(size_t n) {
+//     assert(n == n_);
+//     int total_length = (n *(n+1))/2;
+//     trace_arrow_.resize(total_length);
+// }
 
 void
 TraceArrows::compactify() {
@@ -175,10 +174,11 @@ MasterTraceArrows::dec_source_ref_count(size_t i, size_t j, size_t k, size_t l, 
  */
 void
 MasterTraceArrows::gc_row( size_t i, TraceArrows &source ) {
+    return; // deactivate gc; @todo remove later
     if (ta_debug)
         printf("gc_row %c i:%ld\n",source.source_type(),i);
 
-    assert(i<=ta_n);
+    assert(i<n_);
 
     // check through all trace arrows for that i
     for (size_t j=i; j<n_; ++j) {
@@ -186,8 +186,8 @@ MasterTraceArrows::gc_row( size_t i, TraceArrows &source ) {
 
         bool at_front = true;
 
-        SimpleMap<ta_key_pair, TraceArrow>::iterator it = source.trace_arrow_[ij].begin();
-        SimpleMap<ta_key_pair, TraceArrow>::iterator prev = source.trace_arrow_[ij].begin();
+        auto it = source.trace_arrow_[ij].begin();
+        auto prev = source.trace_arrow_[ij].begin();
 
         // Call garbage collection on all the trace arrows at ij
         while (it != source.trace_arrow_[ij].end()) {
@@ -226,7 +226,11 @@ MasterTraceArrows::gc_row( size_t i, TraceArrows &source ) {
  *  @return true if that trace arrow was erased, else false
  */
 bool
-MasterTraceArrows::gc_trace_arrow(int i, int j, SimpleMap<ta_key_pair, TraceArrow>::iterator &col, TraceArrows &source) {
+MasterTraceArrows::gc_trace_arrow(
+    int i,
+    int j,
+    TraceArrows::trace_arrow_row_map_t::iterator &col,
+    TraceArrows &source) {
     //     col->first.first is k   col->first.second is L
     // assert(col->first.first > 0 && col->first.second > 0);
     // get source trace arrow
@@ -278,8 +282,11 @@ bool
 MasterTraceArrows::gc_trace_arrow(size_t i, size_t j, size_t k, size_t l, TraceArrows &source){
     int ij = index_[i]+j-i;
 
-    assert( source.trace_arrow_[ij].exists(ta_key_pair(k,l)) );
-    SimpleMap<ta_key_pair, TraceArrow>::iterator col = source.trace_arrow_[ij].find(ta_key_pair(k,l));
+    assert(source.trace_arrow_[ij].find(source.ta_key(k, l)) !=
+           source.trace_arrow_[ij].end());
+
+    auto col =
+        source.trace_arrow_[ij].find(source.ta_key(k, l));
 
     //assert(col->first.first == k && col->first.second == l);
 
@@ -302,15 +309,14 @@ MasterTraceArrows::gc_to_target(size_t i, size_t j, size_t k, size_t l, TraceArr
     }
 }
 
-MasterTraceArrows::MasterTraceArrows(size_t n)
+MasterTraceArrows::MasterTraceArrows(size_t n, const int *index)
     : n_(n),
-
-    PL(n,P_PL),
-    PR(n,P_PR),
-    PM(n,P_PM),
-    PO(n,P_PO)
+      index_(index),
+      PL(n,P_PL,index),
+      PR(n,P_PR,index),
+      PM(n,P_PM,index),
+      PO(n,P_PO,index)
 {
-    ta_n = n;
 }
 
 void
@@ -322,24 +328,13 @@ MasterTraceArrows::garbage_collect(size_t i) {
     gc_row(i, PO);
 }
 
-void
-MasterTraceArrows::resize(size_t n) {
-    PL.resize(n);
-    PR.resize(n);
-    PM.resize(n);
-    PO.resize(n);
-
-}
-
-void
-MasterTraceArrows::set_index(const int *index){
-    index_ = index;
-
-    PL.set_index(index);
-    PR.set_index(index);
-    PM.set_index(index);
-    PO.set_index(index);
-}
+// void
+// MasterTraceArrows::resize(size_t n) {
+//     PL.resize(n);
+//     PR.resize(n);
+//     PM.resize(n);
+//     PO.resize(n);
+// }
 
 /**
 *   @brief returns the TraceArrows collection corresponding to @param type
