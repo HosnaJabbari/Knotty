@@ -175,6 +175,10 @@ public:
             std::cerr << std::endl;
         }
     }
+    void
+    print_slice(const Index4D &x) const {
+        print_slice(x.i(),x.j(),x.k(),x.l());
+    }
 
     using index_offset_t = std::vector<std::vector<int>>;
 

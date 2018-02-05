@@ -554,7 +554,8 @@ private:
                              int decomp_cases,
                              candidate_lists *CL,
                              const TriangleMatrix &w,
-                             MatrixSlices3D &PX
+                             MatrixSlices3D &PXsrc,
+                             MatrixSlices3D &PXtgt
                              );
 
     void

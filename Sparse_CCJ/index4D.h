@@ -6,6 +6,13 @@
 //! type of 4D matrix -- left, middle, right, outer
 enum class MType { L, M, R, O };
 
+inline
+std::ostream &
+operator << (std::ostream &out, MType type) {
+    static std::array<std::string,4> symbol {"L","M","R","O"};
+    return out << symbol[static_cast<int>(type)];
+}
+
 //! @brief Four-dimensional index for the gap matrices
 class Index4D : public std::array<int,4> {
  public:
