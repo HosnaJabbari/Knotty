@@ -7,7 +7,7 @@
 //! type of energy
 // Should not be a short as INF is 1600000 and is a very common value for energy.
 typedef long int energy_t;
-typedef unsigned short index_t;
+typedef short index_t;
 
 
 template<class T1,class T2>
