@@ -17,7 +17,7 @@ operator << (std::ostream &out, MType type) {
 class Index4D : public std::array<int,4> {
  public:
     Index4D(int i, int j, int k, int l)
-     :std::array<int,4>{i,j,k,l} {}
+     :std::array<int,4>({i,j,k,l}) {}
 
     int i() const { return (*this)[0]; }
     int j() const { return (*this)[1]; }
