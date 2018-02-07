@@ -20,9 +20,6 @@ add_definitions(-DSIMFOLD_HOME=\"${SIMFOLD_HOME}\")
 # SW - deactivate asserts; use for 'production' compile
 # add_definitions(-DNDEBUG -Wno-unused-variable)
 
-# SW - activate warnings and optimization
-set(CMAKE_CXX_FLAGS "-Wall -g -O2")
-
 # set path for executable to be created
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 # create executable
