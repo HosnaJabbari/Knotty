@@ -483,7 +483,6 @@ void pseudo_loop::compute_PK(int i, int j, int k, int l){
     // by changing d<=l to d<l
     for(int d=k+1; d < l; d++){
         int temp = PK.get(i,j,d,l) + WP.get(k,d-1);  //1G21
-
         if (temp < min_energy){
             min_energy=temp;
             best_branch = 2;
@@ -1380,10 +1379,11 @@ pseudo_loop::trace_PX(const Index4D &x, int e, MType type) {
 
 void
 pseudo_loop::recompute_slice_PfromX(const Index4D &x, MType type) {
-    recompute_slice_PXdecomp(x, decomp_cases_by_mtype(type), from_cl_by_mtype(type), WB,
+    recompute_slice_PXdecomp(x, decomp_cases_by_mtype(type), from_cl_by_mtype(type), WP,
                              fromX_by_mtype(type),fromX_by_mtype(type));
 }
 
+//!@todo combine compute_PfromL,...,compute_PfromO into compute_PfromX
 void
 pseudo_loop::compute_PfromL(int i, int j, int k, int l) {
     const Index4D x(i,j,k,l);
@@ -1392,7 +1392,7 @@ pseudo_loop::compute_PfromL(int i, int j, int k, int l) {
     if (impossible_case(x)) {return;}
 
     int min_energy =
-        generic_decomposition(i, j, k, l, CASE_L, PfromL_CL, WB, PfromL,
+        generic_decomposition(i, j, k, l, CASE_L, PfromL_CL, WP, PfromL,
                               lmro_cases_in_fromX_by_mtype(type),
                               [](int i, int j) {
                                   return gamma2(i, j) + PB_penalty;
@@ -1434,7 +1434,7 @@ void pseudo_loop::compute_PfromR(int i, int j, int k, int l){
 
     int min_energy = generic_decomposition(i, j, k, l,
                                            CASE_R,
-                                           PfromR_CL, WB, PfromR,
+                                           PfromR_CL, WP, PfromR,
                                            lmro_cases_in_fromX_by_mtype(type),
                                            [] (int i, int j) {
                                                return gamma2(i,j) + PB_penalty;
@@ -1474,7 +1474,7 @@ void pseudo_loop::compute_PfromM(int i, int j, int k, int l){
 
     int min_energy = generic_decomposition(i, j, k, l,
                                            CASE_M,
-                                           PfromM_CL, WB, PfromM,
+                                           PfromM_CL, WP, PfromM,
                                            lmro_cases_in_fromX_by_mtype(type),
                                            [] (int i, int j) {
                                                return gamma2(i,j) + PB_penalty;
@@ -1522,7 +1522,7 @@ void pseudo_loop::compute_PfromO(int i, int j, int k, int l){
 
     int min_energy = generic_decomposition(i, j, k, l,
                                            CASE_O,
-                                           PfromO_CL, WB, PfromO,
+                                           PfromO_CL, WP, PfromO,
                                            lmro_cases_in_fromX_by_mtype(type),
                                            [] (int i, int j) {
                                                return gamma2(i,j) + PB_penalty;
