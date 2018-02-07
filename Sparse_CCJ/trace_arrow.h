@@ -44,16 +44,16 @@ public:
      * @param k
      * @param l
      */
-    TraceArrow(index_t src_i, index_t src_j, index_t src_k, index_t src_l,
-    index_t i,index_t j,index_t k,index_t l,
+    TraceArrow(int src_i, int src_j, int src_k, int src_l,
+    int i,int j,int k,int l,
     energy_t e, unsigned char srctype, unsigned char tgttype)
 	:  srctype_(srctype), tgttype_(tgttype), ref_count(0),
            i_(i), j_(j), k_(k), l_(l), energy_(e)
     {
     }
 
-    void replace(index_t src_i, index_t src_j, index_t src_k, index_t src_l,
-    index_t i, index_t j, index_t k, index_t l,
+    void replace(int src_i, int src_j, int src_k, int src_l,
+    int i, int j, int k, int l,
     energy_t e, unsigned char srctype, unsigned char tgttype) {
         i_ = i;
         j_ = j;
@@ -73,10 +73,10 @@ public:
     unsigned char source_type() const { return srctype_;}
     unsigned char target_type() const { return tgttype_;}
 
-    index_t i() const {return i_;}
-    index_t j() const {return j_;}
-    index_t k() const {return k_;}
-    index_t l() const {return l_;}
+    int i() const {return i_;}
+    int j() const {return j_;}
+    int k() const {return k_;}
+    int l() const {return l_;}
 
     energy_t target_energy() const {return energy_;}
     index_t source_ref_count() const {return ref_count;}
