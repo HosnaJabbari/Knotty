@@ -2856,6 +2856,13 @@ int pseudo_loop::get_e_stP(int i, int j){
 	if (i+1 == j-1 || i< 0 || j< 0 || i>=nb_nucleotides || j>=nb_nucleotides ){ 
 		return INF;
 	}
+        // Ian Wark Feb 2018
+        // Need to check if i and j can actually pair first.
+        // gave trouble with sequence AGGUAUGAAGUCCUAUUCGCUCCUGAUAGGAUCGACUUCAUAUUGCUUAUAUAUGUGCUAACGCACAUAUAUAAAUGCUCAUGCAAAACUGCAUGAAUGCCCCUAAGGGAUGC
+        if (!can_pair(i,j)) {
+		return INF;
+        }
+
 	int ss = S->get_energy(i,j,int_sequence);
 	if (ss < INF/2){
 		int energy = (int)round(e_stP_penalty * (double)ss);
