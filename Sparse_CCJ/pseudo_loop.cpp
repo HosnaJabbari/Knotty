@@ -1046,7 +1046,7 @@ pseudo_loop::trace_PfromX(const Index4D &x, int e, MType type) {
         generic_decomposition(x.i(), x.j(), x.k(), x.l(),
                               decomp_cases_by_mtype(type),
                               from_cl_by_mtype(type),
-                              WB, PfromX);
+                              WP, PfromX);
 
     // returning results via class members is convenient but
     // dangerous; here we need local copies
