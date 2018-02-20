@@ -8,6 +8,7 @@
 
 #include "h_common.h"
 #include "matrices.h"
+#include <limits>
 
 //#include <memory>
 
@@ -16,18 +17,22 @@
 // next PK_candidate saved for that l
 class candidate_PK {
 private:
-    short d_;
-    short j_;
-    short k_;
+    using energy_t = short int; // type to internally store energies
+    using index_t = unsigned short int;
 
-    int w_;
+    index_t d_;
+    index_t j_;
+    index_t k_;
+
+    energy_t w_;
 
 public:
-    candidate_PK(size_t set_d, size_t set_j, size_t set_k, int set_w)
-    : d_(set_d), j_(set_j), k_(set_k), w_(set_w)
+    candidate_PK(size_t d, size_t j, size_t k, int w)
+    : d_(d), j_(j), k_(k), w_(w)
     {
         // make sure we can fit it in a short
-        assert((set_w < 32768) && (set_w < 32767));
+        assert( w >= std::numeric_limits<energy_t>::min()
+                && w <= std::numeric_limits<energy_t>::max() );
     }
 
     int d() const { return d_; }
@@ -75,7 +80,10 @@ public:
 //!
 class candidate_lists {
 public:
-    using list_t = SimpleMap<int,int,std::greater<int>>;
+    using energy_t = short int; // type to internally store energies
+    using index_t = unsigned short int; // type for single index (already too small for triangle indices)
+
+    using list_t = SimpleMap<index_t,energy_t,std::greater<energy_t>>;
 
     template<class CList>
     using list_map_t = SimpleMap<int,CList>;
@@ -114,7 +122,7 @@ public:
 
     /**
      * @returns the candidate list at j,k,l
-     * if the list does not exist, return empty list
+    * if the list does not exist, return empty list
      */
     const list_t &
     get_list(int j, int k, int l) const {

@@ -114,6 +114,8 @@ public:
             giveup (e.what(), "energy");
         }
         for (auto &x: m_) x=INF+1;
+
+        // std::cerr << "Create "<<nb_slices<<" slices: " << ((m_.capacity()*sizeof(int)) >> 10)  << " KB" <<std::endl;
     }
 
     int get(int i, int j, int k, int l) const {

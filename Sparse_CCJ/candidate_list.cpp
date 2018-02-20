@@ -49,6 +49,12 @@ void candidate_lists::push_candidate(const Index4D &x, int w) {
     // std::cerr << "candidate_lists::push_candidate(" << x << ", " << w << ")"
     //           << " " << index3D(x.j(),x.k(),x.l()) << std::endl;
 
+    assert( w >= std::numeric_limits<energy_t>::min()
+            && w <= std::numeric_limits<energy_t>::max() );
+
+    assert( x.i() >= std::numeric_limits<index_t>::min()
+            && x.i() <= std::numeric_limits<index_t>::max() );
+
     cls_[x.j()][index(x.k(),x.l())].push_sorted(x.i(), w);
 }
 
