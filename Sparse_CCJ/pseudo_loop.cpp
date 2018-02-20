@@ -547,7 +547,7 @@ void pseudo_loop::recompute_slice_PK(const Index4D &x) {
     for (int l=min_k+1; l<=max_l; l++) {
         for (int j=i; j<=max_j; j++) {
             for (int k = std::max(min_k, j + 2); k < l; k++) {
-                PK.set(i,j,k,l) = INF+1;
+                PK.set(i,j,k,l,INF+1);
             }
         }
     }
@@ -561,7 +561,7 @@ void pseudo_loop::recompute_slice_PK(const Index4D &x) {
             if (d != i || j>max_j || k<min_k || l>max_l)
                 continue;
             assert(c.w() < INF/2);
-            PK.set(i, j, k, l) = c.w();
+            PK.set(i, j, k, l, c.w());
         }
     }
 
@@ -775,7 +775,7 @@ pseudo_loop::recompute_slice_PXdecomp(const Index4D &x,
                 int energy;
                 if (CL!=nullptr &&
                     (energy = CL->find_candidate(i,j,k,l)) < INF/2) {
-                    PXtgt.set(i, j, k, l) = energy;
+                    PXtgt.set(i, j, k, l, energy);
                 } else {
                     // decomposition cases of compute_PXmloop0_sp(i,j,k,l):
                     int min_energy =

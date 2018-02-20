@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <iostream>
+#include <limits>
 
 #include "index4D.h"
 
@@ -97,6 +98,9 @@ class ccj_get_policy {
 
 class MatrixSlices3D {
 public:
+    using energy_t = short int;
+    const energy_t INTERN_INF = std::numeric_limits<energy_t>::max();
+
     //! construct empty
     MatrixSlices3D() {}
 
@@ -113,9 +117,9 @@ public:
         } catch(std::exception &e) {
             giveup (e.what(), "energy");
         }
-        for (auto &x: m_) x=INF+1;
+        for (auto &x: m_) x=INTERN_INF;
 
-        // std::cerr << "Create "<<nb_slices<<" slices: " << ((m_.capacity()*sizeof(int)) >> 10)  << " KB" <<std::endl;
+        // std::cerr << "Create "<<nb_slices<<" slices: " << ((m_.capacity()*sizeof(energy_t)) >> 10)  << " KB" <<std::endl;
     }
 
     int get(int i, int j, int k, int l) const {
@@ -131,25 +135,33 @@ public:
         // also made it an assert since it should never happen
         assert(!(i<0 || l>= n_));
 
-        return m_[index(i,j,k,l)];
+        int val = m_[index(i,j,k,l)];
+        if (val==INTERN_INF) val=INF;
+        return val;
     }
 
     int get(const Index4D &x) const {
         return get(x.i(),x.j(),x.k(),x.l());
     }
 
-    int& set(int i, int j, int k, int l) {
-        return m_[index(i,j,k,l)];
+    void set(int i, int j, int k, int l, int e) {
+        if (e >= INF) e=INTERN_INF;
+        assert( e >= std::numeric_limits<energy_t>::min() );
+
+        m_[index(i,j,k,l)] = e;
     }
 
-    int& set(const Index4D &x) {
-        return set(x.i(),x.j(),x.k(),x.l());
+    void
+    set(const Index4D &x, int e) {
+        set(x.i(),x.j(),x.k(),x.l(), e);
     }
 
     //! set and take care of infinite energy
     void
     setI(int i, int j, int k, int l, int e) {
-        if (e >= INF/2) e=INF;
+        if (e >= INF/2) e=INTERN_INF;
+        assert( e >= std::numeric_limits<energy_t>::min() );
+
         m_[index(i,j,k,l)] = e;
     }
 
@@ -218,7 +230,7 @@ private:
 
     index_offset_t offset_;
 
-    std::vector<int> m_;
+    std::vector<energy_t> m_;
 
     size_t
     index(int i, int j, int k, int l) const {
