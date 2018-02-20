@@ -16,11 +16,10 @@
 // next PK_candidate saved for that l
 class candidate_PK {
 private:
-    int d_;
-    int j_;
-    int k_;
+    short d_;
+    short j_;
+    short k_;
 
-    /// TODO ordering this stuff for space
     int w_;
 
 public:
@@ -31,9 +30,9 @@ public:
         assert((set_w < 32768) && (set_w < 32767));
     }
 
-    short d() const { return d_; }
-    short j() const { return j_; }
-    short k() const { return k_; }
+    int d() const { return d_; }
+    int j() const { return j_; }
+    int k() const { return k_; }
     int w() const { return w_; }
 
 };
