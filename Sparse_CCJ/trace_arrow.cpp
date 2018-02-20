@@ -1,26 +1,17 @@
 #include "trace_arrow.h"
 
-TraceArrows::TraceArrows(size_t n, char srctype, const int *index)
+TraceArrows::TraceArrows(size_t n, const MType &src_mtype, const int *index)
     : n_(n),
       index_(index),
       ta_count_(0),
       ta_avoid_(0),
       ta_erase_(0),
-      ta_shortcut_(0),
-      ta_replace_(0),
       ta_max_(0),
-      srctype_(srctype),
+      src_mtype_(src_mtype),
       trace_arrow_(n * (n + 1) / 2)
 {
     assert(index!=nullptr);
 }
-
-// void
-// TraceArrows::resize(size_t n) {
-//     assert(n == n_);
-//     int total_length = (n *(n+1))/2;
-//     trace_arrow_.resize(total_length);
-// }
 
 void
 TraceArrows::compactify() {
@@ -50,113 +41,64 @@ TraceArrows::capacity() const {
     return c;
 }
 
-/**
- * Register trace arrow
- *
- * @param srctype source matrix type
- * @param i source i
- * @param j source j
- * @param k source k
- * @param l source l
- * @param tgttype target matrix type
- * @param m target i
- * @param n target j
- * @param o target k
- * @param p target l
- * @param target energy e
- */
 void
-MasterTraceArrows::register_trace_arrow(int i, int j, int k, int l,
-                     int m, int n, int o, int p,
-                     energy_t e, int srctype, int tgttype) {
-    TraceArrows *source = get_arrows_by_type(srctype);
-    assert(i <= j && j <= k && k <= l);
-    assert(m <= n && n <= o && o <= p);
+MasterTraceArrows::register_trace_arrow(const Index4D &src_x,
+                                        const Index4D &tgt_x,
+                                        const MType &mtype,
+                                        energy_t e) {
+    TraceArrows *source = get_arrows_by_mtype(mtype);
 
-    // If there is already a trace arrow there
-    // replace it if the new trace arrow is better
-    TraceArrow *old = source->trace_arrow_from(i,j,k,l);
-    if (source->use_replace() && old != nullptr) {
+    // one cannot register arrows twice for the same matrix cell
+    assert( source->trace_arrow_from(src_x) == nullptr );
 
-        if (e < old->target_energy()) {
-            assert(false); // SW - why should this ever happen?
-            /*
-            if (ta_debug) {
-                printf("Replace trace arrow: \n old trace arrow: ");
-                source->print_type(old->source_type()); printf("(%d,%d,%d,%d) -> ", i,j,k,l);
-                source->print_type(old->target_type()); printf("(%d,%d,%d,%d) e:%d\n",old->i(),old->j(),old->k(),old->l(), old->target_energy());
-                printf("new trace arrow: ");
-                source->print_type(srctype); printf("(%d,%d,%d,%d) -> ", i,j,k,l);
-                source->print_type(tgttype);
-                printf("(%d,%d,%d,%d) e:%d\n",m,n,o,p,e);
-            }
-            */
-
-            old->replace(i,j,k,l, m,n,o,p, e,srctype,tgttype);
-            inc_source_ref_count(m,n,o,p,tgttype);
-            source->inc_replaced();
-        }
-    } else {
-        // Just add new trace arrow
-        if (ta_debug) {
-            printf("Register Trace Arrow ");
-            source->print_type(srctype); printf("(%d,%d,%d,%d)->",i,j,k,l);
-            source->print_type(tgttype); printf("(%d,%d,%d,%d) e: %d \n",m,n,o,p, e);
-        }
-
-        assert(!source->exists_trace_arrow_from(i,j,k,l));
-        source->trace_arrow_add(i,j,k,l,m,n,o,p,e,srctype,tgttype);
-
-        inc_source_ref_count(m,n,o,p,tgttype);
-
-        source->inc_count();
-        source->set_max();
+    if (ta_debug) {
+        std::cout << "Register Trace Arrow " << mtype << " " << src_x << " -> "
+                  << tgt_x << " e:" << e;
     }
 
+    assert(!source->exists_trace_arrow_from(src_x));
+    source->trace_arrow_add(src_x, tgt_x, mtype, e);
+
+    inc_source_ref_count(tgt_x, mtype);
+
+    source->inc_count();
+    source->set_max();
 }
 
 /**
  * Increment the reference count of the source
  *
- * @param source i
- * @param source j
- * @param source k
- * @param source l
+ * @param x source index
+ * @param mtype source type
  *
  * If no trace arrow from source exists, do nothing
  */
 void
-MasterTraceArrows::inc_source_ref_count(size_t i, size_t j, size_t k, size_t l, char type) {
+MasterTraceArrows::inc_source_ref_count(const Index4D &x, const MType &mtype) {
     // Must check from the target arrows structure, not source
-    TraceArrows *target = get_arrows_by_type(type);
+    TraceArrows *target = get_arrows_by_mtype(mtype);
     if (target==nullptr) return; // do nothing if there are no trace arrows for the target
 
-    TraceArrow *ta= target->trace_arrow_from(i,j,k,l);
+    TraceArrow *ta= target->trace_arrow_from(x);
     if (ta != nullptr)
     	ta->inc_src();
-
-    //if (ta_debug) {
-//        printf("inc_source_ref_count %c(%d,%d,%d,%d)->%c(%d,%d,%d,%d) ref count:%d\n",ta->source_type(),i,j,k,l, ta->target_type(),ta->i(),ta->j(),ta->k(),ta->l(),ta->source_ref_count());
-//    }
 }
 
 /**
  * Decrement the reference count of the source
  *
- * @param source i
- * @param source j
- * @param source k
- * @param source l
+ * @param x source index
+ * @param mtype source type
  *
  * If no trace arrow from source exists, do nothing
  */
 void
-MasterTraceArrows::dec_source_ref_count(size_t i, size_t j, size_t k, size_t l, char type) {
+MasterTraceArrows::dec_source_ref_count(const Index4D &x, const MType &mtype) {
     // Must check from the target arrows structure, not source
-    TraceArrows *target = get_arrows_by_type(type);
+    TraceArrows *target = get_arrows_by_mtype(mtype);
 
     // get trace arrow from (i,j,k,l) if it exists
-    TraceArrow *ta= target->trace_arrow_from(i,j,k,l);
+    TraceArrow *ta= target->trace_arrow_from(x);
 
     if (ta != nullptr) {
         assert(ta->source_ref_count() > 0);
@@ -167,6 +109,8 @@ MasterTraceArrows::dec_source_ref_count(size_t i, size_t j, size_t k, size_t l, 
     //    printf("dec_source_ref_count %c(%d,%d,%d,%d)->%c(%d,%d,%d,%d) ref count:%d\n",ta->source_type(),i,j,k,l, ta->target_type(),ta->i(),ta->j(),ta->k(),ta->l(),ta->source_ref_count());
     //}
 }
+
+#ifndef TEMP_DEACTIVATE_GC
 
 /** @brief Calls garbage collection of trace arrows on a row of trace arrows
  *  @param i is the which row to garbage collect on
@@ -226,13 +170,16 @@ MasterTraceArrows::gc_row( size_t i, TraceArrows &source ) {
  *  @return true if that trace arrow was erased, else false
  */
 bool
-MasterTraceArrows::gc_trace_arrow(
-    int i,
-    int j,
-    TraceArrows::trace_arrow_row_map_t::iterator &col,
-    TraceArrows &source) {
-    //     col->first.first is k   col->first.second is L
-    // assert(col->first.first > 0 && col->first.second > 0);
+MasterTraceArrows::gc_trace_arrow(const Index4D &x, TraceArrows &source){
+
+    int ij = index_[x.i()]+x.j()-x.i();
+
+    assert(source.trace_arrow_[ij].find(source.ta_key(x.k(), x.l())) !=
+           source.trace_arrow_[ij].end());
+
+    auto col =
+        source.trace_arrow_[ij].find(source.ta_key(x.k(), x.l()));
+
     // get source trace arrow
     const TraceArrow ta = col->second;
 
@@ -246,10 +193,10 @@ MasterTraceArrows::gc_trace_arrow(
     }
 */
 
-    assert(ta.source_ref_count() >= 0);
     if (ta.source_ref_count() == 0) {
         // Save i,j,k,l of target trace arrow before deleting source arrow
-        int target_i = ta.i(), target_j = ta.j(), target_k = ta.k(), target_l = ta.l();
+        auto tgt_x = ta.x(src_x,type);
+        // int target_i = ta.i(), target_j = ta.j(), target_k = ta.k(), target_l = ta.l();
 
         // get container trace arrows of target_type
         TraceArrows *target = get_arrows_by_type(ta.target_type());
@@ -267,30 +214,12 @@ MasterTraceArrows::gc_trace_arrow(
         // Only continue on and delete what it is pointing at if it is going backwards
         if (target_i > i)
             // continue to what source arrow was pointing at
-            gc_to_target(target_i, target_j, target_k, target_l, *target);
+            gc_to_target(tgt_x , *target);
 
         return true;
     }
 
     return false;
-}
-
-/** @brief Garbage collection of a trace arrow
- *  @return true if that trace arrow was erased, else false
- */
-bool
-MasterTraceArrows::gc_trace_arrow(size_t i, size_t j, size_t k, size_t l, TraceArrows &source){
-    int ij = index_[i]+j-i;
-
-    assert(source.trace_arrow_[ij].find(source.ta_key(k, l)) !=
-           source.trace_arrow_[ij].end());
-
-    auto col =
-        source.trace_arrow_[ij].find(source.ta_key(k, l));
-
-    //assert(col->first.first == k && col->first.second == l);
-
-    return gc_trace_arrow(i, j, col, source);
 }
 
 /** @brief Get trace arrow from the target if one exists and call gc_trace_arrow on it
@@ -309,32 +238,28 @@ MasterTraceArrows::gc_to_target(size_t i, size_t j, size_t k, size_t l, TraceArr
     }
 }
 
+#endif
+
 MasterTraceArrows::MasterTraceArrows(size_t n, const int *index)
     : n_(n),
       index_(index),
-      PL(n,P_PL,index),
-      PR(n,P_PR,index),
-      PM(n,P_PM,index),
-      PO(n,P_PO,index)
+      PL(n,MType::L,index),
+      PR(n,MType::R,index),
+      PM(n,MType::M,index),
+      PO(n,MType::O,index)
 {
 }
 
 void
 MasterTraceArrows::garbage_collect(size_t i) {
+#ifndef TEMP_DEACTIVATE_GC
     //printf("MasterTraceArrows::garbage_collect(%d)\n",i);
     gc_row(i, PL);
     gc_row(i, PR);
     gc_row(i, PM);
     gc_row(i, PO);
+#endif
 }
-
-// void
-// MasterTraceArrows::resize(size_t n) {
-//     PL.resize(n);
-//     PR.resize(n);
-//     PM.resize(n);
-//     PO.resize(n);
-// }
 
 /**
 *   @brief returns the TraceArrows collection corresponding to @param type
@@ -354,6 +279,25 @@ MasterTraceArrows::get_arrows_by_type(char type) {
     return target;
 }
 
+/**
+*   @brief returns the TraceArrows collection corresponding to @param type
+*/
+TraceArrows*
+MasterTraceArrows::get_arrows_by_mtype(const MType &type) {
+    TraceArrows *target = nullptr;
+    switch(type) {
+        case MType::L: target = &PL; break;
+        case MType::R: target = &PR; break;
+        case MType::M: target = &PM; break;
+        case MType::O: target = &PO; break;
+
+        default: target=nullptr;
+    }
+
+    return target;
+}
+
+
 void
 MasterTraceArrows::compactify() {
     PL.compactify();
@@ -372,18 +316,10 @@ MasterTraceArrows::print_ta_sizes(){
     unsigned long long avoided =
         PL.avoided() + PR.avoided() + PM.avoided() + PO.avoided();
 
-    unsigned long long shortcut =
-        PL.shortcut() + PR.shortcut() + PM.shortcut() + PO.shortcut();
-
-    unsigned long long replaced =
-        PL.replaced() + PR.replaced() + PM.replaced() + PO.replaced();
-
     unsigned long long max = PL.max() + PR.max() + PM.max() + PO.max();
 
     std::cout << "Trace Arrows Size: "<<size
               <<" Avoided: "<<avoided
-              <<" Shortcut: "<<shortcut
-              <<" Replaced: "<<replaced
               <<" Erased: "<<erased
               <<" Max: "<<max
               <<"\n";
@@ -397,52 +333,4 @@ MasterTraceArrows::print_ta_sizes_verbose(){
     printf("PO: "); PO.print_ta_size();
 
     print_ta_sizes();
-}
-
-void
-TraceArrows::print_type(char type) {
-    switch (type) {
-        case P_P: printf("P"); break;
-        case P_PK: printf("PK"); break;
-
-        case P_PL: printf("PL"); break;
-        case P_PR: printf("PR"); break;
-        case P_PM: printf("PM"); break;
-        case P_PO: printf("PO"); break;
-
-        case P_PfromL: printf("PfromL"); break;
-        case P_PfromR: printf("PfromR"); break;
-        case P_PfromM: printf("PfromM"); break;
-        case P_PfromO: printf("PfromO"); break;
-
-        case P_PLiloop: printf("PLiloop"); break;
-        case P_PLiloop5: printf("PLiloop5"); break;
-        case P_PRiloop: printf("PRiloop"); break;
-        case P_PRiloop5: printf("PRiloop5"); break;
-        case P_PMiloop: printf("PMiloop"); break;
-        case P_PMiloop5: printf("PMiloop5"); break;
-        case P_POiloop: printf("POiloop"); break;
-        case P_POiloop5: printf("POiloop5"); break;
-
-        case P_PLmloop: printf("PLmloop"); break;
-        case P_PLmloop1: printf("PLmloop1"); break;
-        case P_PLmloop0: printf("PLmloop0"); break;
-
-        case P_PRmloop: printf("PRmloop"); break;
-        case P_PRmloop1: printf("PRmloop1"); break;
-        case P_PRmloop0: printf("PRmloop0"); break;
-
-        case P_PMmloop: printf("PMmloop"); break;
-        case P_PMmloop1: printf("PMmloop1"); break;
-        case P_PMmloop0: printf("PMmloop0"); break;
-
-        case P_POmloop: printf("POmloop"); break;
-        case P_POmloop1: printf("POmloop1"); break;
-        case P_POmloop0: printf("POmloop0"); break;
-
-        case P_WB: printf("WB"); break;
-        case P_WBP: printf("WBP"); break;
-        case P_WP: printf("WP"); break;
-        case P_WPP: printf("WPP"); break;
-    }
 }

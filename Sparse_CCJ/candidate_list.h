@@ -1,6 +1,5 @@
 #pragma once
 
-#include "base.h"
 #include "simple_map.h"
 #include "h_struct.h"
 #include "h_common.h"
@@ -17,9 +16,9 @@
 // next PK_candidate saved for that l
 class candidate_PK {
 private:
-    index_t d_;
-    index_t j_;
-    index_t k_;
+    int d_;
+    int j_;
+    int k_;
 
     /// TODO ordering this stuff for space
     int w_;

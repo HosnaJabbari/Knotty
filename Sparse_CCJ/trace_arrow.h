@@ -1,67 +1,52 @@
 #ifndef TRACE_ARROW_H
 #define TRACE_ARROW_H
 
+// temporarily deactivate code for garbage collection
+//
+// The current garbage collection is incompatible with the
+// trace back scheme with recomputation and needs thorough revision
+//
+#define TEMP_DEACTIVATE_GC
+
 #include <unordered_map>
-#include "base.h"
 #include "simple_map.h"
 #include "h_common.h"
 #include "index4D.h"
 
-
 using ta_key_t=int;
 
+using energy_t = int; //as used all over CCJ
+
+
+class MasterTraceArrows;
 
 /**
  * @brief Trace arrow
  *
- * Describes a trace arrow from src_i,src_j,src_k,src_l to i_,j_,k_,l_. The source (X,i,j,k,l)
- * is not represented in the data structure. However, each trace arrow
- * is associated with exactly one source.  Source and target matrix
- * types are maintained.
+ * Describes a trace arrow from src_i,src_j,src_k,src_l to i_,j_,k_,l_. The
+ * source (X,i,j,k,l) and its type is not represented in the data structure.
+ * However, each trace arrow is associated with exactly one source.
+ * All trace arrows point to the entries of the same matrix, therefore we do not
+ * need to store the target type.
  */
 class TraceArrow {
-private:
-    /// TODO don't need srctype (won't save space with 3 chars vs. 2 though)
-    char srctype_;
-    char tgttype_;
-
-    unsigned short ref_count; //!< counts how many trace arrows point to the source
-
-    // The indices of the location the trace arrow points to.
-    // The source i,j,k,l will always be available because that is where the trace arrow is stored (TraceArrows[ij].find(kl))
-    index_t i_;
-    index_t j_;
-    index_t k_;
-    index_t l_;
-
-    energy_t energy_; //!<target energy
-
+    friend class MasterTraceArrows;
 public:
-
     /**
      * @brief construct by target coordinates
-     * @param type
-     * @param k
-     * @param l
      */
-    TraceArrow(int src_i, int src_j, int src_k, int src_l,
-    int i,int j,int k,int l,
-    energy_t e, unsigned char srctype, unsigned char tgttype)
-	:  srctype_(srctype), tgttype_(tgttype), ref_count(0),
-           i_(i), j_(j), k_(k), l_(l), energy_(e)
+    TraceArrow(const Index4D &src_x,
+               const Index4D &tgt_x,
+               const MType &mtype,
+               energy_t e)
+	:
+#ifndef TEMP_DEACTIVATE_GC
+        ref_count(0),
+#endif
+        energy_(e)
     {
-    }
-
-    void replace(int src_i, int src_j, int src_k, int src_l,
-    int i, int j, int k, int l,
-    energy_t e, unsigned char srctype, unsigned char tgttype) {
-        i_ = i;
-        j_ = j;
-        k_ = k;
-        l_ = l;
-
-        energy_ = e;
-        tgttype_ = tgttype;
+        lend_ = tgt_x.lend(mtype);
+        rend_ = tgt_x.rend(mtype);
     }
 
     /**
@@ -69,32 +54,53 @@ public:
      */
     TraceArrow() {}
 
-    // Getters
-    unsigned char source_type() const { return srctype_;}
-    unsigned char target_type() const { return tgttype_;}
-
-    int i() const {return i_;}
-    int j() const {return j_;}
-    int k() const {return k_;}
-    int l() const {return l_;}
+    //! @brief get 4D index of target
+    //! @param src_x 4D index of source
+    //! @param type MType of arrow
+    Index4D x(const Index4D &src_x, const MType &type) const {
+        Index4D y = src_x;
+        y.lend(type) = lend_;
+        y.rend(type) = rend_;
+        return y;
+    }
 
     energy_t target_energy() const {return energy_;}
-    index_t source_ref_count() const {return ref_count;}
+    int source_ref_count() const {
+#ifndef TEMP_DEACTIVATE_GC
+        return ref_count;
+#else
+        return 123;
+#endif
+    }
+
+private:
+#ifndef TEMP_DEACTIVATE_GC
+    unsigned short ref_count; //!< counts how many trace arrows point to the source
+#endif
+
+    // The indices of the location the trace arrow points to.
+    // The source i,j,k,l will always be available because that is where the trace arrow is stored (TraceArrows[ij].find(kl))
+
+    short int lend_;
+    short int rend_;
+
+    energy_t energy_; //!<target energy
 
     // Increase/decrease reference count
     void inc_src() {
+#ifndef TEMP_DEACTIVATE_GC
         assert(ref_count < 65534);
         ref_count++;
+#endif
     }
     void dec_src() {
+#ifndef TEMP_DEACTIVATE_GC
         assert(ref_count > 0);
         ref_count--;
+#endif
     }
 };
 
-
-
-class MasterTraceArrows;
 
 /**
  * @brief Collection of trace arrows
@@ -116,47 +122,49 @@ public:
     //! where ij is the 'triangle matrix' index for (i,j)
     typedef std::vector< trace_arrow_row_map_t >  trace_arrow_map_t;
 
-private:
-
-    size_t n_; //!< sequence length
-    const int *index_;
-
-    unsigned long long ta_count_; // count all generated tas
-    unsigned long long ta_avoid_; // count all avoided tas (since they point to candidates)
-    unsigned long long ta_erase_; // count all erased tas (in gc)
-
-    unsigned long long ta_shortcut_;  // some trace arrows always go out the same way (such as PMiloop), with these
-                                      // we can instead just go straight there and skip a step (PM->PMiloop->PM becomes PM->PM)
-    unsigned long long ta_replace_;   // however, this means inserting a trace arrow before knowing that
-                                      // that is the best branch for the original (PM) so we may have to overwrite that when it is not
-                                      // ta_shortcut is number that have done the shortcut
-                                      // and ta_replace is the number that have been replaced by another, better branch.
-                                      // ta_shortcut is reduced by 1 whenever ta_replace is increased by 1, and ta_shortcut should usually be greater than ta_replace
-
-
-    unsigned long long ta_max_; // keep track of maximum number of tas, existing simultaneously
-
-    char srctype_;
-
-    bool use_replace_ = true;   // if false, will keep extra useless trace arrows that should have been replaced, but may help debug replace function.
-
-    trace_arrow_map_t trace_arrow_;
-
-public:
-
     ta_key_t
-    ta_key(index_t k, index_t l) const {
+    ta_key(int k, int l) const {
         ta_key_t value = k*n_ - l;
         assert(value > 0 && value < 4294967295);
         return value;
     }
 
-
     /**
      * @brief Construct for sequence of specific length
      * @param n sequence length
      */
-    TraceArrows(size_t n, char srctype, const int *index);
+    TraceArrows(size_t n, const MType &src_mtype, const int *index);
+
+    /**
+     * avoid one trace arrow (for statistics only)
+     */
+    void
+    avoid_trace_arrow() {
+        ta_avoid_++;
+    }
+
+    /**
+     * @brief Get target of trace arrow by source (const)
+     *
+     * @param source i
+     * @param source j
+     * @param source k
+     * @param source l
+     *
+     * @return nullptr on failure
+     */
+    TraceArrow*
+    trace_arrow_from(const Index4D &x) {
+        int ij = index_[x.i()]+x.j()-x.i();
+        auto iter = trace_arrow_[ij].find(ta_key(x.k(),x.l()));
+
+        if (iter != trace_arrow_[ij].end())
+            return &iter->second;
+        else
+            return nullptr;
+    }
+
+private:
 
     // void
     // resize(size_t n);
@@ -178,40 +186,15 @@ public:
 
     // Add trace arrow at (i,j,k,l) pointing to (m,n,o,p)
     void
-    trace_arrow_add(size_t i, size_t j, size_t k, size_t l,
-                    size_t m, size_t n, size_t o, size_t p,
-                    energy_t e, char srctype, char tgttype) {
-        int ij = index_[i]+j-i;
-        trace_arrow_[ij][ta_key(k, l)] =
-            TraceArrow(i, j, k, l, m, n, o, p, e, srctype, tgttype);
+    trace_arrow_add(const Index4D &src_x,
+                    const Index4D &tgt_x,
+                    const MType &mtype,
+                    energy_t e) {
+        int ij = index_[src_x.i()]+src_x.j()-src_x.i();
+        trace_arrow_[ij][ta_key(src_x.k(), src_x.l())] =
+            TraceArrow(src_x, tgt_x, mtype, e);
     }
 
-
-    /**
-     * @brief Get target of trace arrow by source (const)
-     *
-     * @param source i
-     * @param source j
-     * @param source k
-     * @param source l
-     *
-     * @return nullptr on failure
-     */
-    const TraceArrow *
-    trace_arrow_from(size_t i, size_t j, size_t k, size_t l) const {
-        int ij = index_[i]+j-i;
-        auto iter = trace_arrow_[ij].find(ta_key(k,l));
-
-        if (iter != trace_arrow_[ij].end())
-            return &iter->second;
-        else
-            return nullptr;
-    }
-
-    const TraceArrow *
-    trace_arrow_from(const Index4D &x) const {
-        return trace_arrow_from(x.i(), x.j(), x.k(), x.l());
-    }
 
     /**
      * Get target of trace arrow by source (non-const)
@@ -244,50 +227,24 @@ public:
      * @returns whether trace arrow exists
      */
     bool
-    exists_trace_arrow_from(size_t i, size_t j, size_t k, size_t l) const {
-        int ij = index_[i]+j-i;
-        return trace_arrow_[ij].find(ta_key(k,l)) != trace_arrow_[ij].end();
+    exists_trace_arrow_from(const Index4D &x) const {
+        int ij = index_[x.i()]+x.j()-x.i();
+        return trace_arrow_[ij].find(ta_key(x.k(),x.l())) != trace_arrow_[ij].end();
     }
 
     void
-    delete_trace_arrow(size_t i, size_t j, size_t k, size_t l) {
-        int ij = index_[i]+j-i;
-        auto iter = trace_arrow_[ij].find(ta_key(k,l));
+    delete_trace_arrow(const Index4D &x) {
+        int ij = index_[x.i()]+x.j()-x.i();
+        auto iter = trace_arrow_[ij].find(ta_key(x.k(),x.l()));
 
         if (iter != trace_arrow_[ij].end())
             trace_arrow_[ij].erase(iter);
-
-        //trace_arrow_[ij].erase(ta_key(k,l));
     }
 
-    /**
-     * avoid one trace arrow (for statistics only)
-     */
-    void
-    avoid_trace_arrow() {
-        ta_avoid_++;
+    const MType &source_type() {
+        return src_mtype_;
     }
 
-    void inc_shortcut() {
-        ta_shortcut_++;
-    }
-
-    void
-    inc_replaced() {
-        ta_replace_++;
-        ta_shortcut_--;
-    }
-
-    bool use_replace() {
-        return use_replace_;
-    }
-
-    char source_type() {
-        return srctype_;
-    }
-
-
-public:
     /**
      * @brief Compactify heap space
      */
@@ -309,15 +266,23 @@ public:
     unsigned long long size() const {return ta_count_;}
     unsigned long long erased() const {return ta_erase_;}
     unsigned long long avoided() const {return ta_avoid_;}
-    unsigned long long shortcut() const {return ta_shortcut_;}
-    unsigned long long replaced() const {return ta_replace_;}
     unsigned long long max() const {return ta_max_;}
+
     void print_ta_size() const {
-        std::cout << "size: " << size() << "avoided: " << avoided() << "shortcut: " << shortcut() << "replaced: " << replaced() << "erased: " << erased() << "max: " << max() << std::endl;
+        std::cout << "size: " << size() << " avoided: " << avoided() << " erased: " << erased() << " max: " << max() << std::endl;
     }
 
-    void
-    print_type(char type);
+    size_t n_; //!< sequence length
+    const int *index_;
+
+    unsigned long long ta_count_; // count all generated tas
+    unsigned long long ta_avoid_; // count all avoided tas (since they point to candidates)
+    unsigned long long ta_erase_; // count all erased tas (in gc)
+    unsigned long long ta_max_; // keep track of maximum number of tas, existing simultaneously
+
+    MType src_mtype_;
+
+    trace_arrow_map_t trace_arrow_;
 };
 
 /**
@@ -336,8 +301,6 @@ private:
 
 public:
     // A seperate TraceArrows for each matrix source type
-    // Explanation in comments by ta_replace in TraceArrows
-    // PLiloop -> PL  PRiloop -> PR  PMiloop -> PM  POiloop -> PO
 
     TraceArrows PL;
     TraceArrows PR;
@@ -356,35 +319,21 @@ public:
     // void
     // set_index(const int *index);
 
+
     /**
      * Register trace arrow
      *
      * @param srctype source matrix type
-     * @param i source i
-     * @param j source j
-     * @param k source k
-     * @param l source l
-     * @param tgttype target matrix type
-     * @param m target i
-     * @param n target j
-     * @param o target k
-     * @param p target l
+     * @param src_x source index
+     * @param tgt_x target index
      * @param target energy e
+     * @param mtype matrix type
      */
-    void
-    register_trace_arrow(int i, int j, int k, int l,
-                         int m, int n, int o, int p,
-                         energy_t e, int srctype, int tgttype);
-
     void
     register_trace_arrow(const Index4D &src_x,
                          const Index4D &tgt_x,
-                         energy_t e, size_t srctype, size_t tgttype) {
-        register_trace_arrow(src_x.i(),src_x.j(),src_x.k(),src_x.l(),
-                             tgt_x.i(),tgt_x.j(),tgt_x.k(),tgt_x.l(),
-                             e, srctype, tgttype);
-    }
-
+                         const MType &mtype,
+                         energy_t e);
     /**
      * Increment the reference count of the source
      *
@@ -396,7 +345,7 @@ public:
      * If no trace arrow from source exists, do nothing
      */
     void
-    inc_source_ref_count(size_t i, size_t j, size_t k, size_t l, char type);
+    inc_source_ref_count(const Index4D &x, const MType &type);
 
     /**
      * Decrement the reference count of the source
@@ -409,7 +358,7 @@ public:
      * If no trace arrow from source exists, do nothing
      */
     void
-    dec_source_ref_count(size_t i, size_t j, size_t k, size_t l, char type);
+    dec_source_ref_count(const Index4D &x, const MType &type);
 
     void
     avoid_trace_arrow(char type) {
@@ -450,11 +399,13 @@ private:
     void
     gc_row( size_t i, TraceArrows &source );
 
-    /** @brief Garbage collection of trace arrows
-     *  @return true if that trace arrow was erased
+    /**
+     * @brief Garbage collection of trace arrows
+     * @param x source index
+     * @return true if that trace arrow was erased
      */
     bool
-    gc_trace_arrow(size_t i, size_t j, size_t k, size_t l, TraceArrows &source);
+    gc_trace_arrow(const Index4D &x, TraceArrows &source);
 
     /** @brief Garbage collection of trace arrows
      *  @return true if that trace arrow was erased
@@ -476,6 +427,10 @@ private:
     *   @brief returns the TraceArrows collection corresponding to @param type
     */
     TraceArrows* get_arrows_by_type(char type);
+    /**
+    *   @brief returns the TraceArrows collection corresponding to @param type
+    */
+    TraceArrows* get_arrows_by_mtype(const MType &type);
 };
 
 

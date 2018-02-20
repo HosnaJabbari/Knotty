@@ -944,7 +944,6 @@ pseudo_loop::penalty(const Index4D &x, Penalty p, MType type) {
 
 void pseudo_loop::compute_PX(Index4D x, MType type) {
     MatrixSlices3D &PX = PX_by_mtype(type);
-    char src_type = pid_by_mtype(type);
 
     int min_energy =
         compute_PX_helper(x, type);
@@ -963,8 +962,7 @@ void pseudo_loop::compute_PX(Index4D x, MType type) {
             mloop0_cl_by_mtype(type)->is_candidate(xp)) {
             tas_by_mtype(type).avoid_trace_arrow();
         } else {
-            ta->register_trace_arrow(x, xp, calc_PX(xp, type), src_type,
-                                     src_type);
+            ta->register_trace_arrow(x, xp, type, calc_PX(xp, type));
         }
     }
 }
@@ -1200,9 +1198,7 @@ pseudo_loop::recompute_PX(const Index4D &x, MType type) {
     //
     const TraceArrow *arrow = tas_by_mtype(type).trace_arrow_from(x);
     if ( arrow != nullptr ) {
-        assert(arrow->target_type() == pid_by_mtype(type));
-
-        Index4D ax(arrow->i(), arrow->j(), arrow->k(), arrow->l());
+        auto ax = arrow->x(x,type);
         best_d_  = ax.lend(type);
         best_dp_ = ax.rend(type);
 
@@ -1433,9 +1429,6 @@ pseudo_loop::compute_PfromL(int i, int j, int k, int l) {
             if (cl_debug | pl_debug)
                 printf ("Push PfromL_CL(%d,%d,%d,12G2),(%d,%d)\n", i, j, k, l, min_energy);
             PfromL_CL->push_candidate(x, min_energy);
-            // always keep arrows starting from candidates
-            if (use_garbage_collection)
-                ta->inc_source_ref_count(i,j,k,l,P_PfromL);
         }
     }
 }
@@ -1474,9 +1467,6 @@ void pseudo_loop::compute_PfromR(int i, int j, int k, int l){
             if (cl_debug | pl_debug)
                 printf ("Push PfromR_CL(%d,%d,%d,12G2),(%d,%d)\n", i, j, k, l, min_energy);
             PfromR_CL->push_candidate(x, min_energy);
-            // always keep arrows starting from candidates
-            if (use_garbage_collection)
-                ta->inc_source_ref_count(i,j,k,l,P_PfromR);
         }
     }
 
@@ -1523,9 +1513,6 @@ void pseudo_loop::compute_PfromM(int i, int j, int k, int l){
             if (cl_debug | pl_debug)
                 printf ("Push PfromM_CL(%d,%d,%d,12G2),(%d,%d)\n", i, j, k, l, min_energy);
             PfromM_CL->push_candidate(x, min_energy);
-            // always keep arrows starting from candidates
-            if (use_garbage_collection)
-                ta->inc_source_ref_count(i,j,k,l,P_PfromM);
         }
     }
 }
@@ -1563,9 +1550,6 @@ void pseudo_loop::compute_PfromO(int i, int j, int k, int l){
             if (cl_debug || pl_debug)
                 printf ("Push PfromO_CL(%d,%d,%d,12G2),(%d,%d)\n", i,j,k,l, min_energy);
             PfromO_CL->push_candidate(x, min_energy);
-            // always keep arrows starting from candidates
-            if (use_garbage_collection)
-                ta->inc_source_ref_count(i,j,k,l,P_PfromO);
         }
     }
 }
@@ -1607,9 +1591,6 @@ pseudo_loop::compute_PLmloop0(int i, int j, int k, int l) {
             if (cl_debug || pl_debug)
                 printf ("Push PLmloop_CL(%d,%d,%d,12G2),(%d,%d)\n", j, k, l, i, min_energy);
             PLmloop0_CL->push_candidate(x, min_energy);
-            // always keep arrows starting from candidates
-            if (use_garbage_collection)
-                ta->inc_source_ref_count(i,j,k,l,P_PLmloop0);
         }
     }
 }
@@ -1753,9 +1734,6 @@ pseudo_loop::compute_POmloop0(int i, int j, int k, int l) {
             if (cl_debug || pl_debug)
                 printf ("Push POmloop_CL(%d,%d,%d,12G2),(%d,%d)\n", j, k, l, i, min_energy);
             POmloop0_CL->push_candidate(x, min_energy);
-            // always keep arrows starting from candidates
-            if (use_garbage_collection)
-                ta->inc_source_ref_count(i,j,k,l,P_POmloop0);
         }
     }
 }
