@@ -372,8 +372,8 @@ private:
     int best_dp_; //!< best second split point (interior loop)
     int best_branch_; //!< index of best branch
     bool decomposing_branch_; //!< whether best branch is decomposing
-    int best_target_type_;
-    int best_target_energy_;
+    int best_tgt_type_;
+    int best_tgt_energy_;
 
     // cases for the generic decomposition
     static const int CASE_12G2 = 1<<0;
@@ -403,7 +403,7 @@ private:
      * @returns minimum energy
      *
      * @note sets the variables best_d_, best_branch_, and flag
-     * decomposing_branch_.
+     * decomposing_branch_, best_tgt_energy_.
      */
     template<class Penalty=int(*)(int,int)>
     int
@@ -549,12 +549,13 @@ private:
     // fill matrix slice at i, copy candidate energies, recompute non-candidates
     void recompute_slice_PK(const Index4D &x);
 
+    // recompute entries for fixex i
     void
     recompute_slice_PXdecomp(const Index4D &x,
                              int decomp_cases,
                              candidate_lists *CL,
                              const TriangleMatrix &w,
-                             MatrixSlices3D &PXsrc,
+                             const MatrixSlices3D &PXsrc,
                              MatrixSlices3D &PXtgt
                              );
 

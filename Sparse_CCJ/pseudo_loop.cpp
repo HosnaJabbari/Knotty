@@ -598,11 +598,14 @@ pseudo_loop::generic_decomposition(int i, int j, int k, int l,
                                    int LMRO_ndcases,
                                    Penalty penfun
                                    ) {
+    auto x = Index4D(i,j,k,l);
+
     int min_energy = INF;
 
     best_branch_ = -1;
     best_d_ = -1;
     decomposing_branch_ = 0;
+    best_tgt_energy_ = INF;
 
     if ( decomp_cases & CASE_12G2 ) {
         if ( CL!=nullptr ) {
@@ -614,16 +617,19 @@ pseudo_loop::generic_decomposition(int i, int j, int k, int l,
                 if (temp < min_energy) {
                     min_energy = temp;
                     best_branch_ = CASE_12G2;
+                    best_tgt_energy_ = c.second;
                     best_d_ = c.first;
                 }
             }
         } else {
             // 12G2 w/o candidate list (non-sparse)
             for(int d = i+1; d<=j; d++){
-                int temp = w.get(i, d - 1) + PX.get(d, j, k, l);
+                int px_e = PX.get(d, j, k, l);
+                int temp = w.get(i, d - 1) + px_e;
                 if (temp < min_energy){
                     min_energy = temp;
                     best_branch_ = CASE_12G2;
+                    best_tgt_energy_ = px_e;
                     best_d_ = d;
                 }
             }
@@ -633,10 +639,12 @@ pseudo_loop::generic_decomposition(int i, int j, int k, int l,
     if (decomp_cases & CASE_12G1) {
         // case 1G21
         for (int d = i; d < j; d++) {
-            int temp = PX.get(i, d, k, l) + w.get(d + 1, j);
+            int px_e = PX.get(i, d, k, l);
+            int temp = px_e + w.get(d + 1, j);
             if (temp < min_energy) {
                 min_energy = temp;
                 best_branch_ = CASE_12G1;
+                best_tgt_energy_ = px_e;
                 best_d_ = d;
             }
         }
@@ -645,10 +653,12 @@ pseudo_loop::generic_decomposition(int i, int j, int k, int l,
     if (decomp_cases & CASE_1G21) {
         // case 1G21
         for(int d = k+1; d <= l; d++){
-            int temp = w.get(k, d - 1) + PX.get(i, j, d, l);
+            int px_e = PX.get(i, j, d, l);
+            int temp = w.get(k, d - 1) + px_e;
             if (temp < min_energy){
                 min_energy = temp;
                 best_branch_ = CASE_1G21;
+                best_tgt_energy_ = px_e;
                 best_d_ = d;
             }
         }
@@ -657,44 +667,54 @@ pseudo_loop::generic_decomposition(int i, int j, int k, int l,
     if (decomp_cases & CASE_1G12) {
         // case 1G12
         for (int d = i; d < j; d++) {
-            int temp = PX.get(i, j, k, d) + w.get(d + 1, j);
+            int px_e = PX.get(i, j, k, d);
+            int temp = px_e + w.get(d + 1, j);
             if (temp < min_energy) {
                 min_energy = temp;
                 best_branch_ = CASE_1G12;
+                best_tgt_energy_ = px_e;
                 best_d_ = d;
             }
         }
     }
 
     if (LMRO_ndcases & CASE_PL) {
-        int temp = calc_PX<MType::L>(Index4D(i, j, k, l)) + penfun(j, i);
+        int px_e = calc_PX<MType::L>(x);
+        int temp = px_e + penfun(j, i);
         if (temp < min_energy) {
             min_energy = temp;
             best_branch_ = CASE_PL;
+            best_tgt_energy_ = px_e;
         }
     }
 
     if (LMRO_ndcases & CASE_PM) {
-        int temp = calc_PX<MType::M>(Index4D(i, j, k, l)) + penfun(j, k);
+        int px_e = calc_PX<MType::M>(x);
+        int temp = px_e + penfun(j, k);
         if (temp < min_energy) {
             min_energy = temp;
             best_branch_ = CASE_PM;
+            best_tgt_energy_ = px_e;
         }
     }
 
     if (LMRO_ndcases & CASE_PR) {
-        int temp = calc_PX<MType::R>(Index4D(i, j, k, l)) + penfun(l, k);
+        int px_e = calc_PX<MType::R>(x);
+        int temp = px_e + penfun(l, k);
         if (temp < min_energy) {
             min_energy = temp;
             best_branch_ = CASE_PR;
+            best_tgt_energy_ = px_e;
         }
     }
 
     if (LMRO_ndcases & CASE_PO) {
-        int temp = calc_PX<MType::O>(Index4D(i, j, k, l)) + penfun(l, i);
+        int px_e = calc_PX<MType::O>(x);
+        int temp = px_e + penfun(l, i);
         if (temp < min_energy) {
             min_energy = temp;
             best_branch_ = CASE_PO;
+            best_tgt_energy_ = px_e;
         }
     }
 
@@ -708,7 +728,7 @@ pseudo_loop::recompute_slice_PXdecomp(const Index4D &x,
                                       int decomp_cases,
                                       candidate_lists *CL,
                                       const TriangleMatrix &w,
-                                      MatrixSlices3D &PXsrc,
+                                      const MatrixSlices3D &PXsrc,
                                       MatrixSlices3D &PXtgt
                                       ) {
 
@@ -1006,27 +1026,28 @@ pseudo_loop::trace_PK(const Index4D &x, int e) {
     }
 
     // continue trace with one of the recursion cases to PL,PM,PR,PO
-    int best_penalty = INF;
-    int best_target_type = -1;
+    int best_tgt_energy = INF;
+    int best_tgt_type = -1;
     min_energy = INF;
 
     for (auto type : {MType::L,MType::M, MType::R, MType::O} ) {
-        int temp = recompute_PX(x, type);
-        int p = penalty(x, gamma2, type) + PB_penalty;
+        int px_e = recompute_PX(x, type);
+        int pen = penalty(x, gamma2, type) + PB_penalty;
+        int temp = px_e + pen;
         // std::cerr << "PX " << type << " " << x << ": " << temp << "+" << p
         //            << "=" << (temp + p) << std::endl;
-        if (temp + p < min_energy) {
+        if (temp < min_energy) {
             min_energy = temp;
-            best_penalty = p;
-            best_target_type = pid_by_mtype(type);
+            best_tgt_energy = px_e;
+            best_tgt_type = pid_by_mtype(type);
         }
     }
 
     //std::cerr<<"trace_PK assert "<<min_energy<<"+"<<best_penalty<<"=="<<e<<std::endl;
-    assert(min_energy + best_penalty == e);
+    assert(min_energy == e);
 
-    trace_update_f(x, P_PK, best_target_type);
-    trace_continue(x, best_target_type, min_energy);
+    trace_update_f(x, P_PK, best_tgt_type);
+    trace_continue(x, best_tgt_type, best_tgt_energy);
 }
 
 void
@@ -1052,6 +1073,7 @@ pseudo_loop::trace_PfromX(const Index4D &x, int e, MType type) {
     // dangerous; here we need local copies
     int best_branch = best_branch_;
     int best_d = best_d_;
+    int best_tgt_energy = best_tgt_energy_;
 
     Index4D x_tgt = x;
     char tgt_type = src_type;
@@ -1063,12 +1085,12 @@ pseudo_loop::trace_PfromX(const Index4D &x, int e, MType type) {
     for (auto type: {MType::L, MType::M, MType::R, MType::O}) {
         int lmro_case = (1 << ((int)type + 4));
         if (lmro_cases & lmro_case) {
-            int temp = recompute_PX(x, type) + penalty(x, penfun, type);
-            // std::cerr << type << " " << lmro_case << " "
-            //           << pid_by_mtype(type) << " " << temp << std::endl;
+            int px_e = recompute_PX(x, type);
+            int temp = px_e + penalty(x, penfun, type);
             if (temp < min_energy) {
                 min_energy = temp;
                 best_branch = lmro_case;
+                best_tgt_energy = px_e;
                 tgt_type = pid_by_mtype(type);
             }
         }
@@ -1078,19 +1100,19 @@ pseudo_loop::trace_PfromX(const Index4D &x, int e, MType type) {
     switch (best_branch) {
     case CASE_12G2:
         x_tgt.i() = best_d;
-        bt_WB(x.i(), best_d - 1);
+        bt_WP(x.i(), best_d - 1);
         break;
     case CASE_12G1:
         x_tgt.j() = best_d;
-        bt_WB(best_d + 1, x.j());
+        bt_WP(best_d + 1, x.j());
         break;
     case CASE_1G21:
         x_tgt.k() = best_d;
-        bt_WB(x.k(), best_d - 1);
+        bt_WP(x.k(), best_d - 1);
         break;
     case CASE_1G12:
         x_tgt.l() = best_d;
-        bt_WB(best_d + 1,x.l());
+        bt_WP(best_d + 1,x.l());
         break;
     }
 
@@ -1098,13 +1120,7 @@ pseudo_loop::trace_PfromX(const Index4D &x, int e, MType type) {
 
     trace_update_f(x, src_type, tgt_type);
 
-    if (tgt_type == src_type) {
-        assert(x_tgt != x);
-        trace_continue(x_tgt, tgt_type, PfromX.get(x_tgt));
-    } else {
-        trace_continue(x, tgt_type,
-                       min_energy - penalty(x, penfun, mtype_by_pid(tgt_type)));
-    }
+    trace_continue(x_tgt, tgt_type, best_tgt_energy);
 }
 
 inline
@@ -1190,15 +1206,15 @@ pseudo_loop::recompute_PX(const Index4D &x, MType type) {
         best_d_  = ax.lend(type);
         best_dp_ = ax.rend(type);
 
-        best_target_type_ = pid_by_mtype(type);
-        best_target_energy_ = arrow->target_energy();
+        best_tgt_type_ = pid_by_mtype(type);
+        best_tgt_energy_ = arrow->target_energy();
 
         min_energy = arrow->target_energy() + iloop_energy(x,best_d_,best_dp_,type);
     }
 
     if ( min_energy < INF/2 ) {
         // std::cerr << "  ! " << best_d_ << " " << best_dp_ << " "
-        //           << (char)best_target_type_ << " " << best_target_energy_ << " "
+        //           << (char)best_tgt_type_ << " " << best_tgt_energy_ << " "
         //           << min_energy << " " << ((arrow != nullptr) ? "ARROW" : "CAND")
         //           << std::endl;
         return min_energy;
@@ -1252,8 +1268,8 @@ pseudo_loop::recompute_PX(const Index4D &x, MType type) {
 
                 if (temp < min_energy) {
                     min_energy = temp;
-                    best_target_type_ = pid_by_mtype(type);
-                    best_target_energy_ = te;
+                    best_tgt_type_ = pid_by_mtype(type);
+                    best_tgt_energy_ = te;
                     best_d_ = d;
                     best_dp_ = dp;
                 }
@@ -1273,8 +1289,8 @@ pseudo_loop::recompute_PX(const Index4D &x, MType type) {
 
                 if (temp < min_energy) {
                     min_energy = temp;
-                    best_target_type_ = pid_by_mtype(type);
-                    best_target_energy_ = te;
+                    best_tgt_type_ = pid_by_mtype(type);
+                    best_tgt_energy_ = te;
                     best_d_ = d;
                     best_dp_ = dp;
                 }
@@ -1293,8 +1309,8 @@ pseudo_loop::recompute_PX(const Index4D &x, MType type) {
 
                 if (temp < min_energy) {
                     min_energy = temp;
-                    best_target_type_ = pid_by_mtype(type);
-                    best_target_energy_ = te;
+                    best_tgt_type_ = pid_by_mtype(type);
+                    best_tgt_energy_ = te;
                     best_d_ = d;
                     best_dp_ = dp;
                 }
@@ -1315,8 +1331,8 @@ pseudo_loop::recompute_PX(const Index4D &x, MType type) {
 
                 if (temp < min_energy) {
                     min_energy = temp;
-                    best_target_type_ = pid_by_mtype(type);
-                    best_target_energy_ = te;
+                    best_tgt_type_ = pid_by_mtype(type);
+                    best_tgt_energy_ = te;
                     best_d_ = d;
                     best_dp_ = dp;
                 }
@@ -1329,8 +1345,8 @@ pseudo_loop::recompute_PX(const Index4D &x, MType type) {
     temp = calc_PXmloop(x, type);
     if (temp < min_energy) {
         min_energy = temp;
-        best_target_energy_ = temp - ap_penalty - penalty(x,beta2P,type);
-        best_target_type_ = mloop1_pid_by_mtype(type);
+        best_tgt_energy_ = temp - ap_penalty - penalty(x,beta2P,type);
+        best_tgt_type_ = mloop1_pid_by_mtype(type);
         best_d_ = x_shrunk.lend(type);
         best_dp_ = x_shrunk.rend(type);
     }
@@ -1340,14 +1356,14 @@ pseudo_loop::recompute_PX(const Index4D &x, MType type) {
     //std::cerr << "  " << x_shrunk << " " << temp << " " << penalty(x,gamma2,type) << std::endl;
     if (temp < min_energy) {
         min_energy = temp;
-        best_target_energy_ = temp - penalty(x,gamma2,type);
-        best_target_type_ = from_pid_by_mtype(type);
+        best_tgt_energy_ = temp - penalty(x,gamma2,type);
+        best_tgt_type_ = from_pid_by_mtype(type);
         best_d_ = x_shrunk.lend(type);
         best_dp_ = x_shrunk.rend(type);
     }
 
     // std::cerr << "    " << best_d_ << " " << best_dp_ << " "
-    //           << (char)best_target_type_ << " " << best_target_energy_ << " "
+    //           << (char)best_tgt_type_ << " " << best_tgt_energy_ << " "
     //           << min_energy << " " << ((arrow != nullptr) ? "ARROW" : "CAND")
     //           << std::endl;
 
@@ -1367,14 +1383,14 @@ pseudo_loop::trace_PX(const Index4D &x, int e, MType type) {
 
     assert(e == energy);
 
-    trace_update_f(x, pid_by_mtype(type), best_target_type_);
+    trace_update_f(x, pid_by_mtype(type), best_tgt_type_);
 
     Index4D xp = x;
     xp.set(best_d_, best_dp_, type);
 
     trace_continue(xp,
-                   best_target_type_,
-                   best_target_energy_);
+                   best_tgt_type_,
+                   best_tgt_energy_);
 }
 
 void
@@ -4319,9 +4335,9 @@ void pseudo_loop::back_track_sp(minimum_fold *f, seq_interval *cur_interval)
             if (node_debug || pl_debug) {
                 printf(
                     "P(%d,%d): tracing PK(%d,%d,%d,%d) e:%d and "
-                    "PK(%d,%d,%d,%d) e:%d\n",
+                    "PK(%d,%d,%d,%d) e:%d (min_energy: %d)\n",
                     i, l, i, c.d() - 1, c.j() + 1, c.k() - 1, e1, c.d(), c.j(),
-                    c.k(), l, e2);
+                    c.k(), l, e2, min_energy);
             }
 
             trace_continue(i,c.d()-1,c.j()+1,c.k()-1,P_PK,e1);
@@ -4600,11 +4616,11 @@ void pseudo_loop::trace_PLmloop1(int i, int j, int k, int l, int e) {
     switch (best_branch_) {
     case CASE_12G2:
         bt_WBP(i, best_d_ - 1);
-        trace_continue(best_d_, l, j, k, P_PLmloop0, PLmloop0.get(best_d_, j, k, l) );
+        trace_continue(best_d_, l, j, k, P_PLmloop0, best_tgt_energy_ );
         break;
     case CASE_12G1:
         bt_WBP(best_d_ + 1, j);
-        trace_continue(i, l, best_d_, k, P_PLmloop0, PLmloop0.get(i, best_d_, k, l) );
+        trace_continue(i, l, best_d_, k, P_PLmloop0, best_tgt_energy_ );
         break;
     default: assert(false);
     }
@@ -4625,16 +4641,16 @@ void pseudo_loop::trace_PLmloop0(int i, int j, int k, int l, int e) {
     case CASE_12G2:
         bt_WB(i, best_d_ - 1);
         trace_update_f(i,j,k,l, P_PLmloop0, P_PLmloop0);
-        trace_continue(best_d_, l, j, k, P_PLmloop0, PLmloop0.get(best_d_, j, k, l) );
+        trace_continue(best_d_, l, j, k, P_PLmloop0, best_tgt_energy_ );
         break;
     case CASE_12G1:
         bt_WB(best_d_ + 1, j);
         trace_update_f(i,j,k,l, P_PLmloop0, P_PLmloop0);
-        trace_continue(i, l, best_d_, k, P_PLmloop0, PLmloop0.get(i, best_d_, k, l) );
+        trace_continue(i, l, best_d_, k, P_PLmloop0, best_tgt_energy_ );
         break;
     case CASE_PL:
         trace_update_f(i,j,k,l, P_PLmloop0, P_PL);
-        trace_continue(i, l, j, k, P_PL, PLmloop0.get(i, j, k, l) );
+        trace_continue(i, l, j, k, P_PL, best_tgt_energy_ );
         break;
     default: assert(false);
     }
@@ -4671,11 +4687,11 @@ void pseudo_loop::trace_PMmloop1(int i, int j, int k, int l, int e) {
     switch (best_branch_) {
     case CASE_12G1:
         bt_WBP(best_d_ + 1, j);
-        trace_continue(i, l, best_d_, k, P_PMmloop0, PMmloop0.get(i, best_d_, k, l) );
+        trace_continue(i, l, best_d_, k, P_PMmloop0, best_tgt_energy_ );
         break;
     case CASE_1G21:
         bt_WBP(best_d_ + 1, j);
-        trace_continue(i, l, j, best_d_, P_PMmloop0, PMmloop0.get(i, j, best_d_, l) );
+        trace_continue(i, l, j, best_d_, P_PMmloop0, best_tgt_energy_ );
         break;
     default: assert(false);
     }
@@ -4691,23 +4707,22 @@ void pseudo_loop::trace_PMmloop0(int i, int j, int k, int l, int e) {
 
     assert ( min_energy == e );
 
-    // SW - I am unsure what we need to update here
     trace_update_f(i,j,k,l, P_PMmloop0);
 
     switch (best_branch_) {
     case CASE_12G1:
         bt_WBP(best_d_ + 1, j);
         trace_update_f(i,j,k,l, P_PMmloop0, P_PMmloop0);
-        trace_continue(i, l, best_d_, k, P_PMmloop0, PMmloop0.get(i, best_d_, k, l) );
+        trace_continue(i, l, best_d_, k, P_PMmloop0, best_tgt_energy_ );
         break;
     case CASE_1G21:
         bt_WBP(best_d_ + 1, j);
         trace_update_f(i,j,k,l, P_PMmloop0, P_PMmloop0);
-        trace_continue(i, l, j, best_d_, P_PMmloop0, PMmloop0.get(i, j, best_d_, l) );
+        trace_continue(i, l, j, best_d_, P_PMmloop0, best_tgt_energy_ );
         break;
     case CASE_PM:
         trace_update_f(i,j,k,l, P_PMmloop0, P_PM);
-        trace_continue(i, l, j, k, P_PM, PMmloop0.get(i, j, k, l) );
+        trace_continue(i, l, j, k, P_PM, best_tgt_energy_ );
         break;
     default: assert(false);
     }
@@ -4744,11 +4759,11 @@ void pseudo_loop::trace_PRmloop1(int i, int j, int k, int l, int e) {
     switch (best_branch_) {
     case CASE_1G21:
         bt_WBP(k, best_d_ - 1);
-        trace_continue(i, l, j, best_d_, P_PRmloop0, PRmloop0.get(i, j, best_d_, l) );
+        trace_continue(i, l, j, best_d_, P_PRmloop0, best_tgt_energy_ );
         break;
     case CASE_1G12:
         bt_WBP(best_d_ + 1, j);
-        trace_continue(i, best_d_, j, k, P_PRmloop0, PRmloop0.get(i, j, k, best_d_) );
+        trace_continue(i, best_d_, j, k, P_PRmloop0, best_tgt_energy_ );
         break;
     default: assert(false);
     }
@@ -4771,16 +4786,16 @@ void pseudo_loop::trace_PRmloop0(int i, int j, int k, int l, int e) {
     case CASE_1G21:
         bt_WBP(k, best_d_ - 1);
         trace_update_f(i,j,k,l, P_PRmloop0, P_PRmloop0);
-        trace_continue(i, l, j, best_d_, P_PRmloop0, PRmloop0.get(i, j, best_d_, l) );
+        trace_continue(i, l, j, best_d_, P_PRmloop0, best_tgt_energy_ );
         break;
     case CASE_1G12:
         bt_WBP(best_d_ + 1, j);
         trace_update_f(i,j,k,l, P_PRmloop0, P_PRmloop0);
-        trace_continue(i, best_d_, j, k, P_PRmloop0, PRmloop0.get(i, j, k, best_d_) );
+        trace_continue(i, best_d_, j, k, P_PRmloop0, best_tgt_energy_ );
         break;
     case CASE_PR:
         trace_update_f(i,j,k,l, P_PRmloop0, P_PR);
-        trace_continue(i, l, j, k, P_PR, PRmloop0.get(i, j, k, l) );
+        trace_continue(i, l, j, k, P_PR, best_tgt_energy_ );
         break;
     default: assert(false);
     }
@@ -4816,11 +4831,11 @@ void pseudo_loop::trace_POmloop1(int i, int j, int k, int l, int e) {
     switch (best_branch_) {
     case CASE_12G2:
         bt_WBP(i, best_d_ - 1);
-        trace_continue(best_d_, l, j, k, P_POmloop0, POmloop0.get(best_d_, j, k, l) );
+        trace_continue(best_d_, l, j, k, P_POmloop0, best_tgt_energy_ );
         break;
     case CASE_1G12:
         bt_WBP(best_d_ + 1, j);
-        trace_continue(i, best_d_, j, k, P_POmloop0, POmloop0.get(i, j, k, best_d_) );
+        trace_continue(i, best_d_, j, k, P_POmloop0, best_tgt_energy_ );
         break;
     default: assert(false);
     }
@@ -4842,16 +4857,16 @@ void pseudo_loop::trace_POmloop0(int i, int j, int k, int l, int e) {
     case CASE_12G2:
         bt_WB(i, best_d_ - 1);
         trace_update_f(i,j,k,l, P_POmloop0, P_POmloop0);
-        trace_continue(best_d_, l, j, k, P_POmloop0, POmloop0.get(best_d_, j, k, l) );
+        trace_continue(best_d_, l, j, k, P_POmloop0, best_tgt_energy_ );
         break;
     case CASE_1G12:
         bt_WB(best_d_ + 1, j);
         trace_update_f(i,j,k,l, P_POmloop0, P_POmloop0);
-        trace_continue(i, best_d_, j, k, P_POmloop0, POmloop0.get(i, j, k, best_d_) );
+        trace_continue(i, best_d_, j, k, P_POmloop0, best_tgt_energy_ );
         break;
     case CASE_PO:
         trace_update_f(i,j,k,l, P_POmloop0, P_PO);
-        trace_continue(i, l, j, k, P_PO, POmloop0.get(i, j, k, l) );
+        trace_continue(i, l, j, k, P_PO, best_tgt_energy_ );
         break;
     default: assert(false);
     }
@@ -4861,7 +4876,7 @@ void pseudo_loop::trace_POmloop0(int i, int j, int k, int l, int e) {
 void pseudo_loop::trace_continue(int i, int j, int k, int l, char srctype, energy_t e)
 {
     Index4D x(i,j,k,l);
-//    std::cerr<<"trace_continue(" << x << " " << srctype<< " e:" << e << ")"<< std::endl;
+    //std::cerr<<"trace_continue(" << x << " " << srctype<< " e:" << e << ")"<< std::endl;
 
     assert (i<=j && j<=k && k<=l);
 
