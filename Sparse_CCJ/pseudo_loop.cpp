@@ -791,13 +791,15 @@ pseudo_loop::recompute_slice_PXdecomp(const Index4D &x,
 
 void
 pseudo_loop::recompute_slice_PXmloop0(const Index4D &x, MType type) {
-    recompute_slice_PXdecomp(x, decomp_cases_by_mtype(type), mloop0_cl_by_mtype(type), WB,
-                             PXmloop0_by_mtype(type),PXmloop0_by_mtype(type));
+    recompute_slice_PXdecomp(x, decomp_cases_by_mtype(type),
+                             mloop0_cl_by_mtype(type), WB,
+                             PXmloop0_by_mtype(type), PXmloop0_by_mtype(type));
 }
 
 void pseudo_loop::recompute_slice_PXmloop1(const Index4D &x, MType type) {
-    recompute_slice_PXdecomp(x, decomp_cases_by_mtype(type), nullptr, WBP,
-                             PXmloop0_by_mtype(type),PXmloop1_by_mtype(type));
+    recompute_slice_PXdecomp(x, decomp_cases_by_mtype(type),
+                             mloop0_cl_by_mtype(type), WBP,
+                             PXmloop0_by_mtype(type), PXmloop1_by_mtype(type));
 }
 
 
@@ -1338,10 +1340,10 @@ pseudo_loop::recompute_PX(const Index4D &x, MType type) {
     }
 
     // mloop case
-    temp = calc_PXmloop(x, type);
+    temp = calc_PXmloop(x, type) + bp_penalty;
     if (temp < min_energy) {
         min_energy = temp;
-        best_tgt_energy_ = temp - ap_penalty - penalty(x,beta2P,type);
+        best_tgt_energy_ = temp - bp_penalty - ap_penalty - penalty(x,beta2P,type);
         best_tgt_type_ = mloop1_pid_by_mtype(type);
         best_d_ = x_shrunk.lend(type);
         best_dp_ = x_shrunk.rend(type);
@@ -1920,9 +1922,7 @@ int pseudo_loop::calc_PLmloop(int i, int j, int k, int l){
     // also made it an assert since it should never happen
     assert(!(i<0 || l>= nb_nucleotides));
 
-    int min_energy = PLmloop1.get(i+1,j-1,k,l)+ ap_penalty + beta2P(j,i);
-
-    // SW - no need for trace arrows
+    int min_energy = PLmloop1.get(i+1,j-1,k,l) + ap_penalty + beta2P(j,i);
 
     return min_energy;
 }
@@ -2039,7 +2039,8 @@ int pseudo_loop::calc_PMmloop(int i, int j, int k, int l){
     // also made it an assert since it should never happen
     assert(!(i<0 || l>= nb_nucleotides));
 
-    int min_energy = PMmloop1.get(i,j-1,k+1,l)+ap_penalty+beta2P(j,k);
+    int min_energy =
+        PMmloop1.get(i, j - 1, k + 1, l) + ap_penalty + beta2P(j, k);
 
     return min_energy;
 }
@@ -2098,7 +2099,8 @@ int pseudo_loop::calc_POmloop(int i, int j, int k, int l){
     // also made it an assert since it should never happen
     assert(!(i<0 || l>= nb_nucleotides));
 
-    int min_energy = POmloop1.get(i+1,j,k,l-1) + ap_penalty + beta2P(l,i);
+    int min_energy =
+        POmloop1.get(i + 1, j, k, l - 1) + ap_penalty + beta2P(l, i);
 
     return min_energy;
 }
