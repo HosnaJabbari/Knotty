@@ -77,7 +77,7 @@ s_partition_function::s_partition_function (char *cseq, int ignore, int compute_
 
     for (i=0; i < seqlen; i++)
     {
-        toupper(csequence[i]);
+        csequence[i] = toupper(csequence[i]);
     }
     sequence = new int[seqlen];
     if (sequence == NULL) giveup ("Cannot allocate memory", "s_partition_function");
@@ -4633,7 +4633,7 @@ void s_partition_function::compute_logZ_gradient ()
 
                                                                     if (parsi_int22 == T99)
                                                                     {
-                                                                        if (nnnuc==iinuc && mmnuc==jjnuc && ppnuc==kknuc && oonuc==llnuc & watson_crick(iinuc,jjnuc) && !watson_crick(kknuc,llnuc))
+                                                                        if (nnnuc==iinuc && mmnuc==jjnuc && ppnuc==kknuc && oonuc==llnuc && watson_crick(iinuc,jjnuc) && !watson_crick(kknuc,llnuc))
                                                                         {
                                                                             sprintf (type, "int22[%d][%d][%d][%d][%d][%d][%d][%d]", iinuc, jjnuc, kknuc, llnuc, mmnuc, nnnuc, oonuc, ppnuc);
                                                                             tindex = structure_type_index (type);
@@ -4758,7 +4758,7 @@ void s_partition_function::compute_logZ_gradient ()
 
                                                                         if (parsi_int22 == T99)
                                                                         {
-                                                                            if (nnnuc==iinuc && mmnuc==jjnuc && ppnuc==kknuc && oonuc==llnuc & watson_crick(iinuc,jjnuc) && !watson_crick(kknuc,llnuc))
+                                                                            if (nnnuc==iinuc && mmnuc==jjnuc && ppnuc==kknuc && oonuc==llnuc && watson_crick(iinuc,jjnuc) && !watson_crick(kknuc,llnuc))
                                                                             {
                                                                                 sprintf (type, "int22[%d][%d][%d][%d][%d][%d][%d][%d]", iinuc, jjnuc, kknuc, llnuc, mmnuc, nnnuc, oonuc, ppnuc);
                                                                                 tindex = structure_type_index (type);
@@ -5849,5 +5849,3 @@ void s_partition_function::compute_upm (int i, int j)
     //printf ("i=%d, j=%d, upm=%g\n", i, j, upm[ij]);
 }
 */
-
-

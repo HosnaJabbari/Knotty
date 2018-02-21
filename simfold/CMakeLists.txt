@@ -2,19 +2,19 @@
 
 # ensure SIMFOLD_HOME == CMAKE_CURRENT_SOURCE_DIR
 # if not, give error
-if(${SIMFOLD_HOME} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR}) 
+if(${SIMFOLD_HOME} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
 
 else()
     message(FATAL_ERROR "SIMFOLD_HOME != CMAKE_CURRENT_SOURCE_DIR")
 endif()
 
 SET(SOURCE
-  src/common/params.cpp src/common/common.cpp	
-  src/common/init.cpp 			
-  src/simfold/s_specific_functions.cpp src/simfold/s_min_folding.cpp	
-  src/simfold/s_hairpin_loop.cpp src/simfold/s_stacked_pair.cpp		
-  src/simfold/s_energy_matrix.cpp src/simfold/s_internal_loop.cpp	
-  src/simfold/s_multi_loop.cpp src/simfold/s_multi_loop_sub.cpp		
+  src/common/params.cpp src/common/common.cpp
+  src/common/init.cpp
+  src/simfold/s_specific_functions.cpp src/simfold/s_min_folding.cpp
+  src/simfold/s_hairpin_loop.cpp src/simfold/s_stacked_pair.cpp
+  src/simfold/s_energy_matrix.cpp src/simfold/s_internal_loop.cpp
+  src/simfold/s_multi_loop.cpp src/simfold/s_multi_loop_sub.cpp
   src/simfold/s_sub_folding.cpp src/simfold/s_partition_function.cpp
 )
 
@@ -32,3 +32,7 @@ target_include_directories (simfold PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories (simfold PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories (simfold PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/common)
 target_include_directories (simfold PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/simfold)
+
+# suppress some warnings
+add_definitions(-Wno-format -Wno-unused-result -Wno-sign-compare
+  -Wno-maybe-uninitialized -Wno-unused-variable -Wno-unused-but-set-variable)

@@ -795,7 +795,7 @@ void set_starters ()
         start_internal22_UGU = structure_type_index("int22[3][2][3][0][2][3][0][3]");
     }
 
-    if (parsi_dangles == T99 | parsi_dangles == LAVISH)
+    if ((parsi_dangles == T99) | (parsi_dangles == LAVISH))
         start_dangle = structure_type_index("dangle_top[0][3][0]");
     start_internal_size = structure_type_index("internal_penalty_by_size[4]");
     if (parsi_bulge1 == T99)    // there's no bulge1, so bulge_penalty_by_size starts from 1
@@ -6735,7 +6735,8 @@ double simfold_restricted_logZ (char *sequence, char *real_structure, char *rest
 }
 
 
-double simfold_restricted_logZ_gradient (char *sequence, char *real_structure, char *restricted, PFTYPE *logZ_gradient)
+void
+simfold_restricted_logZ_gradient (char *sequence, char *real_structure, char *restricted, PFTYPE *logZ_gradient)
 // return
 // if the real_structure is not one of the suboptimal structures, add it
 {
@@ -7600,7 +7601,10 @@ int generate_structure_withbb (char *sequence, char *known_structure, char *give
             while (position_right != NULL && old_counts[bb_index] < threshold)
             {
                 // found a new place for my building block
-                for (i=0; i < seqlen; i++)   restricted[i] = '_'; restricted [seqlen] = '\0';
+                for (i = 0; i < seqlen; i++)
+                    restricted[i] = '_';
+                restricted [seqlen] = '\0';
+
                 replace_str_piece (restricted, position_left-sequence, bbstr_left[bb_index]);
                 replace_str_piece (restricted, position_right-sequence, bbstr_right[bb_index]);
                 // if it if type tstackh, then everything in between bbstr_left and bbstr_right must be "...."
@@ -8041,7 +8045,10 @@ int generate_structure_withbb_many_thresholds (char *sequence, char structures[]
             while (position_right != NULL && old_counts[bb_index] < many_thresholds[bb_index])
             {
                 // found a new place for my building block
-                for (i=0; i < seqlen; i++)   restricted[i] = '_'; restricted [seqlen] = '\0';
+                for (i = 0; i < seqlen; i++)
+                    restricted[i] = '_';
+                restricted [seqlen] = '\0';
+
                 replace_str_piece (restricted, position_left-sequence, bbstr_left[bb_index]);
                 replace_str_piece (restricted, position_right-sequence, bbstr_right[bb_index]);
                 // if it if type tstackh, then everything in between bbstr_left and bbstr_right must be "...."
@@ -8195,7 +8202,10 @@ void search_bb (char *sequence, double *old_counts, int threshold, int num_param
             while (position_right != NULL)
             {
                 // found a new place for my building block
-                for (i=0; i < seqlen; i++)   restricted[i] = '_'; restricted [seqlen] = '\0';
+                for (i = 0; i < seqlen; i++)
+                    restricted[i] = '_';
+                restricted[seqlen] = '\0';
+
                 replace_str_piece (restricted, position_left-sequence, bbstr_left[bb_index]);
                 replace_str_piece (restricted, position_right-sequence, bbstr_right[bb_index]);
                 // if it if type tstackh, then everything in between bbstr_left and bbstr_right must be "...."
@@ -9539,7 +9549,7 @@ int get_data_from_buffer (char *buffer, const char *header, char last_char, char
     while (1)
     {
         if (begin[i] == last_char) { output[i] = '\0'; break; }
-        output[i] = begin[i++];
+        output[i] = begin[i]; i++;
     }
     if (strstr (header, "sequence") != NULL || strstr (header, "structure") != NULL)
     {
@@ -10978,6 +10988,3 @@ int create_building_block_strings ()
                 }
         }   // end if (!parsi_int22)
 */
-
-
-

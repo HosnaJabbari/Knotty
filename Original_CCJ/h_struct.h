@@ -34,7 +34,7 @@ typedef struct brack_type
         open(_open),
         close(_close)
         {
-            
+
         }
 	}brack_type;
 
@@ -51,12 +51,12 @@ typedef struct brack_stack
 // Hosna Feb 19, 2014
 // I need a structure to hold the band type to be used in band array.
 typedef struct band_elem
-{	
+{
 	band_elem *next;
 	char open;
 	char close;
-	int outer_end;
 	int outer_start;
+	int outer_end;
 	int inner_start;
 	int inner_end;
 	void copy(band_elem *other){
@@ -75,7 +75,7 @@ typedef struct band_elem
     inner_start(_inner_start),
     inner_end(_inner_end)
     {
-        
+
     }
 }band_elem;
 
