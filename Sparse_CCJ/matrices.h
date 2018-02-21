@@ -31,6 +31,14 @@ public:
         return index_[i]+j-i;
     }
 
+    //! unchecked get
+    int
+    get_uc(int i, int j) const {
+        assert (!(i< 0 || j<0 || i>=n_ || j>=n_) );
+        assert (i<=j);
+        return m_[ij(i,j)];
+    }
+
     int
     get (int i, int j) const {
         if (i< 0 || j<0 || i>=n_ || j>=n_){
@@ -39,8 +47,9 @@ public:
         if (i>j)
             return 0;
 
-        return m_[ij(i,j)];
+        return get_uc(i,j);
     }
+
 
     int &
     operator [] (int ij) {
@@ -122,6 +131,27 @@ public:
         // std::cerr << "Create "<<nb_slices<<" slices: " << ((m_.capacity()*sizeof(energy_t)) >> 10)  << " KB" <<std::endl;
     }
 
+    //! unchecked get
+    int get_uc(int i, int j, int k, int l) const {
+        assert ( i <= j && j < k-1 && k <= l );
+
+        // Hosna, April 3, 2014
+        // adding impossible cases
+        // Ian Wark, April 7, 2017
+        // get rid of some cases because this will have already been caught
+        // eg. if i<=j<k<=l we only need to check l>=n and i<0
+        // also made it an assert since it should never happen
+        assert(!(i<0 || l>= n_));
+
+        int val = m_[index(i,j,k,l)];
+        if (val==INTERN_INF) val=INF;
+        return val;
+    }
+
+    int get_uc(const Index4D &x) const {
+        return get_uc(x.i(),x.j(),x.k(),x.l());
+    }
+
     int get(int i, int j, int k, int l) const {
         if (!(i <= j && j < k-1 && k <= l)){
             //printf("!(i <= j && j < k-1 && k <= l)\n");
@@ -135,9 +165,7 @@ public:
         // also made it an assert since it should never happen
         assert(!(i<0 || l>= n_));
 
-        int val = m_[index(i,j,k,l)];
-        if (val==INTERN_INF) val=INF;
-        return val;
+        return get_uc(i,j,k,l);
     }
 
     int get(const Index4D &x) const {

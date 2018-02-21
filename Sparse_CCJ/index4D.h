@@ -13,6 +13,13 @@ operator << (std::ostream &out, MType type) {
     return out << symbol[static_cast<int>(type)];
 }
 
+template <class T, T l, T m, T r, T o>
+const T &
+select_by_mtype(const MType &type) {
+    static T x[] = {l,m,r,o};
+    return x[static_cast<int>(type)];
+}
+
 //! @brief Four-dimensional index for the gap matrices
 class Index4D : public std::array<int,4> {
  public:
@@ -31,26 +38,22 @@ class Index4D : public std::array<int,4> {
 
     //! @brief left end for type
     int lend(MType type) const {
-        static std::array<int,4> end {0,1,2,0};
-        return (*this)[end[static_cast<int>(type)]];
+        return (*this)[select_by_mtype<int,0,1,2,0>(type)];
     }
 
     //! @brief left end for type
     int rend(MType type) const {
-        static std::array<int,4> end {1,2,3,3};
-        return (*this)[end[static_cast<int>(type)]];
+        return (*this)[select_by_mtype<int,1,2,3,3>(type)];
     }
 
     //! @brief left end for type
     int &lend(MType type) {
-        static std::array<int,4> end {0,1,2,0};
-        return (*this)[end[static_cast<int>(type)]];
+        return (*this)[select_by_mtype<int,0,1,2,0>(type)];
     }
 
     //! @brief left end for type
     int &rend(MType type) {
-        static std::array<int,4> end {1,2,3,3};
-        return (*this)[end[static_cast<int>(type)]];
+        return (*this)[select_by_mtype<int,1,2,3,3>(type)];
     }
 
     //! @brief set left and right indices for type

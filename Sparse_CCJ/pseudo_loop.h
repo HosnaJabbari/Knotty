@@ -54,6 +54,14 @@ public:
     // in order to be able to check the border values consistantly
     // I am adding these get functions
 
+    //! @brief calculate PX
+    //! @pre bases can pair (at the type-specific ends)
+    //! @todo for PM this checks the termination case, which should be avoided
+    template<MType type>
+    int calc_PX_paired(const Index4D &x);
+
+    //! @brief calculate PX
+    //! @note returns INF if bases cannot pair (at the type-specific ends)
     template<MType type>
     int calc_PX(const Index4D &x);
 
@@ -242,22 +250,20 @@ private:
     MasterTraceArrows *ta;
 
     // SW some precomputation for optimization
-    // caching can_pair saves almost 3% runtime (still only demonstrating
-    // potentials)
     std::vector<bool> can_pair_;
     void
     init_can_pair() {
-        can_pair_.resize(nb_nucleotides*(nb_nucleotides+1)/2);
+        can_pair_.resize(nb_nucleotides*nb_nucleotides);
         for (int i=0; i<nb_nucleotides; i++) {
             for (int j=i+1; j<nb_nucleotides; j++) {
-                int ij = index[i]+j-i;
+                int ij = i*nb_nucleotides+j;
                 can_pair_[ij] = ::can_pair(int_sequence[i],int_sequence[j]);
             }
         }
     }
 
     int can_pair(int i, int j) const {
-        return can_pair_[index[i]+j-i];
+        return can_pair_[i*nb_nucleotides+j];
     }
 
     //! @brief array for pre-computed e_intP interior loop energies
@@ -291,9 +297,6 @@ private:
         assert(x<MAXLOOP);
         assert(xp<MAXLOOP);
 
-        if (! ( d + TURN < dp ) ) {
-            std::cerr << "get_e_intP "<<i<< " "<<d<<" "<<dp<< " "<<j<<" "<<std::endl;
-        }
         assert(d + TURN < dp);
 
         int ij = index[i]+j-i;
@@ -420,24 +423,24 @@ private:
     int
     decomp_cases_by_mtype(MType type);
 
+
     //! non-decomposing cases in the from recursions by type
     //! @param type
     int
     lmro_cases_in_fromX_by_mtype(MType type) const {
-        static std::array<int, 4> lrmo{
-            CASE_PM | CASE_PR | CASE_PO, // fromL
-            CASE_PL | CASE_PR,           // fromM
-            CASE_PM | CASE_PO,           // fromR
-            CASE_PL | CASE_PR            // fromO
-        };
-        return lrmo[static_cast<int>(type)];
+        return
+            select_by_mtype<int,
+                            CASE_PM | CASE_PR | CASE_PO, // fromL
+                            CASE_PL | CASE_PR,           // fromM
+                            CASE_PM | CASE_PO,           // fromR
+                            CASE_PL | CASE_PR>           // fromO
+            (type);
     }
 
     //! char P_ matrix identifier by type
     char
     pid_by_mtype(MType type) {
-        static std::array<char,4> pid{P_PL,P_PM,P_PR,P_PO};
-        return pid[static_cast<int>(type)];
+        return select_by_mtype<char, P_PL, P_PM, P_PR, P_PO>(type);
     }
 
     //! char P_ matrix identifier by type

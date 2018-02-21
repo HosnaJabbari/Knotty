@@ -318,6 +318,7 @@ void pseudo_loop::compute_energies_ns(int i, int l)
 }
 
 
+inline
 bool
 pseudo_loop::impossible_case(int i, int l) const {
     // Hosna, April 3, 2014
@@ -328,6 +329,7 @@ pseudo_loop::impossible_case(int i, int l) const {
     return false;
 }
 
+inline
 bool
 pseudo_loop::impossible_case(const Index4D &x) const {
     // Hosna, April 3, 2014
@@ -453,6 +455,101 @@ void pseudo_loop::compute_P_ns(int i, int l){
         P[il]=min_energy;
     }
 }
+
+inline
+int
+pseudo_loop::decomp_cases_by_mtype(MType type) {
+    static std::array<int, 4> cases{CASE_L, CASE_M, CASE_R, CASE_O};
+    return cases[static_cast<int>(type)];
+}
+
+inline
+MatrixSlices3D &
+pseudo_loop::PX_by_mtype(MType type) {
+    static std::array<MatrixSlices3D *,4> matrices{&PL, &PM, &PR, &PO};
+    return *matrices[static_cast<int>(type)];
+}
+
+inline
+MatrixSlices3D &
+pseudo_loop::fromX_by_mtype(MType type) {
+    static std::array<MatrixSlices3D *,4> matrices{&PfromL, &PfromM, &PfromR, &PfromO};
+    return *matrices[static_cast<int>(type)];
+}
+
+inline
+MatrixSlices3D &
+pseudo_loop::PXmloop0_by_mtype(MType type) {
+    static std::array<MatrixSlices3D *, 4> matrices{&PLmloop0, &PMmloop0,
+                                                    &PRmloop0, &POmloop0};
+    return *matrices[static_cast<int>(type)];
+}
+
+inline
+MatrixSlices3D &
+pseudo_loop::PXmloop1_by_mtype(MType type) {
+    static std::array<MatrixSlices3D *, 4> matrices{&PLmloop1, &PMmloop1,
+                                                    &PRmloop1, &POmloop1};
+    return *matrices[static_cast<int>(type)];
+}
+
+inline
+candidate_lists *pseudo_loop::mloop0_cl_by_mtype(MType type) {
+    static std::array<candidate_lists *, 4> cls{PLmloop0_CL, PMmloop0_CL,
+                                               PRmloop0_CL, POmloop0_CL};
+    return cls[static_cast<int>(type)];
+}
+
+inline
+candidate_lists *pseudo_loop::from_cl_by_mtype(MType type) {
+    static std::array<candidate_lists *, 4> cls{PfromL_CL, PfromM_CL,
+                                               PfromR_CL, PfromO_CL};
+    return cls[static_cast<int>(type)];
+}
+
+inline
+TraceArrows &pseudo_loop::tas_by_mtype(MType type) {
+    static std::array<TraceArrows *, 4> tas{&ta->PL, &ta->PM, &ta->PR, &ta->PO};
+    return *tas[static_cast<int>(type)];
+}
+
+
+template <>
+int pseudo_loop::calc_PX_paired<MType::M>(const Index4D &x){
+    const auto type = MType::M;
+    assert(can_pair(x.lend(type),x.rend(type)));
+
+    if (x.i()==x.j() && x.k()==x.l()){
+        return  (int)gamma2(x.i(),x.l());
+    } else {
+        return PX_by_mtype(type).get(x);
+    }
+}
+
+template<MType type>
+int pseudo_loop::calc_PX_paired(const Index4D &x){
+    assert(can_pair(x.lend(type),x.rend(type)));
+
+    return PX_by_mtype(type).get(x);
+}
+
+template <MType type>
+int pseudo_loop::calc_PX(const Index4D &x){
+    if (!can_pair(x.lend(type),x.rend(type))) {
+        return INF;
+    }
+    return calc_PX_paired<type>(x);
+}
+
+int pseudo_loop::calc_PX(const Index4D &x, MType type){
+    static std::array<std::function<int(pseudo_loop &, const Index4D &)>, 4>
+        fs{&pseudo_loop::calc_PX<MType::L>,
+            &pseudo_loop::calc_PX<MType::M>,
+            &pseudo_loop::calc_PX<MType::R>,
+            &pseudo_loop::calc_PX<MType::O>};
+    return fs[static_cast<int>(type)](*this, x);
+}
+
 
 void pseudo_loop::compute_PK(int i, int j, int k, int l){
     int min_energy = INF, temp = INF;
@@ -613,7 +710,7 @@ pseudo_loop::generic_decomposition(int i, int j, int k, int l,
             // 12G2 using candidate list
             for (const auto c : CL->get_list(j, k, l)) {
                 if ( c.first <= i ) break;
-                int temp = w.get(i, c.first - 1) + c.second;
+                int temp = w.get_uc(i, c.first - 1) + c.second;
                 if (temp < min_energy) {
                     min_energy = temp;
                     best_branch_ = CASE_12G2;
@@ -624,8 +721,8 @@ pseudo_loop::generic_decomposition(int i, int j, int k, int l,
         } else {
             // 12G2 w/o candidate list (non-sparse)
             for(int d = i+1; d<=j; d++){
-                int px_e = PX.get(d, j, k, l);
-                int temp = w.get(i, d - 1) + px_e;
+                int px_e = PX.get_uc(d, j, k, l);
+                int temp = w.get_uc(i, d - 1) + px_e;
                 if (temp < min_energy){
                     min_energy = temp;
                     best_branch_ = CASE_12G2;
@@ -639,8 +736,8 @@ pseudo_loop::generic_decomposition(int i, int j, int k, int l,
     if (decomp_cases & CASE_12G1) {
         // case 1G21
         for (int d = i; d < j; d++) {
-            int px_e = PX.get(i, d, k, l);
-            int temp = px_e + w.get(d + 1, j);
+            int px_e = PX.get_uc(i, d, k, l);
+            int temp = px_e + w.get_uc(d + 1, j);
             if (temp < min_energy) {
                 min_energy = temp;
                 best_branch_ = CASE_12G1;
@@ -653,8 +750,8 @@ pseudo_loop::generic_decomposition(int i, int j, int k, int l,
     if (decomp_cases & CASE_1G21) {
         // case 1G21
         for(int d = k+1; d <= l; d++){
-            int px_e = PX.get(i, j, d, l);
-            int temp = w.get(k, d - 1) + px_e;
+            int px_e = PX.get_uc(i, j, d, l);
+            int temp = w.get_uc(k, d - 1) + px_e;
             if (temp < min_energy){
                 min_energy = temp;
                 best_branch_ = CASE_1G21;
@@ -666,9 +763,9 @@ pseudo_loop::generic_decomposition(int i, int j, int k, int l,
 
     if (decomp_cases & CASE_1G12) {
         // case 1G12
-        for (int d = i; d < j; d++) {
-            int px_e = PX.get(i, j, k, d);
-            int temp = px_e + w.get(d + 1, j);
+        for (int d = k; d < l; d++) {
+            int px_e = PX.get_uc(i, j, k, d);
+            int temp = px_e + w.get_uc(d + 1, l);
             if (temp < min_energy) {
                 min_energy = temp;
                 best_branch_ = CASE_1G12;
@@ -679,6 +776,7 @@ pseudo_loop::generic_decomposition(int i, int j, int k, int l,
     }
 
     if (LMRO_ndcases & CASE_PL) {
+        // int px_e = calc_PX<MType::L>(x);
         int px_e = calc_PX<MType::L>(x);
         int temp = px_e + penfun(j, i);
         if (temp < min_energy) {
@@ -848,55 +946,6 @@ pseudo_loop::compute_PX_helper(const Index4D &x, MType type) {
     return min_energy;
 }
 
-int
-pseudo_loop::decomp_cases_by_mtype(MType type) {
-    static std::array<int, 4> cases{CASE_L, CASE_M, CASE_R, CASE_O};
-    return cases[static_cast<int>(type)];
-}
-
-MatrixSlices3D &
-pseudo_loop::PX_by_mtype(MType type) {
-    static std::array<MatrixSlices3D *,4> matrices{&PL, &PM, &PR, &PO};
-    return *matrices[static_cast<int>(type)];
-}
-
-MatrixSlices3D &
-pseudo_loop::fromX_by_mtype(MType type) {
-    static std::array<MatrixSlices3D *,4> matrices{&PfromL, &PfromM, &PfromR, &PfromO};
-    return *matrices[static_cast<int>(type)];
-}
-
-MatrixSlices3D &
-pseudo_loop::PXmloop0_by_mtype(MType type) {
-    static std::array<MatrixSlices3D *, 4> matrices{&PLmloop0, &PMmloop0,
-                                                    &PRmloop0, &POmloop0};
-    return *matrices[static_cast<int>(type)];
-}
-
-MatrixSlices3D &
-pseudo_loop::PXmloop1_by_mtype(MType type) {
-    static std::array<MatrixSlices3D *, 4> matrices{&PLmloop1, &PMmloop1,
-                                                    &PRmloop1, &POmloop1};
-    return *matrices[static_cast<int>(type)];
-}
-
-candidate_lists *pseudo_loop::mloop0_cl_by_mtype(MType type) {
-    static std::array<candidate_lists *, 4> cls{PLmloop0_CL, PMmloop0_CL,
-                                               PRmloop0_CL, POmloop0_CL};
-    return cls[static_cast<int>(type)];
-}
-
-candidate_lists *pseudo_loop::from_cl_by_mtype(MType type) {
-    static std::array<candidate_lists *, 4> cls{PfromL_CL, PfromM_CL,
-                                               PfromR_CL, PfromO_CL};
-    return cls[static_cast<int>(type)];
-}
-
-
-TraceArrows &pseudo_loop::tas_by_mtype(MType type) {
-    static std::array<TraceArrows *, 4> tas{&ta->PL, &ta->PM, &ta->PR, &ta->PO};
-    return *tas[static_cast<int>(type)];
-}
 
 int
 pseudo_loop::calc_PXiloop(const Index4D &x, MType type) {
@@ -1749,38 +1798,6 @@ pseudo_loop::calc_P(int i, int j) {
     return P[P.ij(i, j)];
 }
 
-template<MType type>
-int pseudo_loop::calc_PX(const Index4D &x){
-    if (!can_pair(x.lend(type),x.rend(type))){
-        return INF;
-    }
-
-    int e;
-    if (type==MType::M && x.i()==x.j() && x.k()==x.l()){
-        e =  (int)gamma2(x.i(),x.l());
-    } else {
-        e = PX_by_mtype(type).get(x);
-    }
-    //if (e<INF/2) std::cerr << x << " " << static_cast<int>(type) << " " << e << std::endl;
-    return e;
-}
-
-int pseudo_loop::calc_PX(const Index4D &x, MType type){
-    if (!can_pair(x.lend(type),x.rend(type))){
-        return INF;
-    }
-
-    int e;
-    if (type==MType::M && x.i()==x.j() && x.k()==x.l()){
-        e =  (int)gamma2(x.i(),x.l());
-    } else {
-        e = PX_by_mtype(type).get(x);
-    }
-    //if (e<INF/2) std::cerr << x << " " << static_cast<int>(type) << " " << e << std::endl;
-    return e;
-}
-
-
 int pseudo_loop::calc_PfromL(int i, int j, int k, int l){
     // Hosna, April 3, 2014
     // adding impossible cases
@@ -1891,7 +1908,8 @@ int pseudo_loop::calc_PLiloop(int i, int j, int k, int l){
 
     for(int d= i+1; d<std::min(j,i+MAXLOOP); d++){
         for(int dp = j-1; dp > std::max(d+TURN,j-MAXLOOP); dp--){
-            int temp = get_e_intP(i,d,dp,j) + calc_PX<MType::L>(Index4D(d,dp,k,l));
+            if (!can_pair(d,dp)) continue;
+            int temp = get_e_intP(i,d,dp,j) + calc_PX_paired<MType::L>(Index4D(d,dp,k,l));
             if(temp < min_energy){
                 min_energy = temp;
                 best_d_ = d;
@@ -1953,7 +1971,8 @@ int pseudo_loop::calc_PRiloop(int i, int j, int k, int l){
 
     for(int d= k+1; d<std::min(l,k+MAXLOOP); d++){
         for(int dp=l-1; dp > std::max(d+TURN,l-MAXLOOP); dp--){
-            int temp = get_e_intP(k,d,dp,l) + calc_PX<MType::R>(Index4D(i,j,d,dp));
+            if (!can_pair(d,dp)) continue;
+            int temp = get_e_intP(k,d,dp,l) + calc_PX_paired<MType::R>(Index4D(i,j,d,dp));
             if(temp < min_energy){
                 min_energy = temp;
                 best_d_ = d;
@@ -2010,7 +2029,8 @@ int pseudo_loop::calc_PMiloop(int i, int j, int k, int l){
     int temp = INF;
     for(int d= j-1; d>std::max(i,j-MAXLOOP); d--){
         for (int dp=k+1; dp<std::min(l,k+MAXLOOP); dp++) {
-            temp = get_e_intP(d,j,k,dp) + calc_PX<MType::M>(Index4D(i,d,dp,l));
+            if (!can_pair(d,dp)) continue;
+            temp = get_e_intP(d,j,k,dp) + calc_PX_paired<MType::M>(Index4D(i,d,dp,l));
 
             if(temp < min_energy){
                 min_energy = temp;
@@ -2072,7 +2092,8 @@ int pseudo_loop::calc_POiloop(int i, int j, int k, int l){
 
     for(int d= i+1; d<std::min(j,i+MAXLOOP); d++){
         for (int dp=l-1; dp >std::max(l-MAXLOOP,k); dp--) {
-            int temp = get_e_intP(i,d,dp,l) + calc_PX<MType::O>(Index4D(d,j,k,dp));
+            if (!can_pair(d,dp)) continue;
+            int temp = get_e_intP(i,d,dp,l) + calc_PX_paired<MType::O>(Index4D(d,j,k,dp));
 
             if(temp < min_energy){
                 min_energy = temp;
@@ -2080,7 +2101,6 @@ int pseudo_loop::calc_POiloop(int i, int j, int k, int l){
                 best_dp_ = dp;
             }
         }
-
     }
 
     return min_energy;
