@@ -515,8 +515,9 @@ TraceArrows &pseudo_loop::tas_by_mtype(MType type) {
 
 
 template <>
-int pseudo_loop::calc_PX_paired<MType::M>(const Index4D &x){
+int pseudo_loop::calc_PX_checked<MType::M>(const Index4D &x){
     const auto type = MType::M;
+    assert(x.difference(type) > TURN);
     assert(can_pair(x.lend(type),x.rend(type)));
 
     if (x.i()==x.j() && x.k()==x.l()){
@@ -527,7 +528,8 @@ int pseudo_loop::calc_PX_paired<MType::M>(const Index4D &x){
 }
 
 template<MType type>
-int pseudo_loop::calc_PX_paired(const Index4D &x){
+int pseudo_loop::calc_PX_checked(const Index4D &x){
+    assert(x.difference(type) > TURN);
     assert(can_pair(x.lend(type),x.rend(type)));
 
     return PX_by_mtype(type).get(x);
@@ -535,10 +537,10 @@ int pseudo_loop::calc_PX_paired(const Index4D &x){
 
 template <MType type>
 int pseudo_loop::calc_PX(const Index4D &x){
-    if (!can_pair(x.lend(type),x.rend(type))) {
+    if (!can_pair(x.lend(type), x.rend(type))) {
         return INF;
     }
-    return calc_PX_paired<type>(x);
+    return calc_PX_checked<type>(x);
 }
 
 int pseudo_loop::calc_PX(const Index4D &x, MType type){
@@ -549,7 +551,6 @@ int pseudo_loop::calc_PX(const Index4D &x, MType type){
             &pseudo_loop::calc_PX<MType::O>};
     return fs[static_cast<int>(type)](*this, x);
 }
-
 
 void pseudo_loop::compute_PK(int i, int j, int k, int l){
     int min_energy = INF, temp = INF;
@@ -945,7 +946,6 @@ pseudo_loop::compute_PX_helper(const Index4D &x, MType type) {
 
     return min_energy;
 }
-
 
 int
 pseudo_loop::calc_PXiloop(const Index4D &x, MType type) {
@@ -1909,7 +1909,7 @@ int pseudo_loop::calc_PLiloop(int i, int j, int k, int l){
     for(int d= i+1; d<std::min(j,i+MAXLOOP); d++){
         for(int dp = j-1; dp > std::max(d+TURN,j-MAXLOOP); dp--){
             if (!can_pair(d,dp)) continue;
-            int temp = get_e_intP(i,d,dp,j) + calc_PX_paired<MType::L>(Index4D(d,dp,k,l));
+            int temp = get_e_intP(i,d,dp,j) + calc_PX_checked<MType::L>(Index4D(d,dp,k,l));
             if(temp < min_energy){
                 min_energy = temp;
                 best_d_ = d;
@@ -1972,7 +1972,7 @@ int pseudo_loop::calc_PRiloop(int i, int j, int k, int l){
     for(int d= k+1; d<std::min(l,k+MAXLOOP); d++){
         for(int dp=l-1; dp > std::max(d+TURN,l-MAXLOOP); dp--){
             if (!can_pair(d,dp)) continue;
-            int temp = get_e_intP(k,d,dp,l) + calc_PX_paired<MType::R>(Index4D(i,j,d,dp));
+            int temp = get_e_intP(k,d,dp,l) + calc_PX_checked<MType::R>(Index4D(i,j,d,dp));
             if(temp < min_energy){
                 min_energy = temp;
                 best_d_ = d;
@@ -2030,7 +2030,7 @@ int pseudo_loop::calc_PMiloop(int i, int j, int k, int l){
     for(int d= j-1; d>std::max(i,j-MAXLOOP); d--){
         for (int dp=k+1; dp<std::min(l,k+MAXLOOP); dp++) {
             if (!can_pair(d,dp)) continue;
-            temp = get_e_intP(d,j,k,dp) + calc_PX_paired<MType::M>(Index4D(i,d,dp,l));
+            temp = get_e_intP(d,j,k,dp) + calc_PX_checked<MType::M>(Index4D(i,d,dp,l));
 
             if(temp < min_energy){
                 min_energy = temp;
@@ -2093,7 +2093,7 @@ int pseudo_loop::calc_POiloop(int i, int j, int k, int l){
     for(int d= i+1; d<std::min(j,i+MAXLOOP); d++){
         for (int dp=l-1; dp >std::max(l-MAXLOOP,k); dp--) {
             if (!can_pair(d,dp)) continue;
-            int temp = get_e_intP(i,d,dp,l) + calc_PX_paired<MType::O>(Index4D(d,j,k,dp));
+            int temp = get_e_intP(i,d,dp,l) + calc_PX_checked<MType::O>(Index4D(d,j,k,dp));
 
             if(temp < min_energy){
                 min_energy = temp;
@@ -4061,7 +4061,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
             int best_row = 1, best_d = -1, best_dp = -1;
             for(int d= i+1; d<std::min(j,i+MAXLOOP); d++){
                 for (int dp=l-1; dp >std::max(l-MAXLOOP,k); dp--) {
-                    int branch2 = get_e_intP(i,d,dp,l) + calc_PX<MType::O>(Index4D(d,j,dp,k));
+                    int branch2 = get_e_intP(i,d,dp,l) + calc_PX<MType::O>(Index4D(d,j,k,dp));
 
                     if(branch2 < min_energy){
                         min_energy = branch2;
@@ -4086,7 +4086,7 @@ void pseudo_loop::back_track_ns(minimum_fold *f, seq_interval *cur_interval)
 					if (node_debug || debug){
 						printf("POiloop(%d,%d,%d,%d)(2): Pushing POiloop(%d,%d,%d,%d) e:%d\n",i,j,k,l,best_d,j,best_dp,k, min_energy);
 					}
-					insert_node(best_d,k,j,best_dp,P_PO);
+					insert_node(best_d,best_dp,j,k,P_PO);
 					break;
 				default:
 					printf("default: This should not have happened!, P_POiloop(%d,%d,%d,%d)\n",i,j,k,l);

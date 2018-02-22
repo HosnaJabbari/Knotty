@@ -55,10 +55,10 @@ public:
     // I am adding these get functions
 
     //! @brief calculate PX
-    //! @pre bases can pair (at the type-specific ends)
+    //! @pre (type-specific) base pair ends can pair and have the right difference
     //! @todo for PM this checks the termination case, which should be avoided
     template<MType type>
-    int calc_PX_paired(const Index4D &x);
+    int calc_PX_checked(const Index4D &x);
 
     //! @brief calculate PX
     //! @note returns INF if bases cannot pair (at the type-specific ends)
@@ -255,14 +255,21 @@ private:
     init_can_pair() {
         can_pair_.resize(nb_nucleotides*nb_nucleotides);
         for (int i=0; i<nb_nucleotides; i++) {
-            for (int j=i+1; j<nb_nucleotides; j++) {
+            for (int j=i; j<=i+TURN && j<nb_nucleotides; j++) {
+                int ij = i*nb_nucleotides+j;
+                can_pair_[ij] = false;
+            }
+            for (int j=i+TURN+1; j<nb_nucleotides; j++) {
                 int ij = i*nb_nucleotides+j;
                 can_pair_[ij] = ::can_pair(int_sequence[i],int_sequence[j]);
             }
         }
     }
 
+    //! @brief check whether two positions can pair
+    //! checks for canonical base pairing *and* distance (TURN)
     int can_pair(int i, int j) const {
+        assert(i<=j);
         return can_pair_[i*nb_nucleotides+j];
     }
 
