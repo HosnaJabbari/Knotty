@@ -222,21 +222,20 @@ public:
         print_slice(x.i(),x.j(),x.k(),x.l());
     }
 
-    using index_offset_t = std::vector<std::vector<int>>;
+    using index_offset_t = std::vector<std::vector<size_t>>;
 
-    static int
+    static size_t
     index3D(int j, int k, int l,
             const index_offset_t & offset) {
         return offset[j][k] + l;
     }
-
 
     static
     void construct_index(index_offset_t & offset, int n) {
         // construct for j<=k<=l (even if j<k-1)
         offset.resize(n);
 
-        int idx=-n;
+        size_t idx=-n;
         for (int j=0; j<n; j++) {
             offset[j].resize(n);
 
