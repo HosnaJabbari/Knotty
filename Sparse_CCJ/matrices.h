@@ -17,13 +17,13 @@ public:
         n_ = n;
         index_ = index;
 
-        int tl=total_length(n);
+        size_t tl=total_length(n);
         try {
-            m_.resize(tl);
+            m_.clear();
+            m_.resize(tl,INF+1);
         } catch(std::exception &e) {
-            giveup (e.what(), "energy");
+            giveup("Cannot allocate memory", "TriangleMatrix");
         }
-        for (int i=0; i < tl; i++) m_[i] = INF+1;
     }
 
     int
@@ -71,9 +71,9 @@ public:
         }
     }
 
-    static int
+    static size_t
     total_length(int n) {
-        return (n *(n+1))/2;
+        return (n *((size_t)n+1))/2;
     }
 
     static int *
@@ -120,13 +120,13 @@ public:
 
         construct_index(offset_,n);
         slice_size_ = offset_[n_-1][n_-1] + n_;
-        assert( slice_size_ == n_*(n_+1)*(n_+2)/6 );
+        assert( slice_size_ == n_*(n_+1)*((size_t)n_+2)/6 );
         try {
-            m_.resize(nb_slices_ * slice_size_);
+            m_.clear();
+            m_.resize(nb_slices_ * slice_size_,INTERN_INF);
         } catch(std::exception &e) {
-            giveup (e.what(), "energy");
+            giveup("Cannot allocate memory", "MatrixSlices3D");
         }
-        for (auto &x: m_) x=INTERN_INF;
 
         // std::cerr << "Create "<<nb_slices<<" slices: " << ((m_.capacity()*sizeof(energy_t)) >> 10)  << " KB" <<std::endl;
     }
@@ -254,7 +254,7 @@ private:
     int nb_slices_;
 
     //! size of one 3D slice
-    int slice_size_;
+    size_t slice_size_;
 
     index_offset_t offset_;
 
