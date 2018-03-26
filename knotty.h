@@ -3,6 +3,6 @@
 
 #include "h_struct.h"
 
-double ccj(char *sequence, char *structure);
+double knotty(char *sequence, char *structure);
 
 #endif /*HFOLD_H_*/

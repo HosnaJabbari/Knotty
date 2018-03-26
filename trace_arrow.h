@@ -15,7 +15,7 @@
 
 using ta_key_t=int;
 
-using energy_t = int; //as used all over CCJ
+using energy_t = int; //as used all over knotty
 
 
 class MasterTraceArrows;

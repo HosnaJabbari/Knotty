@@ -58,19 +58,19 @@ void VM_final::compute_energy(int i, int j){
             min_energy = tmp;
 
 		tmp = WM[iplus2k] + WM[kplus1jminus1] +dangle_top [sequence [i]][sequence [j]][sequence [i+1]] + misc.multi_free_base_penalty;
-		
+
 		// add the loss
         if (pred_pairings != NULL)
         {
             pred_pairings[i+1] = -1;
             tmp = tmp - loss (i+1,i+1);
         }
-		
+
 		if (tmp < min_energy){
 			min_energy= tmp;
         }
-		
-		
+
+
         tmp = WM[iplus1k] + WM[kplus1jminus2] +dangle_bot [sequence[i]][sequence[j]][sequence[j-1]] + misc.multi_free_base_penalty;
 		// add the loss
         if (pred_pairings != NULL)
@@ -78,11 +78,11 @@ void VM_final::compute_energy(int i, int j){
             pred_pairings[j-1] = -1;
             tmp = tmp - loss (j-1,j-1);
         }
-		
+
 		if (tmp < min_energy){
 			min_energy = tmp;
         }
-        
+
 		tmp = WM[iplus2k] + WM[kplus1jminus2] + dangle_top [sequence [i]][sequence [j]][sequence [i+1]] + dangle_bot [sequence[i]][sequence[j]][sequence[j-1]] + 2 * misc.multi_free_base_penalty;
 		// add the loss
         if (pred_pairings != NULL)
@@ -90,8 +90,8 @@ void VM_final::compute_energy(int i, int j){
             pred_pairings[i+1] = -1;
             pred_pairings[j-1] = -1;
             tmp = tmp - loss (i+1,i+1) - loss (j-1,j-1);
-        }    
-		
+        }
+
 		if (tmp < min_energy){
             min_energy = tmp;
         }
@@ -116,16 +116,16 @@ int VM_final::get_energy(int i, int j){
 	return VM[ij];
 }
 
- 
+
 /**
  *  PRE: simfold's WM matrix has been filled for i and j
- *  and now we need to fill in the WM matrix that hfold/ccj needs
+ *  and now we need to fill in the WM matrix that hfold/knotty needs
  *
  */
 void VM_final::WM_compute_energy(int i, int j){
 
 	int s_wm = s_vm->get_energy_WM(i,j);
-	// WM recurrences in HFold and CCJ are the same so I am keeping them here for CCJ similar to HFold
+	// WM recurrences in HFold and knotty are the same so I am keeping them here for knotty similar to HFold
 	int p_energy = p->get_energy(i,j)+PSM_penalty+b_penalty;
 	int min_energy = MIN(s_wm, p_energy);
 	int ij = index[i]+j-i;

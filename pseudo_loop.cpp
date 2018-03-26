@@ -346,7 +346,7 @@ void pseudo_loop::compute_WBP(int i, int l){
     for(int d=i; d< l; d++){
         for(int e = d+1; e<= l; e++){
             // Hosna, August 26, 2014
-            // comparing calculation of WI in HFold and WPP in CCJ, I found that
+            // comparing calculation of WI in HFold and WPP in knotty, I found that
             // in HFold we add another penalty called PPS_penalty for closed regions inside a pseudoloop or multiloop that spans a band
             //int common = WB.get(i,d-1) + beta1P*(l-e);
             int common = WB.get(i,d-1) + beta1P*(l-e)+PPS_penalty;
@@ -379,7 +379,7 @@ void pseudo_loop::compute_WPP(int i, int l){
     for(int d=i; d< l; d++){
         for(int e = d+1; e<= l; e++){
             // Hosna, August 26, 2014
-            // comparing calculation of WI in HFold and WPP in CCJ, I found that
+            // comparing calculation of WI in HFold and WPP in knotty, I found that
             // in HFold we add another penalty called PPS_penalty for closed regions inside a pseudoloop or multiloop that spans a band
             int common = WP.get(i,d-1) + gamma1*(l-e) + PPS_penalty;
             b1 = V->get_energy(d,e) + gamma2(e,d) + common;
@@ -4423,7 +4423,7 @@ void pseudo_loop::bt_WBP(int i, int l) {
         for(int e = d+1; e<= l; e++){
             //branch 1
             // Hosna, August 26, 2014
-            // comparing calculation of WI in HFold and WPP in CCJ, I found that
+            // comparing calculation of WI in HFold and WPP in knotty, I found that
             // in HFold we add another penalty called PPS_penalty for closed regions inside a pseudoloop or multiloop that spans a band
             //int common = WB.get(i,d-1) + beta1P*(l-e);
             int common = WB.get(i,d-1) + beta1P*(l-e)+PPS_penalty;
@@ -4540,7 +4540,7 @@ void pseudo_loop::bt_WPP(int i, int l) {
     for(int d=i; d< l; d++){
         for(int e = d+1; e<= l; e++){
             // Hosna, August 26, 2014
-            // comparing calculation of WI in HFold and WPP in CCJ, I found that
+            // comparing calculation of WI in HFold and WPP in knotty, I found that
             // in HFold we add another penalty called PPS_penalty for closed regions inside a pseudoloop or multiloop that spans a band
             //int common = WP.get(i,d-1) + gamma1*(l-e);
             int common = WP.get(i,d-1) + gamma1*(l-e)+PPS_penalty;

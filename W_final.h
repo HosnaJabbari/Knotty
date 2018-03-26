@@ -15,7 +15,7 @@ class W_final: public s_min_folding{
         ~W_final ();
         // The destructor
 
-        double ccj ();
+        double knotty ();
         // PRE:  the init_data function has been called;
         //       the space for structure has been allocate
         // POST: fold sequence, return the MFE structure in structure, and return the MFE
@@ -29,7 +29,7 @@ class W_final: public s_min_folding{
 
     protected:
     	// Hosna: Feb 9, 2014:
-        // this pointer is the main part of CCJ program
+        // this pointer is the main part of knotty program
         // and corresponds to P recurrence
         pseudo_loop *P;
 

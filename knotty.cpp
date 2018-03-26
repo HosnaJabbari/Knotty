@@ -1,5 +1,5 @@
 
-// a simple driver for the CCJ
+// a simple driver for Knotty
 // Hosna: base pair maximization version, Feb 9, 2014
 
 #include <stdio.h>
@@ -16,7 +16,7 @@
 
 #include "cmd_line_options.h"
 
-#include "CCJ.h"
+#include "knotty.h"
 
 int main (int argc, char *argv[])
 {
@@ -29,7 +29,7 @@ int main (int argc, char *argv[])
 
     // reading arguments
     if (argc < 2)
-        cmd_line_error = true; // need at least 2 arguments (CCJ and sequence)
+        cmd_line_error = true; // need at least 2 arguments (knotty and sequence)
     else
     {
 	// get sequence
@@ -42,7 +42,7 @@ int main (int argc, char *argv[])
             for (int i = 2; i < argc; ++i) {
                 char * arg = argv[i];
 
-		// -ns uses non-sparse version ("modified CCJ")
+		// -ns uses non-sparse version
                 if (!strcmp(arg, "-ns"))
                     cmd_line_options.set_use_sparse(false);
                 else
@@ -81,7 +81,7 @@ int main (int argc, char *argv[])
     if (cmd_line_error) {
         printf ("Usage: %s <sequence> <arguments>\n", argv[0]);
         printf ("Valid arguments include: \n");
-        printf ("-ns to use non-sparse or \"Modifed CCJ\" version\n");
+        printf ("-ns to use non-sparse or \"Modifed knotty\" version\n");
         printf ("-ngc to not use garbage collection \n \n");
 
         printf ("-w to print only the result and energy\n");
@@ -126,7 +126,7 @@ int main (int argc, char *argv[])
 	// so we add it here
 	fill_data_structures_with_new_parameters (SIMFOLD_HOME "/params/parameters_DP09.txt");
 
-	energy = ccj(sequence, structure);
+	energy = knotty(sequence, structure);
 
     if (w) {
         printf ("%s %.2lf\n", structure, energy);

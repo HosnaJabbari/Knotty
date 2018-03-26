@@ -195,7 +195,7 @@ struct seq_interval
   char type;
   seq_interval* next = nullptr;
 	// Hosna, Feb 15, 2014
-	// adding the following so that I can use stack_interval for backtracking the gapped region in CCJ also.
+	// adding the following so that I can use stack_interval for backtracking the gapped region in knotty also.
 	// I am defining the gapped region as [i,k]U[l,j] instead of [i,j]U[k,l] in the recurrences for compatibility with simfold's seq_interval
 	int k;
 	int l;

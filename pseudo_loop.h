@@ -162,7 +162,7 @@ private:
     TriangleMatrix WP;				// the loop inside a pseudoknot (in general it looks like a W but is inside a pseudoknot) // in base pair maximization, there is no difference between the two
     TriangleMatrix WPP;				// similar to WP but has at least one base pair
     // Hosna, Feb 14, 2014
-    // WM and Vm recurrences in HFold and CCJ are similar, so I am keeping them here for CCJ similar to HFold
+    // WM and Vm recurrences in HFold and knotty are similar, so I am keeping them here for knotty similar to HFold
     // i.e. WM is implemented in VM_final
     //int *WM;				// the loop inside a regular multiloop // in base pair maximization, there is no difference between the two
     //int *WMP;				// similar to WM but has at least one base pair
@@ -643,7 +643,7 @@ private:
     // used for backtracking
     void insert_node (int i, int j, char type);//, seq_interval *stack_interval);
     // Hosna, Feb 15, 2014
-    // added the following function for CCJ use
+    // added the following function for knotty use
     // overloaded functions of insert_node
     void insert_node(int i, int j, int k, int l, char type);
     void insert_node(int i, int j, int k, int l, int s, char type);

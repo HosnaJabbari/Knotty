@@ -13,7 +13,7 @@
 
 // Hosna feb 12, 2008
 #include "W_final.h"
-#include "CCJ.h"
+#include "knotty.h"
 
 
 
@@ -99,7 +99,7 @@ brack_type *h_pop (brack_stack *st)
 }
 
 
-double ccj(char *sequence, char *structure){
+double knotty(char *sequence, char *structure){
     // Ian Wark June 2017
     // tell simfold to precompute penalties.
     // essential to not seg-faulting
@@ -107,9 +107,9 @@ double ccj(char *sequence, char *structure){
     create_asymmetry_penalties(strlen(sequence));
 
     W_final *min_fold = new W_final (sequence);
-    if (min_fold == NULL) giveup ("Cannot allocate memory", "CCJ");
+    if (min_fold == NULL) giveup ("Cannot allocate memory", "Knotty");
 
-	double energy = min_fold->ccj();
+	double energy = min_fold->knotty();
     min_fold->return_structure (structure);
 
     delete min_fold;
@@ -171,7 +171,7 @@ int alpha3P(int z)
 int beta2(int i, int l)
 {
 	// Hosna, April 2, 2014
-	// I don't think this is the complete value, but since HFold's WM and CCJ's Vmloop recurrences are the same I am not changing this value here, unless I find out it is needed
+	// I don't think this is the complete value, but since HFold's WM and knotty's Vmloop recurrences are the same I am not changing this value here, unless I find out it is needed
 	// the correct value should be: Non-GC-penalty(i,l)+b_penalty
 	return b_penalty;
 }
@@ -181,7 +181,7 @@ int beta2(int i, int l)
 int beta2P(int i, int l)
 {
 	// Hosna, April 2, 2014
-	// I don't think this is the complete value, but since HFold's WM and CCJ's Vmloop recurrences are the same I am not changing this value here, unless I find out it is needed
+	// I don't think this is the complete value, but since HFold's WM and knotty's Vmloop recurrences are the same I am not changing this value here, unless I find out it is needed
 	// the correct value should be: Non-GC-penalty(i,l) *0.74 + bp_penalty
 	return bp_penalty;
 }

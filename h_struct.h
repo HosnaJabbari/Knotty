@@ -43,7 +43,7 @@ typedef struct brack_type
 // I need a stack to hold different types of brackets for structure formation
 typedef struct brack_stack
 {
-	brack_type elem[5]; // Hosna, Feb 18, 2014 I don't see more than 5 different types of brackets being used in CCJ
+	brack_type elem[5]; // Hosna, Feb 18, 2014 I don't see more than 5 different types of brackets being used in knotty
 	int top;
 } brack_stack;
 

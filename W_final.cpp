@@ -62,7 +62,7 @@ void W_final::space_allocation(){
 
 
 
-double W_final::ccj(){
+double W_final::knotty(){
 	double energy=INF;
     int i=0, j=0;
 
@@ -88,7 +88,7 @@ double W_final::ccj(){
         VM->compute_energy_WM(j);
     }
 
-	//printf("W_final::ccj() done with V matrices!\n");
+	//printf("W_final::knotty() done with V matrices!\n");
 	for(i=nb_nucleotides; i>=0; i--)
 	//for (j=0; j < nb_nucleotides; j++)
     {

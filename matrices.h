@@ -95,7 +95,7 @@ private:
 
 
 template <int>
-class ccj_get_policy {
+class knotty_get_policy {
 };
 
 

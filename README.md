@@ -5,7 +5,7 @@ Knotty is a MFE (minimum free energy) based method for predicting the psuedoknot
 
 Knotty should work on most Linux or Mac machines.
      
-### Installation:  
+### Installating CMake:  
 Requirements: A compiler that supports C++11 standard (tested with g++ version 4.7.2 or higher)  and CMake version 3.1 or greater.    
 
 [CMake](https://cmake.org/install/) version 3.1 or greater must be installed in a way that Knotty can find it.    
@@ -37,7 +37,7 @@ make install
 ```
 [Linux instructions source](https://geeksww.com/tutorials/operating_systems/linux/installation/downloading_compiling_and_installing_cmake_on_linux.php)
 
-#### Steps for installation   
+#### Installing Knotty  
 1. [Download the repository](https://github.com/HosnaJabbari/Knotty/archive/master.zip) and extract the files onto your system.
 2. From a command line in the root directory (where this README.md is) run
 ```
@@ -51,20 +51,44 @@ cmake -H. -Bbuild -DCMAKE_CXX_COMPILER=g++
 cmake --build build
 ```   
 
-3. Run CCJ by navigating to the directory of the CCJ version you wish to use and following the usage instructions in the README.md of that directory.   
-
-[Sparse_CCJ Readme (recommended)](https://github.com/HosnaJabbari/CCJ/tree/master/Sparse_CCJ/README.md)      
-[Original_CCJ Readme](https://github.com/HosnaJabbari/CCJ/tree/master/Original_CCJ/README.md)     
-
 After installing you can move the executables wherever you wish, but you should not delete or move the simfold folder, or you must recompile the executables.
 If you move the folders and wish to recompile, you should first delete the created "build" folder before recompiling.
 
+#### Usage: 
+Run from a command line in Knotty directory:   
+```
+./knotty <sequence> <arguments>  
+```
+where \<sequence> is the input RNA sequence and \<arguments> are detailed below.
+
+Arguments are largely for debugging.
+Valid arguments include:   
+
+-ns to use non-sparse version  
+-ngc to not use garbage collection for Knotty
+
+-w to print only the result and energy
+-pta to print information on the number of trace arrows  
+-pta-v to print verbose trace arrow information  
+-pcl to print information on the candidate lists  
+-pcl-v to print verbose candidate list information  
+
+Examples:     
+To get the predicted secondary structure for the sequence "GCAACGAUGACAUACAUCGCUAGUCGACGC":
+```
+./knotty GCAACGAUGACAUACAUCGCUAGUCGACGC
+```
+To use Knotty with no garbage collection, printing out information on the number of trace arrows used:
+```
+./knotty GCAACGAUGACAUACAUCGCUAGUCGACGC -ngc -pta
+```
+
 ### Licence
 SimFold is a part of MultiRNAFold (http://www.rnasoft.ca/download.html).     
-CCJ and MultiRNAFold are copyrighted under GNU General Public Licence.
+Knotty and MultiRNAFold are copyrighted under GNU General Public Licence.
 
 ### Disclaimer
-Although the authors have made every effort to ensure that CCJ correctly implements the underlying models and fullfills the functions described in the documentation, neither the authors nor the University of Alberta guarantee its correctness, fitness for a particular purpose, or future availability.
+Although the authors have made every effort to ensure that Knotty correctly implements the underlying models and fullfills the functions described in the documentation, neither the authors nor the University of Alberta guarantee its correctness, fitness for a particular purpose, or future availability.
 
 ### Contact  
 If you have any issues or feature requests, please contact Hosna Jabbari: jabbari at ualberta dot ca.
