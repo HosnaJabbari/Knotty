@@ -1,31 +1,14 @@
-# CCJ
+# Knotty
 
 ### Description
-Contains three software implementations of CCJ.
-CCJ is a MFE (minimum free energy) based method for predicting the psuedoknotted secondary structures of RNA sequences.     
-There are three different versions of CCJ that are compared for the WABI 2017 paper submission.   
-For general usage, Sparse CCJ is recommended to be used.   
+Knotty is a MFE (minimum free energy) based method for predicting the psuedoknotted secondary structures of RNA sequences.    
 
-CCJ should work on most Linux or Mac machines.
-
-The different versions are as follows:   
-Original CCJ is the original CCJ detailed in ["Algorithms for prediction of RNA pseudoknotted secondary structures"](https://open.library.ubc.ca/cIRcle/collections/ubctheses/24/items/1.0167140).   
-Modified CCJ is a version of Original CCJ that uses the DP09 energy model.   
-Sparse CCJ is a "sparsified" version of Modified CCJ that uses less memory than any of the other versions.     
+Knotty should work on most Linux or Mac machines.
      
-### Organization
-SimFold is contained in the [Simfold subdirectory](https://github.com/HosnaJabbari/CCJ/tree/master/simfold) and is required to be installed as a library before using any version of CCJ.      
-
-Original CCJ is contained in the [Original_CCJ subdirectory](https://github.com/HosnaJabbari/CCJ/tree/master/Original_CCJ).    
-Sparse CCJ is contained in the [Sparse_CCJ subdirectory](https://github.com/HosnaJabbari/CCJ/tree/master/Sparse_CCJ).   
-Modified CCJ is used by running Sparse CCJ with a special argument. This is detailed in the [README.md](https://github.com/HosnaJabbari/CCJ/tree/master/Sparse_CCJ#sparse-ccj) in the [Sparse_CCJ subdirectory](https://github.com/HosnaJabbari/CCJ/tree/master/Sparse_CCJ). 
-
-Instructions for usage are in the READMEs of the respective subdirectories.   
-
 ### Installation:  
 Requirements: A compiler that supports C++11 standard (tested with g++ version 4.7.2 or higher)  and CMake version 3.1 or greater.    
 
-[CMake](https://cmake.org/install/) version 3.1 or greater must be installed in a way that CCJ can find it.    
+[CMake](https://cmake.org/install/) version 3.1 or greater must be installed in a way that Knotty can find it.    
 To test if your Mac or Linux system already has CMake, you can type into a terminal:      
 ```
 cmake --version
@@ -55,7 +38,7 @@ make install
 [Linux instructions source](https://geeksww.com/tutorials/operating_systems/linux/installation/downloading_compiling_and_installing_cmake_on_linux.php)
 
 #### Steps for installation   
-1. [Download the repository](https://github.com/HosnaJabbari/CCJ/archive/master.zip) and extract the files onto your system.
+1. [Download the repository](https://github.com/HosnaJabbari/Knotty/archive/master.zip) and extract the files onto your system.
 2. From a command line in the root directory (where this README.md is) run
 ```
 cmake -H. -Bbuild
