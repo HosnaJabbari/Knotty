@@ -8,14 +8,13 @@ set(SIMFOLD_HOME ${CMAKE_SOURCE_DIR}/simfold)
 set(CMAKE_CXX_FLAGS "-Wall -g -O2")
 
 # SW - deactivate asserts; use for 'production' compile
-# add_definitions(-DNDEBUG -Wno-unused-variable -Wno-unused-but-set-variable)
+add_definitions(-DNDEBUG -Wno-unused-variable -Wno-unused-but-set-variable)
 
 # turn off some warnings
 add_definitions(-Wno-format)
 
 # build simfold
 add_subdirectory(simfold)
-
 
 # build Knotty
 SET(SOURCE
@@ -39,6 +38,7 @@ add_definitions(-DSIMFOLD_HOME=\"${SIMFOLD_HOME}\")
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 # create executable
 add_executable(knotty ${SOURCE})
+# set executable name
 set_target_properties(knotty PROPERTIES OUTPUT_NAME knotty)
 
 # enable required C++11 features
