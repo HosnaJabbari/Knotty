@@ -79,16 +79,18 @@ int main (int argc, char *argv[])
 
 
     if (cmd_line_error) {
-        printf ("Usage: %s <sequence> <arguments>\n", argv[0]);
+        printf ("Usage: %s <sequence> <arguments>\n\n", argv[0]);
+        printf ("Arguments are largely for debugging.\n");
         printf ("Valid arguments include: \n");
-        printf ("-ns to use non-sparse or \"Modifed knotty\" version\n");
+        printf ("-ns to use non-sparse version\n");
         printf ("-ngc to not use garbage collection \n \n");
 
         printf ("-w to print only the result and energy\n");
         printf ("-pta to print information on the number of trace arrows\n");
         printf ("-pta-v to print verbose trace arrow information\n");
         printf ("-pcl to print information on the candidate lists\n");
-        printf ("-pcl-v to print verbose candidate list information\n");
+        printf ("-pcl-v to print verbose candidate list information\n\n");
+
         printf ("Example: %s GCAACGAUGACAUACAUCGCUAGUCGACGC \n", argv[0]);
         return -1;
     }

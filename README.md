@@ -61,7 +61,7 @@ Run from a command line in Knotty directory:
 ```
 where \<sequence> is the input RNA sequence and \<arguments> are detailed below.
 
-Arguments are largely for debugging.
+Arguments are largely for debugging.   
 Valid arguments include:   
 
 -ns to use non-sparse version  
@@ -73,14 +73,10 @@ Valid arguments include:
 -pcl to print information on the candidate lists  
 -pcl-v to print verbose candidate list information  
 
-Examples:     
+Example:     
 To get the predicted secondary structure for the sequence "GCAACGAUGACAUACAUCGCUAGUCGACGC":
 ```
 ./knotty GCAACGAUGACAUACAUCGCUAGUCGACGC
-```
-To use Knotty with no garbage collection, printing out information on the number of trace arrows used:
-```
-./knotty GCAACGAUGACAUACAUCGCUAGUCGACGC -ngc -pta
 ```
 
 ### Licence
