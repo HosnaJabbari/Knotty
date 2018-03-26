@@ -1,7 +1,7 @@
 # SimFold
 
 #### Description:
-Simfold library used by CCJ. Install before using CCJ.
+Simfold library used by Knotty. Install before using Knotty.
 
 Description from Mirela Andronescu's original readme:   
 SimFold predicts the minimum free energy (MFE) secondary structure of a
