@@ -112,8 +112,12 @@ int main (int argc, char *argv[])
 
     if (cmd_line_error) {
         printf ("Usage: %s <sequence> <arguments>\n\n", argv[0]);
-        printf ("Arguments are largely for debugging.\n");
+
         printf ("Valid arguments include: \n");
+        printf ("-shape=\"filename\" to specify a file for SHAPE data\n");
+        printf ("-b=number to specify an intercept for the SHAPE data (default is -0.600000)\n");
+        printf ("-m=number to specify a slope for the SHAPE data (default is 1.800000)\n \n");
+
         printf ("-ns to use non-sparse version\n");
         printf ("-ngc to not use garbage collection \n \n");
 

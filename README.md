@@ -61,8 +61,10 @@ Run from a command line in Knotty directory:
 ```
 where \<sequence> is the input RNA sequence and \<arguments> are detailed below.
 
-Arguments are largely for debugging.   
 Valid arguments include:   
+-shape="filename" to specify a file for SHAPE data
+-b=number to specify an intercept for the SHAPE data (default is -0.600000)
+-m=number to specify a slope for the SHAPE data (default is 1.800000)
 
 -ns to use non-sparse version  
 -ngc to not use garbage collection for Knotty
