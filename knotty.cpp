@@ -15,6 +15,7 @@
 #include "params.h"
 
 #include "cmd_line_options.h"
+#include "shape_data.h"
 
 #include "knotty.h"
 
@@ -36,6 +37,7 @@ int main (int argc, char *argv[])
         strcpy (sequence, argv[1]);
 	// important that this is before set_shape_file
         cmd_line_options.set_sequence_length(strlen(sequence));
+        shape.set_sequence_length(strlen(sequence));
 
 	// addtional arguments
         if (argc > 2) {
@@ -46,6 +48,36 @@ int main (int argc, char *argv[])
                 if (!strcmp(arg, "-ns"))
                     cmd_line_options.set_use_sparse(false);
                 else
+
+		// ** The following arguments are related to shape data functionality
+		// -shape= gets the shape file to be used
+                if (!strncmp(arg, "-shape=", 7)) {
+                    // cut off first 7 characters ("-shape=")
+                    std::string filename = std::string(arg);
+                    filename = filename.substr(7,filename.length()-6);
+                    shape.set_shape_file(filename);
+                }
+                else
+		// -b= will change the intercept for shape data calculations
+                if (!strncmp(arg, "-b=",3)) {
+                    std::string str = std::string(arg);
+                    str = str.substr(3,str.length()-2);
+                    if (shape.is_number(str))
+                        shape.set_b(atof(str.c_str()));
+                    else
+                        cmd_line_error = true; // is not a number
+                }
+                else
+		// -m= will change the slope for shape data calculations
+                if (!strncmp(arg, "-m=",3)) {
+                    std::string str = std::string(arg);
+                    str = str.substr(3,str.length()-2);
+                    if (shape.is_number(str))
+                        shape.set_m(atof(str.c_str()));
+                    else
+                        cmd_line_error = true; // is not a number
+                }
+		else
 
 		// ** The following arguments are primarily debug options **
 		// -ngc does not use garbage collection (sparse version only)
