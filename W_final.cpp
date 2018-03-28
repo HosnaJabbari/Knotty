@@ -456,7 +456,7 @@ void W_final::backtrack(seq_interval *cur_interval){
 					f[i].type = INTER;
 					f[j].type = INTER;
 					// detect the other closing pair
-					int ip, jp, best_ip, best_jp, minq;
+					int ip, jp, best_ip = -1, best_jp = -1, minq;
 					int tmp, min_energy = INF;
 					for (ip = i+1; ip <= MIN(j-2,i+MAXLOOP+1); ip++)
 					{
