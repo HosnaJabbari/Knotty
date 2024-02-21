@@ -1023,187 +1023,31 @@ void W_final::p_backtrack(seq_interval* cur_interval) {
 void W_final::fill_structure()
 {
 
-    std::stack < brack_type > st;
+    std::vector<int> pair;
+	for(int i=0;i<nb_nucleotides;++i){
+		int j = f[i].pair;
+		if(structure[i] == '(' || structure[i] == ')' || j<0) continue;
 
-    //	brack_stack *st;
-    //	st = new brack_stack;
-    // Hosna, April 3, 2014
-    // to make sure I have correct news and deletes I don't call h_init and copy its code here
-    //h_init(st);
-
-    //	st->top = STACK_EMPTY;
-    //    brack_type e1;
-    //	e1 = new brack_type;
-    //	e1->open = '<';
-    //	e1->close = '>';
-    //	h_push(st,e1);
-    st.push(brack_type('<','>'));
-
-    //	brack_type *e2;
-    //	e2 = new brack_type;
-    //	e2->open = '{';
-    //	e2->close = '}';
-    //	h_push(st,e2);
-    st.push(brack_type('{','}'));
-
-    //	brack_type *e3;
-    //	e3 = new brack_type;
-    //	e3->open = '[';
-    //	e3->close = ']';
-    //	h_push(st,e3);
-    st.push(brack_type('[',']'));
-
-    //	brack_type *e4;
-    //	e4 = new brack_type;
-    //	e4->open = '(';
-    //	e4->close = ')';
-    //	h_push(st,e4);
-    st.push(brack_type('(',')'));
-
-
-
-
-    int isInABand=0;
-    int num_crossing_bands=0;
-
-    //	band_elem *head = new band_elem;
-    //    initNode(head,0,0,0,0);
-    //    display(head);
-    std::list <band_elem > bands;
-    bands.push_back(band_elem('|','|',0,0,0,0));
-
-    //if(debug){
-    //printf("queue_pointer outer_end = %d ---> root node created!\n",queue_pointer->outer_end);
-    //}
-
-    for (int i = 0; i < nb_nucleotides; i++){
-        int ipair=f[i].pair;
-        if (ipair == -1){ // i is unpaired
-            structure[i]='.';
-            if(debug){
-                printf("base %d is unpaired => structure %c \n",i, structure[i]);
-            }
-
-        }else if (i < ipair){
-
-            if(debug){
-                printf("base %d is paired with %d (%d<%d) \n",i,ipair,i,ipair);
-            }
-            isInABand=0;
-            //			for (band_elem *p = head; p != NULL;  p = p->next){
-            for (std::list<band_elem > ::iterator it = bands.begin(); it != bands.end(); it++){
-                //				if(debug){
-                //					printf("%d is paired with %d and it->outer_end = %d \n",i,ipair,p->outer_end);
-                //				}
-                if(i> (*it).inner_start && ipair < (*it).inner_end){ // i.e. i is paired and i.pair[i] is nested in the band
-                    (*it).inner_start = i;
-                    (*it).inner_end =ipair;
-                    structure[i] = (*it).open;
-                    structure[ipair] = (*it).close;
-                    if(debug){
-                        printf("structure[%d]=%c and structure[%d]=%c \n",i,structure[i],ipair,structure[ipair]);
-                    }
-                    isInABand=1;
-                    break;
-                }
-            }
-
-            if (!isInABand){
-                if(debug){
-                    printf("%d is NOT in a band, so we need a new paran type \n",i);
-                }
-                // Hosna, April 4, 2014
-                // I am eliminating reference to h_pop to see if the invalid read error in valgrind would disappear
-                //brack_type *e = h_pop(st);
-                brack_type e = st.top();
-                st.pop();
-                //				st->top = st->top -1 ;
-
-                num_crossing_bands++;
-                // create a new node
-                //				band_elem *tmp;
-                //				tmp = new band_elem;
-                //				tmp->outer_start =i;
-                //				tmp-> outer_end = ipair;
-                //				tmp->inner_start =i;
-                //				tmp-> inner_end = ipair;
-                //				tmp->open = e->open;
-                //				tmp->close = e->close;
-                //				tmp->next = NULL;
-                //                addNode(head,ipair,i,ipair,i,e.open,e.close);
-
-                bands.push_back(band_elem(e.open,e.close,i,ipair,i,ipair));
-                structure[i] = e.open;
-                structure[ipair] = e.close;
-                if(debug){
-                    printf("structure[%d]=%c and structure[%d]=%c \n",i,structure[i],ipair,structure[ipair]);
-                }
-
-                //				band_elem *p;
-                //				p=queue_pointer;
-                //				if (p == NULL){
-                //					printf("head pointer is NULL!!! \n");
-                //					exit(-1);
-                //				}
-                //				// move to the end of the queue
-                //				while(p->next != NULL){
-                //					p = p->next;
-                //				}
-                //				p->next = tmp;
-                //
-                //				if(debug){
-                //
-                //					printf("CHECKING the list so far: \n");
-                //					for(band_elem *current=queue_pointer; current != NULL; current = current->next){
-                //						printf("current->end =%d \n",current->outer_end);
-                //					}
-                //				}
-
-
-            }
-            //             display(head);
-
-        }else{ //having the closing base pair i>pair[i]
-            if(debug){
-                printf("base %d is paired with %d (%d>%d) \n",i,ipair,i,ipair);
-            }
-            //			for(band_elem *current = head; current->next != NULL; current = current->next){
-            for(std::list<band_elem > ::iterator current = bands.begin(); current != bands.end(); current++){
-                if(debug) printf("i= %d and current->outer_end = %d \n",i,(*current).outer_end);
-                if (i == (*current).outer_end){
-                    // Hosna, September 16, 2014
-                    // in pseudoknot free loops brackets don't get freed so we end up with ((..))..[[..]].{{..}}
-                    // I think it was because of scope of new, so after the if there would be no element pushed back into stack!
-
-                    //					brack_type e;
-                    //					e = new brack_type;
-                    //					e->open = current->open;
-                    //					e->close = current->close;
-                    //					h_push(st,e);
-                    st.push(brack_type((*current).open,(*current).close));
-
-                    //                    if (debug) printf("stack's top is currently at: %d \n",st->top);
-                    //                    st->top = st->top +1 ;
-                    //                    brack_type *e = &(st->elem[st->top]);
-                    //                    e->open = current->open;
-                    //					e->close = current->close;
-                    break;
-                }
-            }
-            if (debug) printf("%d > %d, stack's size is: %lu, open=%c, close=%c\n",i,ipair,st.size(),(st.top()).open,(st.top()).close);
-        }
-    }
-
-
-    //delete head;
-    // before deleting the stack we need to make sure we delete all elements we pushed in it.
-    //	delete e1;
-    //	delete e2;
-    //	delete e3;
-    //	delete e4;
-
-    // now delete the stack itself
-    //	delete st;
+		if(j<i){
+			if(!pair.empty() && i==pair.back()){
+				pair.pop_back();
+				structure[j] = '(';
+				structure[i] = ')';
+			}
+		}
+		else{
+			if(pair.empty()){
+				pair.push_back(j);
+			}
+			else{
+				if(j<pair.back()) pair.push_back(j);
+				else{
+					structure[i] = '[';
+					structure[j] = ']';
+				}
+			}
+		}
+	}
 
 }
 
