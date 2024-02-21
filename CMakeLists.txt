@@ -35,7 +35,7 @@ SET(SOURCE
 add_definitions(-DSIMFOLD_HOME=\"${SIMFOLD_HOME}\")
 
 # set path for executable to be created
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR})
+# set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 # create executable
 add_executable(knotty ${SOURCE})
 # set executable name

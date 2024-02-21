@@ -1,6 +1,4 @@
 file(REMOVE_RECURSE
-  "/Users/mateo2/Documents/Code/Knotty/knotty"
-  "/Users/mateo2/Documents/Code/Knotty/knotty.pdb"
   "CMakeFiles/knotty.dir/VM_final.cpp.o"
   "CMakeFiles/knotty.dir/VM_final.cpp.o.d"
   "CMakeFiles/knotty.dir/V_final.cpp.o"
@@ -17,6 +15,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/knotty.dir/pseudo_loop.cpp.o.d"
   "CMakeFiles/knotty.dir/trace_arrow.cpp.o"
   "CMakeFiles/knotty.dir/trace_arrow.cpp.o.d"
+  "knotty"
+  "knotty.pdb"
 )
 
 # Per-language clean rules from dependency scanning.

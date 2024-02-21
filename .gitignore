@@ -1,0 +1,51 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# build
+/build/
+
+# Other
+*~
+configure
+Makefile.in
+_inst
+_build
+aclocal.m4
+config.h.in
+config
+src/Makefile.in
+autom4te.cache
+Doc
+bash.sh
+bashStructure.sh
+out.txt
