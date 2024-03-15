@@ -2,6 +2,7 @@
 #define INDEX4D_H
 
 #include <tuple>
+#include <array>
 
 //! type of 4D matrix -- left, middle, right, outer
 enum class MType { L, M, R, O };
