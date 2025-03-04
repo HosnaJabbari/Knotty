@@ -709,7 +709,7 @@ pseudo_loop::generic_decomposition(int i, int j, int k, int l,
         if ( CL!=nullptr ) {
             // Ian Wark Jan 23 2017
             // 12G2 using candidate list
-            for (const auto c : CL->get_list(j, k, l)) {
+            for (const auto& c : CL->get_list(j, k, l)) {
                 if ( c.first <= i ) break;
                 int temp = w.get_uc(i, c.first - 1) + c.second;
                 if (temp < min_energy) {
@@ -1297,7 +1297,7 @@ pseudo_loop::recompute_PX(const Index4D &x, MType type) {
     switch(type) {
     case MType::L:
         for(int dp = x.j()-1; dp > std::max( x.i(), x.j()-MAXLOOP ); dp--) {
-            for (const auto c : CL->get_list(dp, x.k(), x.l())) {
+            for (const auto& c : CL->get_list(dp, x.k(), x.l())) {
 
                 int d = c.first;
 
@@ -1366,7 +1366,7 @@ pseudo_loop::recompute_PX(const Index4D &x, MType type) {
         break;
     case MType::O:
         for(int dp = x.l()-1; dp > std::max( x.k()-1, x.l()-MAXLOOP ); dp--) {
-            for (const auto c : CL->get_list(x.j(), x.k(), dp)) {
+            for (const auto& c : CL->get_list(x.j(), x.k(), dp)) {
                 int d = c.first;
 
                 if (d <= x.i() || (x.l() - dp + d - x.i()) > MAXLOOP)
