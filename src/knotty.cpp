@@ -1,4 +1,3 @@
-
 // a simple driver for Knotty
 // Hosna: base pair maximization version, Feb 9, 2014
 
@@ -6,6 +5,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <iostream>
+#include <ctime>
 
 // include the simfold header files
 #include "simfold.h"
@@ -26,71 +26,69 @@ int main (int argc, char *argv[])
 
     bool cmd_line_error = false;
     bool w = false;
+    bool print_time = false;
+
+    // Start measuring time
+    clock_t start_time = clock();
 
     // reading arguments
     if (argc < 2)
         cmd_line_error = true; // need at least 2 arguments (knotty and sequence)
     else
     {
-	// get sequence
+        // get sequence
         strcpy (sequence, argv[1]);
-	// important that this is before set_shape_file
+        // important that this is before set_shape_file
         cmd_line_options.set_sequence_length(strlen(sequence));
 
-	// addtional arguments
+        // addtional arguments
         if (argc > 2) {
             for (int i = 2; i < argc; ++i) {
                 char * arg = argv[i];
-
-		// -ns uses non-sparse version
-                if (!strcmp(arg, "-ns"))
+                if (!strcmp(arg, "-ns")) // -ns uses non-sparse version
                     cmd_line_options.set_use_sparse(false);
-                else
 
-		// ** The following arguments are primarily debug options **
-		// -ngc does not use garbage collection (sparse version only)
-                if (!strcmp(arg, "-ngc"))
+                // ** The following arguments are primarily debug options **
+                // -ngc does not use garbage collection (sparse version only)
+                else if (!strcmp(arg, "-ngc"))
                     cmd_line_options.set_use_garbage_collection(false);
-                else
-		// -w for web printing (used for web server)
-                if (!strcmp(arg, "-w"))
+                // -w for web printing (used for web server)
+                else if (!strcmp(arg, "-w")) 
                     w = true;
-                else
-		// -pta prints extra trace arrow info
-                if (!strcmp(arg, "-pta"))
+                // -pta prints extra trace arrow info
+                else if (!strcmp(arg, "-pta"))
                     cmd_line_options.set_print_trace_arrow_info(1);
-                else
-		// -pta-v prints even more verbose trace arrow info
-                if (!strcmp(arg, "-pta-v"))
+                // -pta-v prints even more verbose trace arrow info
+                else if (!strcmp(arg, "-pta-v"))
                     cmd_line_options.set_print_trace_arrow_info(2);
-                else
-		// -pcl print extra candidate list info
-                if (!strcmp(arg, "-pcl"))
+                // -pcl print extra candidate list info
+                else if (!strcmp(arg, "-pcl"))
                     cmd_line_options.set_print_candidate_list_info(1);
-                else
-		// -pcl-v prints even more verbose candidate list info
-                if (!strcmp(arg, "-pcl-v"))
+                // -pcl-v prints even more verbose candidate list info
+                else if (!strcmp(arg, "-pcl-v"))
                     cmd_line_options.set_print_candidate_list_info(2);
+                // -time prints the runtime of the program after completion
+                else if (!strcmp(arg, "-time")) {
+                    print_time = true;
+                }
                 else
-                    cmd_line_error = true; // argument is invalid
+                    cmd_line_error = true; 
             }
         }
     }
-
 
     if (cmd_line_error) {
         printf ("Usage: %s <sequence> <arguments>\n\n", argv[0]);
         printf ("Arguments are largely for debugging.\n");
         printf ("Valid arguments include: \n");
         printf ("-ns to use non-sparse version\n");
-        printf ("-ngc to not use garbage collection \n \n");
-
+        printf ("-ngc to not use garbage collection \n\n");
         printf ("-w to print only the result and energy\n");
         printf ("-pta to print information on the number of trace arrows\n");
         printf ("-pta-v to print verbose trace arrow information\n");
         printf ("-pcl to print information on the candidate lists\n");
         printf ("-pcl-v to print verbose candidate list information\n\n");
-
+        printf ("-time to print execution runtime\n\n");
         printf ("Example: %s GCAACGAUGACAUACAUCGCUAGUCGACGC \n", argv[0]);
         return -1;
     }
@@ -106,35 +104,51 @@ int main (int argc, char *argv[])
     strcpy (config_file, SIMFOLD_HOME "/params/multirnafold.conf");
 
     // what to fold: RNA or DNA
-    int dna_or_rna;
-    dna_or_rna = RNA;
+    int dna_or_rna = RNA;
 
     // temperature: any integer or real number between 0 and 100
     // represents degrees Celsius
     double temperature = 37.0;
-
 
     // initialize the thermodynamic parameters
     // call init_data only once for the same dna_or_rna and same temperature
     // if one of them changes, call init_data again
     init_data (argv[0], config_file, dna_or_rna, temperature);
 
-	// Hosna, July 18, 2012
+    // Hosna, July 18, 2012
 	// In simfold we have the following for RNA && temp=37
-	fill_data_structures_with_new_parameters (SIMFOLD_HOME "/params/turner_parameters_fm363_constrdangles.txt");
+    fill_data_structures_with_new_parameters (SIMFOLD_HOME "/params/turner_parameters_fm363_constrdangles.txt");
 
-	// Hosna, July 25, 2012
+    // Hosna, July 25, 2012
 	// in HotKnots and ComputeEnergy package the most up-to-date parameters set is DP09.txt
 	// so we add it here
-	fill_data_structures_with_new_parameters (SIMFOLD_HOME "/params/parameters_DP09.txt");
+    fill_data_structures_with_new_parameters (SIMFOLD_HOME "/params/parameters_DP09.txt");
 
-	energy = knotty(sequence, structure);
+    energy = knotty(sequence, structure);
+
+    // End measuring time
+    clock_t end_time = clock();
+    double runtime = (double)(end_time - start_time) / CLOCKS_PER_SEC;
 
     if (w) {
         printf ("%s %.2lf\n", structure, energy);
     } else {
         printf ("Seq: %s\n", sequence);
         printf ("RES: %s  %.2lf\n", structure, energy);
+    }
+
+    if (print_time) {
+        int hours = (int)(runtime / 3600);
+        int minutes = (int)(runtime / 60) % 60;
+        double seconds = runtime - (hours * 3600) - (minutes * 60);
+
+        if (runtime < 60) {
+            printf("Runtime: %.6f seconds\n", runtime);
+        } else if (runtime < 3600) {
+            printf("Runtime: %d minutes, %.6f seconds\n", minutes, seconds);
+        } else {
+            printf("Runtime: %d hours, %d minutes, %.6f seconds\n", hours, minutes, seconds);
+        }
     }
 
     return 0;
