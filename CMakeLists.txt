@@ -18,17 +18,14 @@ add_subdirectory(simfold)
 
 # build Knotty
 SET(SOURCE
-  h_externs.h h_globals.h h_struct.h
-  simple_map.h
-  cmd_line_options.h
-  W_final.h W_final.cpp
-  pseudo_loop.h pseudo_loop.cpp
-  V_final.h V_final.cpp
-  VM_final.h VM_final.cpp
-  h_common.h h_common.cpp
-  trace_arrow.h trace_arrow.cpp
-  candidate_list.h candidate_list.cpp
-  knotty.h knotty.cpp
+  src/W_final.cpp
+  src/pseudo_loop.cpp
+  src/V_final.cpp
+  src/VM_final.cpp
+  src/h_common.cpp
+  src/trace_arrow.cpp
+  src/candidate_list.cpp
+  src/knotty.cpp
 )
 
 # pass SIMFOLD_HOME to binary
