@@ -1,6 +1,0 @@
-/Users/mateo2/Documents/Code/Knotty/build/CMakeFiles/knotty.dir
-/Users/mateo2/Documents/Code/Knotty/build/CMakeFiles/edit_cache.dir
-/Users/mateo2/Documents/Code/Knotty/build/CMakeFiles/rebuild_cache.dir
-/Users/mateo2/Documents/Code/Knotty/build/simfold/CMakeFiles/simfold.dir
-/Users/mateo2/Documents/Code/Knotty/build/simfold/CMakeFiles/edit_cache.dir
-/Users/mateo2/Documents/Code/Knotty/build/simfold/CMakeFiles/rebuild_cache.dir
