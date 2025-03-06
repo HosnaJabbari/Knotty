@@ -4902,15 +4902,17 @@ void pseudo_loop::trace_continue(int i, int j, int k, int l, char srctype, energ
         case P_PLmloop0: trace_PLmloop0(i,j,k,l,e); return;
 
         case P_PRmloop1: trace_PRmloop1(i,j,k,l,e); return;
-        case P_PRmloop0: trace_PRmloop1(i,j,k,l,e); return;
+        case P_PRmloop0: trace_PRmloop0(i,j,k,l,e); return;
 
         case P_PMmloop1: trace_PMmloop1(i,j,k,l,e); return;
-        case P_PMmloop0: trace_PMmloop1(i,j,k,l,e); return;
+        case P_PMmloop0: trace_PMmloop0(i,j,k,l,e); return;
 
         case P_POmloop1: trace_POmloop1(i,j,k,l,e); return;
         case P_POmloop0: trace_POmloop0(i,j,k,l,e); return;
 
-        default: printf("continue_trace: source type switch statement failed type: %c\n",srctype); exit(-1);
+        default:
+            printf("continue_trace: source type switch statement failed type: %c (int: %d)\n", srctype, (int)srctype);
+        exit(-1);
     }
 }
 
