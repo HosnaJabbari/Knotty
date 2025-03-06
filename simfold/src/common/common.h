@@ -60,10 +60,9 @@ public:
 
     ~asymmetry_penalties_class() {}
   
-    inline PARAMTYPE get_asymmetry_penalty(int size1, char size2) {
+    inline PARAMTYPE get_asymmetry_penalty(int size1, int size2) {
         return arr[size1][size2];
     }
-
 };
 
 // external pointer to the object: create_asymmetry_penalties has to be called to create the object first
@@ -74,7 +73,7 @@ void create_asymmetry_penalties(int nb_nucleotides);
 
 inline PARAMTYPE asymmetry_penalty (int size1, int size2)
 {
-    return asymmetry_penalties->get_asymmetry_penalty(size1,size2);
+    return asymmetry_penalties->get_asymmetry_penalty(size1, size2);
 }
 
 #define asymmetry_penalty_enthalpy(size1, size2) (MIN (enthalpy_misc.asymmetry_penalty_max_correction, abs (size1-size2) * enthalpy_misc.asymmetry_penalty_array [MIN (2, MIN ((size1), (size2)))-1]))
