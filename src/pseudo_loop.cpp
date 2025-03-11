@@ -1024,6 +1024,7 @@ pseudo_loop::trace_PK(const Index4D &x, int e) {
     int j = x.j();
     int k = x.k();
     int l = x.l();
+    // printf("i: %i, j: %i, k: %i, l: %i, e: %e\n", i,j,k,l,e);
 
     int best_d = -1, best_branch=-1;
 
@@ -1076,13 +1077,15 @@ pseudo_loop::trace_PK(const Index4D &x, int e) {
 
     // continue trace with one of the recursion cases to PL,PM,PR,PO
     int best_tgt_energy = INF;
-    int best_tgt_type = -1;
+    char best_tgt_type = '\0';
     min_energy = INF;
 
-    for (auto type : {MType::L,MType::M, MType::R, MType::O} ) {
+    for (auto type : {MType::L, MType::M, MType::R, MType::O} ) {
         int px_e = recompute_PX(x, type);
         int pen = penalty(x, gamma2, type) + PB_penalty;
         int temp = px_e + pen;
+        // std::cerr << "Type: " << pid_by_mtype(type) << ", px_e: " << px_e
+        //       << ", pen: " << pen << ", temp: " << temp << std::endl;
         // std::cerr << "PX " << type << " " << x << ": " << temp << "+" << p
         //            << "=" << (temp + p) << std::endl;
         if (temp < min_energy) {
@@ -1091,7 +1094,6 @@ pseudo_loop::trace_PK(const Index4D &x, int e) {
             best_tgt_type = pid_by_mtype(type);
         }
     }
-
     //std::cerr<<"trace_PK assert "<<min_energy<<"+"<<best_penalty<<"=="<<e<<std::endl;
     assert(min_energy == e);
 
@@ -1241,7 +1243,8 @@ pseudo_loop::recompute_PX(const Index4D &x, MType type) {
     int temp;
     int min_energy = INF;
 
-    if (!can_pair(x.lend(type),x.rend(type))){
+    if (!can_pair(x.lend(type), x.rend(type))){
+        // printf("Cannot pair, returning infinity: left end: %i, right end: %i\n", x.lend(type), x.rend(type));
         return INF;
     }
 
