@@ -1,0 +1,39 @@
+package:
+  name: knotty
+  version: "1.0.0"
+
+source:
+  path: ..
+  # git_url: https://github.com/HosnaJabbari/Knotty.git
+  # git_rev: (latest tag)
+
+build:
+  number: 0
+
+requirements:
+  build:
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
+    - make
+    - cmake >=3.1
+  host:
+    - libstdcxx-ng    # [linux]
+    - libcxx          # [osx]
+  run:
+    - libstdcxx-ng    # [linux]
+    - libcxx          # [osx]
+
+about:
+  home: https://github.com/HosnaJabbari/Knotty
+  summary: "knotty summary"
+  description: |
+    Knotty description
+  dev_url: https://github.com/HosnaJabbari/Knotty
+
+extra:
+  recipe-maintainers:
+    - PointlessUser
+
+test:
+  commands:
+    - knotty --help
