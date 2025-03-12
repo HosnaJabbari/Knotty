@@ -865,26 +865,27 @@ void calculate_energies (double temp)
         formula (temp, tloop[i].energy, enthalpy_tloop[i].energy);
 }
 
+#define PATH_LENGTH 512
 //void init_data (char *config_file, int what, double temperature)
 void init_data(char *arg, char *config_file, int what, double temperature)
 // the function that must be called by the main program to read data files
 // PRE:  None
 // POST: Read all data and configuration files
 {
-    char stack_energy37_filename[200], loop_energy37_filename[200];
-    char tloop_energy37_filename[200], tstackh_energy37_filename[200];
-    char tstacki_energy37_filename[200], int11_energy37_filename[200];
-    char int21_energy37_filename[200], int22_energy37_filename[200];
-    char miscloop_energy37_filename[200], dangle_energy37_filename[200];
-    char triloop_energy37_filename[200];
+    char stack_energy37_filename[PATH_LENGTH], loop_energy37_filename[PATH_LENGTH];
+    char tloop_energy37_filename[PATH_LENGTH], tstackh_energy37_filename[PATH_LENGTH];
+    char tstacki_energy37_filename[PATH_LENGTH], int11_energy37_filename[PATH_LENGTH];
+    char int21_energy37_filename[PATH_LENGTH], int22_energy37_filename[PATH_LENGTH];
+    char miscloop_energy37_filename[PATH_LENGTH], dangle_energy37_filename[PATH_LENGTH];
+    char triloop_energy37_filename[PATH_LENGTH];
 
-    char stack_enthalpy_filename[200], loop_enthalpy_filename[200];
-    char tloop_enthalpy_filename[200], tstackh_enthalpy_filename[200];
-    char tstacki_enthalpy_filename[200], int11_enthalpy_filename[200];
-    char int21_enthalpy_filename[200], int22_enthalpy_filename[200];
-    char miscloop_enthalpy_filename[200], dangle_enthalpy_filename[200];
-    char triloop_enthalpy_filename[200];
-    char conf[200];
+    char stack_enthalpy_filename[PATH_LENGTH], loop_enthalpy_filename[PATH_LENGTH];
+    char tloop_enthalpy_filename[PATH_LENGTH], tstackh_enthalpy_filename[PATH_LENGTH];
+    char tstacki_enthalpy_filename[PATH_LENGTH], int11_enthalpy_filename[PATH_LENGTH];
+    char int21_enthalpy_filename[PATH_LENGTH], int22_enthalpy_filename[PATH_LENGTH];
+    char miscloop_enthalpy_filename[PATH_LENGTH], dangle_enthalpy_filename[PATH_LENGTH];
+    char triloop_enthalpy_filename[PATH_LENGTH];
+    char conf[PATH_LENGTH];
 
     // Added on Mar 19, 2008
     char special_hl_energy37_filename[1000];
@@ -895,9 +896,9 @@ void init_data(char *arg, char *config_file, int what, double temperature)
     int i, j, k, l, m, n, o, p, ip, jp;
     int len;
     int index;
-    char path[200];
+    char path[PATH_LENGTH];
     char separator;
-    char config_dir[200];
+    char config_dir[PATH_LENGTH];
 
     len = strlen(arg);
     index = -1;
