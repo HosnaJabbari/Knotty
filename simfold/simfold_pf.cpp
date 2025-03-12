@@ -13,6 +13,7 @@
 #include "constants.h"
 #include "params.h"
 #include "s_partition_function.h"
+#include "param_path.h"
 
 char sequence[MAXSLEN];
 char parameter_filename[500] = "";
@@ -93,8 +94,7 @@ int main (int argc, char *argv[])
     //     and to call the function init_data, which loads the thermodynamic parameters into memory
     
     // configuration file, the path should be relative to the location of this executable
-    char config_file[200];
-    strcpy (config_file, "params/multirnafold.conf");
+    char* config_file = getParamPath("multirnafold.conf");
 
     // what to fold: RNA or DNA
     int dna_or_rna;

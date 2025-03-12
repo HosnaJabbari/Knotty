@@ -23,6 +23,9 @@ requirements:
     - libstdcxx-ng    # [linux]
     - libcxx          # [osx]
 
+files:
+ - ../simfold/params/*
+
 about:
   home: https://github.com/HosnaJabbari/Knotty
   summary: "knotty summary"
