@@ -23,14 +23,22 @@ requirements:
     - libstdcxx-ng    # [linux]
     - libcxx          # [osx]
 
-files:
- - ../simfold/params/*
-
 about:
   home: https://github.com/HosnaJabbari/Knotty
-  summary: "knotty summary"
+  summary: "MFE-based RNA secondary structure prediction with pseudoknots."
   description: |
-    Knotty description
+    Knotty is a computational tool for predicting RNA secondary structures, 
+    including pseudoknotted configurations, using a Minimum Free Energy (MFE) 
+    approach. It allows users to input RNA sequences and receive predicted 
+    structural conformations optimized for thermodynamic stability.
+
+    The software is implemented in C++ and requires a C++11-compatible compiler 
+    along with CMake (≥3.1) for installation. Knotty is designed to run on Linux 
+    and macOS platforms and provides a command-line interface for flexible usage.
+
+    For installation, usage instructions, and additional details, visit:
+    https://github.com/HosnaJabbari/Knotty
+
   dev_url: https://github.com/HosnaJabbari/Knotty
 
 extra:
